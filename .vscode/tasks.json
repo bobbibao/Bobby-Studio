@@ -1,0 +1,78 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "workspace: open terminals",
+      "dependsOn": [
+        "terminal: frontend",
+        "terminal: server-api",
+        "terminal: worker"
+      ],
+      "dependsOrder": "parallel",
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "terminal: frontend",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "$Host.UI.RawUI.WindowTitle='frontend'; Clear-Host; Write-Host 'frontend'"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}\\frontend"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "workspace-terminals",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "terminal: server-api",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "$Host.UI.RawUI.WindowTitle='server-api'; Clear-Host; Write-Host 'server-api'"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}\\server-api"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "workspace-terminals",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "terminal: worker",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "$Host.UI.RawUI.WindowTitle='worker'; Clear-Host; Write-Host 'worker'"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}\\worker"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "workspace-terminals",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

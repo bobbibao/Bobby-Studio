@@ -1,0 +1,10 @@
+{
+    "javascript.preferences.importModuleSpecifier": "relative",
+    "python-envs.pythonProjects": [
+        {
+            "path": "python-model",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ],
+}
