@@ -1,0 +1,61 @@
+$color_1: white;
+$color_2: green;
+$background-color_1: white;
+$background-color_2: #111113;
+$color_dark: black;
+$color_light: white;
+
+$dark-mode: "body.chakra-ui-dark";
+
+.survey-form {
+  .chakra-radio {
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    background-color: $background-color_1;
+
+    #{$dark-mode} & {
+      color: $color_dark;
+    }
+  }
+
+  .chakra-radio[data-checked] {
+    background-color: $background-color_2;
+    color: $color_1;
+
+    .chakra-radio__control {
+      background-color: $background-color_2;
+      color: $color_1;
+    }
+
+    #{$dark-mode} & {
+      color: $color_light;
+    }
+  }
+
+  .chakra-radio__control {
+    display: none !important;
+  }
+
+  .chakra-radio__input {
+    &:checked {
+      + {
+        .chakra-radio__control {
+          + {
+            .chakra-radio__label {
+              + {
+                .checked-icon {
+                  &::before {
+                    content: "✔";
+                    font-size: 1.2rem;
+                    color: $color_2;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
