@@ -1,0 +1,393 @@
+/* styles.css */
+.css-s8t3bk[aria-checked='true'],
+.css-s8t3bk[data-checked],
+.css-s8t3bk[data-state='checked'] {
+  @apply !border-primary !bg-primary text-white;
+}
+.css-s8t3bk {
+  @apply dark:!border-[#2E2E2E];
+}
+
+/* Switch component styling - using pagination purple colors */
+.chakra-switch__track {
+  /* Unchecked state - light gray background */
+  background: #E0E0E0 !important;
+  border-color: #E0E0E0 !important;
+  transition: background-color 0.2s, border-color 0.2s !important;
+}
+
+.chakra-switch__track[data-checked],
+.chakra-switch__track[data-checked=""] {
+  /* Checked state - use purple matching pagination (#a26ef4) */
+  background: #a26ef4 !important;
+  border-color: #a26ef4 !important;
+}
+
+.chakra-switch__track[data-hover],
+.chakra-switch__track[data-hover=""] {
+  /* Hover state - slightly darker gray when unchecked */
+  background: #D0D0D0 !important;
+}
+
+.chakra-switch__track[data-checked][data-hover],
+.chakra-switch__track[data-checked=""][data-hover],
+.chakra-switch__track[data-checked=""][data-hover=""] {
+  /* Hover state when checked - slightly darker purple */
+  background: #9333ea !important;
+  border-color: #9333ea !important;
+}
+
+.chakra-switch__track[data-focus],
+.chakra-switch__track[data-focus=""] {
+  /* Focus state - add outline ring with purple */
+  box-shadow: 0 0 0 3px rgba(162, 110, 244, 0.2) !important;
+}
+
+/* Dark mode switch styling */
+body.chakra-ui-dark .chakra-switch__track {
+  /* Unchecked state in dark mode */
+  background: #2E2E2E !important;
+  border-color: #2E2E2E !important;
+}
+
+body.chakra-ui-dark .chakra-switch__track[data-checked],
+body.chakra-ui-dark .chakra-switch__track[data-checked=""] {
+  /* Checked state in dark mode - use purple matching pagination (#a26ef4) */
+  background: #a26ef4 !important;
+  border-color: #a26ef4 !important;
+}
+
+body.chakra-ui-dark .chakra-switch__track[data-hover],
+body.chakra-ui-dark .chakra-switch__track[data-hover=""] {
+  /* Hover state in dark mode when unchecked */
+  background: #3E3E3E !important;
+}
+
+body.chakra-ui-dark .chakra-switch__track[data-checked][data-hover],
+body.chakra-ui-dark .chakra-switch__track[data-checked=""][data-hover],
+body.chakra-ui-dark .chakra-switch__track[data-checked=""][data-hover=""] {
+  /* Hover state in dark mode when checked - slightly darker purple */
+  background: #9333ea !important;
+  border-color: #9333ea !important;
+}
+/* select placeholder */
+/* .chakra-select.css-161pkch {
+  @apply border border-[#E0E0E0] dark:border-[#2E2E2E] text-[#6C757D] dark:bg-[#0E0E0E];
+}
+
+.chakra-select__icon-wrapper.css-iohxn1 svg {
+  @apply dark:!text-white;
+} */
+
+input {
+  @apply border !border-[#E0E0E0] dark:!border-[#2E2E2E] text-[#6C757D] dark:bg-[#0E0E0E];
+}
+
+.css-b62m3t-container {
+  @apply max-w-[220px] flex-1 w-auto;
+}
+
+.layout-columns-2 {
+  columns: 2;
+  column-gap: 5px;
+  column-fill: balance;
+}
+
+.layout-columns-3 {
+  columns: 3;
+  column-gap: 8px;
+  column-fill: balance;
+}
+
+.layout-columns-4 {
+  columns: 4;
+  column-gap: 8px;
+  column-fill: balance;
+}
+
+@media (max-width: 1024px) {
+  .layout-columns-4 {
+    columns: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-columns-3,
+  .layout-columns-4 {
+    columns: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .layout-columns-3,
+  .layout-columns-4 {
+    columns: 1;
+  }
+}
+
+/* Ensure images in column layout break properly and fill width */
+.layout-columns-2 > * {
+  display: block !important;
+  width: 100%;
+  break-inside: avoid;
+  margin: 0 0 5px 0 !important;
+  padding: 0 !important;
+}
+
+.layout-columns-3 > *,
+.layout-columns-4 > * {
+  display: block !important;
+  width: 100%;
+  break-inside: avoid;
+  margin: 0 0 8px 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure child elements don't add extra spacing */
+.layout-columns-2 > * > *,
+.layout-columns-3 > * > *,
+.layout-columns-4 > * > * {
+  margin: 0 !important;
+  display: block !important;
+}
+
+/* Auth background grid spacing */
+div.layout-columns-2[data-no-spacing="true"] {
+  column-fill: auto !important;
+}
+
+div.layout-columns-2[data-no-spacing="true"] > * {
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  vertical-align: top !important;
+}
+
+/* Auth page scrolling animation */
+@keyframes authScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(calc(-1 * var(--scroll-distance, 0px)));
+  }
+}
+
+.auth-scroll-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.auth-scroll-animation {
+  display: flex;
+  flex-direction: column;
+  animation-name: authScroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: var(--scroll-duration, 60s);
+  will-change: transform;
+}
+
+.auth-scroll-section {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* Make sure images scale to fill their containers */
+.layout-columns-2 .chakra-image,
+.layout-columns-3 .chakra-image,
+.layout-columns-4 .chakra-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+body.chakra-ui-dark {
+  background-color: #1e1e1e;
+
+  .chakra-checkbox__control[data-checked] {
+    color: #fff !important;
+  }
+
+  .chakra-alert[data-status='success'] {
+    @apply dark:bg-[#198754] text-[#FFFFFF];
+  }
+  .chakra-alert[data-status='loading'] {
+    @apply dark:bg-[#198754] text-[#FFFFFF];
+  }
+
+  .chakra-alert[data-status='error'] {
+    @apply dark:bg-[#DF4958] text-[#FFFFFF];
+  }
+
+  .chakra-alert__icon {
+    color: #ffffff;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.066) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.066) 1px, transparent 1px),
+      linear-gradient(to right, rgba(255, 255, 255, 0.033) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.033) 1px, transparent 1px);
+    background-size:
+      60px 60px,
+      60px 60px,
+      15px 15px,
+      15px 15px;
+    background-position:
+      -1px -1px,
+      -1px -1px,
+      -1px -1px,
+      -1px -1px;
+    background-attachment: local;
+  }
+
+  .gradient-cover {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0.75) 100%);
+    width: 100%;
+  }
+}
+
+body.chakra-ui-light {
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size:
+      60px 60px,
+      60px 60px,
+      15px 15px,
+      15px 15px;
+    background-position:
+      -1px -1px,
+      -1px -1px,
+      -1px -1px,
+      -1px -1px;
+    background-attachment: local;
+  }
+
+  .gradient-cover {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.5) 75%, rgba(0, 0, 0, 0.75) 100%);
+    width: 100%;
+  }
+}
+
+/* Canvas scrollbars */
+.canvas-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--chakra-colors-zinc-700) transparent;
+}
+
+.canvas-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.canvas-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.canvas-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--chakra-colors-zinc-600);
+  border-radius: 8px;
+  border: 2px solid transparent;
+}
+
+body.chakra-ui-dark .canvas-scroll::-webkit-scrollbar-track {
+  background: #090909;
+}
+
+body.chakra-ui-dark .canvas-scroll::-webkit-scrollbar-thumb {
+  background-color: #27272a;
+}
+
+body.chakra-ui-light .canvas-scroll::-webkit-scrollbar-track {
+  background: #f4f4f5;
+}
+
+body.chakra-ui-light .canvas-scroll::-webkit-scrollbar-thumb {
+  background-color: #a1a1aa;
+}
+
+.chakra-checkbox__control[data-checked] {
+  background: #5b21b6 !important;
+  border-color: #5b21b6 !important;
+}
+
+.checkbox-inspiration .chakra-checkbox__control {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.checkbox-project .chakra-checkbox__control {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.checkbox-project .chakra-checkbox__control[data-checked] {
+  background: #5b21b6 !important;
+}
+
+.css-tj5bde-Svg {
+  @apply dark:text-white;
+}
+
+.chakra-accordion__item.css-17mg6aq {
+  @apply border-t-0;
+}
+
+.chakra-accordion__button.css-uttm9k {
+  @apply hover:bg-[unset];
+}
+
+/* Textarea resize handle styling */
+.chakra-textarea[resize="vertical"],
+.chakra-textarea[resize="both"] {
+  resize: vertical;
+}
+
+.chakra-textarea[resize="vertical"]::-webkit-resizer,
+.chakra-textarea[resize="both"]::-webkit-resizer {
+  border-width: 0 0 16px 16px;
+  border-style: solid;
+  border-color: transparent transparent #a1a1aa transparent;
+  background: transparent;
+  cursor: ns-resize;
+}
+
+.chakra-textarea[resize="vertical"]:hover::-webkit-resizer,
+.chakra-textarea[resize="both"]:hover::-webkit-resizer {
+  border-color: transparent transparent #71717a transparent;
+}
+
+body.chakra-ui-dark .chakra-textarea[resize="vertical"]::-webkit-resizer,
+body.chakra-ui-dark .chakra-textarea[resize="both"]::-webkit-resizer {
+  border-color: transparent transparent #52525b transparent;
+}
+
+body.chakra-ui-dark .chakra-textarea[resize="vertical"]:hover::-webkit-resizer,
+body.chakra-ui-dark .chakra-textarea[resize="both"]:hover::-webkit-resizer {
+  border-color: transparent transparent #71717a transparent;
+}
+
+/* Hide resize handle icon for canvas textareas (but keep resize functionality) */
+.canvas-textarea-no-resizer::-webkit-resizer {
+  opacity: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: ns-resize;
+}
