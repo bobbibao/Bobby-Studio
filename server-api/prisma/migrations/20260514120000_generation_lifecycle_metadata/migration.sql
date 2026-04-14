@@ -1,0 +1,37 @@
+ALTER TABLE "ImageRequest"
+  ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "ImageJob"
+  ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS "startedAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "completedAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "cancelledAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "payload" JSONB;
+
+UPDATE "ImageRequest"
+SET status = CASE LOWER(status)
+  WHEN 'pending' THEN 'PENDING'
+  WHEN 'queued' THEN 'QUEUED'
+  WHEN 'waiting' THEN 'QUEUED'
+  WHEN 'processing' THEN 'PROCESSING'
+  WHEN 'active' THEN 'PROCESSING'
+  WHEN 'progress' THEN 'PROCESSING'
+  WHEN 'completed' THEN 'COMPLETED'
+  WHEN 'failed' THEN 'FAILED'
+  WHEN 'cancelled' THEN 'CANCELLED'
+  ELSE UPPER(status)
+END;
+
+UPDATE "ImageJob"
+SET status = CASE LOWER(status)
+  WHEN 'pending' THEN 'PENDING'
+  WHEN 'queued' THEN 'QUEUED'
+  WHEN 'waiting' THEN 'QUEUED'
+  WHEN 'processing' THEN 'PROCESSING'
+  WHEN 'active' THEN 'PROCESSING'
+  WHEN 'progress' THEN 'PROCESSING'
+  WHEN 'completed' THEN 'COMPLETED'
+  WHEN 'failed' THEN 'FAILED'
+  WHEN 'cancelled' THEN 'CANCELLED'
+  ELSE UPPER(status)
+END;

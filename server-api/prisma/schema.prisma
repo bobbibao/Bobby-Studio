@@ -1,0 +1,420 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  email               String
+  password            String
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  profileType         String?
+  role                String?
+  isAdmin             Boolean              @default(false)
+  emailVerified       Boolean              @default(false)
+  surveyCompletedAt   DateTime?
+  language            String?              @default("English")
+  passwordUpdatedAt   DateTime?
+  stripeCustomerId    String?              @unique
+  teamId              String?
+  freeCredit          Int                  @default(100)
+  usedFreeCredit      Int                  @default(0)
+  freeCreditRenewalAt DateTime?
+  paidCredit          Int                  @default(0)
+  usedPaidCredit      Int                  @default(0)
+  paidCreditRenewalAt DateTime?
+  Bookmark            Bookmark[]
+  Favorite            Favorite[]
+  feedbacks           Feedback[]
+  invoices            Invoice[]
+  notifications       Notification[]
+  roles               Role[]
+  ownedTeams          Team?
+  teamMembers         TeamMember[]
+  usages              Usage[]
+  privacySettings     UserPrivacySettings?
+  isActive             Boolean? @default(true)
+  deactivatedAt        DateTime?
+  lastLogin            DateTime?
+}
+
+model UserPrivacySettings {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  dataProcessing  Boolean  @default(false)
+  newsletter      Boolean  @default(false)
+  termsAccepted   Boolean  @default(false)
+  privacyAccepted Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model Team {
+  id        String       @id @default(uuid())
+  name      String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  ownerId   String       @unique
+  owner     User         @relation(fields: [ownerId], references: [id])
+  members   TeamMember[]
+}
+
+model TeamMember {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String
+  teamId     String
+  role       String?
+  credit     Int      @default(0)
+  usedCredit Int      @default(0)
+  team       Team     @relation(fields: [teamId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, teamId])
+}
+
+model PersonalProfile {
+  userId         String   @id
+  firstName      String
+  lastName       String
+  jobTitle       String
+  phoneNumber    String
+  pictureProfile String?
+  streetAddress  String?
+  postalCode     String?
+  country        String?
+  countryCode    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model CompanyProfile {
+  userId                     String   @id
+  name                       String
+  type                       String
+  size                       Int
+  email                      String
+  website                    String?
+  country                    String?
+  countryCode                String?
+  postalCode                 String
+  city                       String?
+  cityCode                   String?
+  state                      String?
+  stateCode                  String?
+  streetAddress              String
+  pictureProfile             String?
+  billingAddress             String
+  billingContactName         String
+  billingEmailAddress        String
+  businessRegistrationNumber String
+  companyDescription         String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+  vatNumber                  String
+  
+}
+
+model UserSurvey {
+  userId String @id @default(uuid())
+  survey Json
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  actions   Action[]
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Action {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  roleId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  role        Role     @relation(fields: [roleId], references: [id])
+  policy      Policy?
+}
+
+model Policy {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  conditions  Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  actionId    String   @unique
+  action      Action   @relation(fields: [actionId], references: [id])
+}
+
+model AttraibuteType {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  schema      Json
+}
+
+model UserAttribute {
+  userId      String
+  attributeId String
+
+  @@id([userId, attributeId])
+}
+
+model AttributeVersion {
+  id          String  @id
+  version     String
+  isActive    Boolean @default(true)
+  isPublished Boolean @default(false)
+
+  @@index([id, version, isActive, isPublished])
+}
+
+model Attribute {
+  id              String
+  version         String
+  jobId           String?
+  batchEditId     String?
+  type            String?
+  value           Json?
+  actions         Json?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  previousVersion String?
+  Bookmark        Bookmark[]
+  Favorite        Favorite[]
+  Feedback        Feedback[]
+
+  @@id([id, version])
+  @@index([jobId])
+  @@index([batchEditId])
+  @@index([type, id, version])
+  @@index([createdAt(sort: Desc), id(sort: Desc)])
+  @@index([batchEditId, createdAt, id])
+}
+
+model CurrentAttribute {
+  id              String   @id @default(uuid())
+  version         String
+  previousVersion String?
+  type            String
+  value           Json
+  actions         Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model UserConfigurations {
+  userId      String
+  attributeId String
+  version     String
+  value       Json
+  actions     Json
+  createdAt   DateTime
+
+  @@id([userId, attributeId])
+}
+
+model Environment {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  userId         String
+  subscriptionId String
+  amount         Float
+  status         String
+  billingDate    DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+model Usage {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  type        String
+  amount      Int
+  freeAmount  Int      @default(0)
+  paidAmount  Int      @default(0)
+  description String?
+  resourceId  String?
+  metadata    Json?
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  type      String
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id          String    @id @default(uuid())
+  attributeId String
+  version     String
+  userId      String
+  type        String
+  categories  String[]
+  comment     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  attribute   Attribute @relation(fields: [attributeId, version], references: [id, version])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([attributeId, version, userId])
+}
+
+model Favorite {
+  id               String    @id @default(uuid())
+  userId           String
+  attributeId      String
+  attributeVersion String
+  createdAt        DateTime  @default(now())
+  attribute        Attribute @relation(fields: [attributeId, attributeVersion], references: [id, version])
+  user             User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, attributeId, attributeVersion])
+  @@index([userId, attributeId, attributeVersion])
+}
+
+model Bookmark {
+  id               String    @id @default(uuid())
+  userId           String
+  attributeId      String
+  attributeVersion String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  attribute        Attribute @relation(fields: [attributeId, attributeVersion], references: [id, version])
+  user             User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, attributeId, attributeVersion])
+  @@index([userId, attributeId, attributeVersion])
+}
+
+model ImageRequest {
+  id         String     @id @default(uuid())
+  userId     String
+  method     String
+  parameters Json
+  status     String     @default("PENDING")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  jobs       ImageJob[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ImageJob {
+  id          String       @id @default(uuid())
+  requestId   String
+  modelName   String
+  provider    String
+  status      String       @default("QUEUED")
+  payload     Json?
+  error       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  startedAt   DateTime?
+  completedAt DateTime?
+  cancelledAt DateTime?
+  request     ImageRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model CreditSystem {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  modelName String
+  quality   String
+  credits   Int
+  createdAt DateTime @default(now())
+}
+
+model Model {
+  id          String                @id
+  provider    String
+  displayName String
+  connectorFunction String?
+  description String?
+  status      ModelStatus           @default(active)
+  sortOrder   Int                   @default(0)
+  metadata    Json?
+  pricing     Json?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  entitlements ModelPlanEntitlement[]
+
+  @@index([status])
+  @@index([sortOrder])
+}
+
+model ModelPlanEntitlement {
+  id                String   @id @default(uuid())
+  modelId           String
+  plan              PlanType
+  enabled           Boolean  @default(true)
+  allowedResolutions String[]
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  model             Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@unique([modelId, plan])
+  @@index([plan])
+  @@index([enabled])
+}
+
+model Config{
+  id              String   @id @default(uuid())
+  configKey       String?   @unique
+  configValue     String?
+  createdAt       DateTime? @default(now())
+  updatedAt       DateTime? @updatedAt
+}
+enum PlanType {
+  FREE
+  BASIC
+  PRO
+  TEAM3
+  TEAM5
+}
+
+enum ModelStatus {
+  active
+  disabled
+}
