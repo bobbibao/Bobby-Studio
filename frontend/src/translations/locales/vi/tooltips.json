@@ -1,0 +1,11 @@
+{
+  "creation_type": "Chọn nội thất hoặc ngoại thất. Đây hoạt động như một bộ lọc để AI có thể hiểu rõ hơn loại không gian bạn muốn trực quan hóa.",
+  "input_type": "Chọn loại đầu vào bạn muốn sử dụng:\n\nBản phác thảo: Bạn có bản phác thảo tay hoặc bản vẽ CAD để sử dụng làm tham chiếu.\n\nMô hình 3D: Bạn có mô hình 3D xuất từ CAD để sử dụng làm tham chiếu.\n\nPrompt văn bản: Bạn muốn tạo hình ảnh thuần túy từ mô tả văn bản.\n\nTham khảo: Bạn muốn tạo hình ảnh mới dựa trên hình ảnh tham chiếu hiện có.",
+  "prompt": "Mô tả những gì bạn muốn tạo bằng câu đầy đủ, không phải chỉ từ khóa.",
+  "select_style": "Chọn phong cách bạn muốn hình ảnh của bạn xuất hiện – ví dụ hiện đại, Bắc Âu, cổ điển hoặc tối giản.",
+  "settings": "Điều chỉnh cách mạnh mẽ AI xem xét các phần tử cụ thể:\n\nĐầu vào: Xác định hình ảnh hoặc mô hình được tải lên của bạn ảnh hưởng đến việc tạo bao nhiêu. (Chỉ áp dụng cho các mô hình nhất định.)\n\nPhong cách: Kiểm soát cách thế nào phong cách được chọn xuất hiện trong kết quả. (Chỉ áp dụng cho các mô hình nhất định.)\n\nSáng tạo: Đây là hạt – một giá trị bắt đầu ngẫu nhiên kiểm soát biến thể sáng tạo.\n\nHạt giống = đầu ra tương tự; hạt mới = ý tưởng mới.",
+  "edit_mode": "Chọn loại chỉnh sửa bạn muốn áp dụng cho hình ảnh của bạn",
+  "edit_params": "Điều chỉnh các tham số cụ thể cho thao tác chỉnh sửa được chọn",
+  "model_selector": "Chọn mô hình AI để sử dụng cho việc tạo. Các mô hình khác nhau xuất sắc ở các phong cách và chất lượng khác nhau",
+  "pro_mode": "Bạn có quyền truy cập để chọn mô hình AI nào được sử dụng để tạo hoặc chỉnh sửa hình ảnh. Nếu PRO được tắt, hệ thống sẽ tự động chọn mô hình tốt nhất cho bạn."
+}

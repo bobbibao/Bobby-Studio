@@ -1,0 +1,11 @@
+{
+  "creation_type": "Select exterior or interior. This acts as a filter so the AI can better understand which type of space you want to visualize.",
+  "input_type": "Choose the type of input you want to use:\n\nLine Drawing: You have a hand sketch or CAD line drawing to use as reference.\n\n3D Model: You have a CAD-exported 3D model to use as reference.\n\nText Prompt: You want to generate images purely from text descriptions.\n\nReference: You want to create new images based on an existing reference image.",
+  "prompt": "Describe what you want to create using full sentences, not just keywords.",
+  "select_style": "Select the style in which you want your images to appear – for example modern, Scandinavian, classic, or minimalistic.",
+  "settings": "Adjust how strongly the AI considers specific elements:\n\nInput: Defines how much your uploaded image or model influences the generation. (Applies only to certain models.)\n\nStyle: Controls how dominant the selected style appears in the result. (Applies only to certain models.)\n\nCreative: This is the seed – a random starting value that controls creative variation.\n\nSame seed = similar outputs; new seed = new ideas.",
+  "edit_mode": "Select the type of edit you want to apply to your image",
+  "edit_params": "Adjust parameters specific to the selected edit operation",
+  "model_selector": "Select the AI model to use for generation. Different models excel at different styles and qualities",
+  "pro_mode": "You gain access to choose which AI models are used for image generation or image editing. If PRO is turned off, the system will automatically select the best model for you."
+}

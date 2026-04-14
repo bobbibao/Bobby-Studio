@@ -1,0 +1,11 @@
+{
+  "creation_type": "Wählen Sie zwischen Aussen- oder Innenbereich. Diese Auswahl dient als Filter, damit die KI besser versteht, welchen Raumtyp Sie visualisieren möchten.",
+  "input_type": "Wählen Sie, welche Art von Eingabe Sie verwenden möchten:\n\nStrichzeichnung: Sie haben eine Handskizze oder Strichzeichnung aus dem CAD, die Sie als Referenz verwenden möchten.\n\n3D-Modell: Sie haben ein 3D-Modell aus dem CAD exportiert, das als Referenz dient.\n\nText-Prompt: Sie möchten Bilder rein aus Textbeschreibungen erzeugen.\n\nReferenz: Sie möchten neue Bilder anhand eines Referenzbildes erstellen.",
+  "prompt": "Beschreiben Sie, was Sie erstellen möchten, in vollständigen Sätzen anstatt nur Stichworten.",
+  "select_style": "Wählen Sie den Stil, in dem Ihre Bilder dargestellt werden sollen – zum Beispiel modern, skandinavisch, klassisch oder minimalistisch.",
+  "settings": "Passen Sie an, wie stark die KI bestimmte Elemente berücksichtigt:\n\nEingabe: Legt fest, wie stark Ihr hochgeladenes Bild oder Modell in die Generierung einfliesst. (Wirkt nur bei bestimmten Modellen.)\n\nStil: Bestimmt, wie dominant der gewählte Stil im Ergebnis erscheint. (Wirkt nur bei bestimmten Modellen.)\n\nKreativ: Dies ist der sogenannte Seed – eine zufällige Startnummer, welche die kreative Variation steuert.\n\nGleicher Seed = ähnliche Ergebnisse; neuer Seed = neue Ideen.",
+  "edit_mode": "Wählen Sie den Bearbeitungstyp aus, den Sie auf Ihr Bild anwenden möchten",
+  "edit_params": "Passen Sie die Parameter für die ausgewählte Bearbeitungsoperation an",
+  "model_selector": "Wählen Sie das KI-Modell für die Generierung. Verschiedene Modelle zeichnen sich durch unterschiedliche Stile und Qualitäten aus",
+  "pro_mode": "Sie erhalten die Auswahl, welche KI-Modelle für die Bilderzeugung oder Bildbearbeitung verwendet werden sollen. Wenn Sie PRO deaktivieren, wählt das System automatisch das beste Modell für Sie aus."
+}

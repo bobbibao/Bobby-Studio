@@ -1,0 +1,20 @@
+{
+  "what_would_you_like_to_create": "Tools erkunden",
+  "what_would_you_like_to_create_today": "Was möchten Sie heute erstellen?",
+  "explore_tools": "Tools entdecken",
+  "line_drawing_to_image_description": "Verwandeln Sie Architekturskizzen in detaillierte Visualisierungen. Wandeln Sie handgezeichnete Pläne oder digitale Umrisse in realistische Renderings um und bewahren Sie dabei die ursprüngliche Designabsicht.",
+  "text_to_image_description": "Erstellen Sie Architekturvisualisierungen mit beschreibendem Text. Geben Sie Ihr Designkonzept, Ihre Materialien und Ihre Umgebung ein, um hochwertige Bilder zu erstellen, die Ihrer Vision entsprechen.",
+  "image_to_image_description": "Generieren Sie neue Architekturbilder, inspiriert von Ihrem Referenzfoto. Erstellen Sie Variationen mit ähnlicher Designsprache und entdecken Sie dabei verschiedene Stile und Kompositionen.",
+  "upscaling_description": "Erhöhen Sie die Auflösung und verbessern Sie Details von Architekturbildern. Schärfen Sie Merkmale und verbessern Sie die Klarheit ohne Verzerrungen, um Visualisierungen für Präsentationen und Druck vorzubereiten.",
+  "edit_image_description": "Nehmen Sie gezielte Änderungen an Architekturvisualisierungen vor. Ändern Sie Materialien, passen Sie die Beleuchtung an oder verändern Sie bestimmte Elemente, ohne die Gesamtbildkonsistenz zu beeinträchtigen.",
+  "elevation_description": "Verwandeln Sie 2D-Ansichtszeichnungen in fotorealistische Visualisierungen. Laden Sie Ihre technischen Fassadenpläne hoch und lassen Sie KI detaillierte Architekturdarstellungen mit präzisen Materialien und Proportionen erstellen.",
+  "custom_styles_description": "Eigene Designstile hochladen und auf Visualisierungen anwenden.",
+  "image_to_animation_description": "Verwandeln Sie Visualisierungen in dynamische, animierte Videos.",
+  "expand_image_borders_description": "Bilder über Grenzen erweitern – mit KI-generiertem, nahtlosem Kontext.",
+  "remove_objects_description": "Unerwünschte Objekte intelligent entfernen – für perfekte Visualisierungen.",
+  "replace_objects_description": "Tauschen Sie Objekte, ergänzen Sie Elemente oder modifizieren Sie Bildteile.",
+  "change_season_description": "Verwandeln Sie die Jahreszeit Ihrer Visualisierung – von Sommer zu Winter.",
+  "change_time_of_day_description": "Passen Sie die Tageszeit an, um verschiedene Lichtverhältnisse zu präsentieren.",
+  "change_facade_colors_description": "Erstellen Sie Farbvarianten für Fassaden – automatisch und in Echtzeit.",
+  "optimize_quality_description": "Optimieren Sie Bildqualität und Schärfe – für professionelle Präsentationen."
+}

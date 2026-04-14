@@ -1,0 +1,8 @@
+{
+  "num_inference_steps": "Số bước",
+  "guidance_scale": "Mức hướng dẫn",
+  "generation_time": "Thời gian tạo",
+  "image_size": "Kích thước hình ảnh",
+  "not_available": "Không có sẵn",
+  "ai_model": "Mô hình AI"
+}
