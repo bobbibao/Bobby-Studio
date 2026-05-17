@@ -1,0 +1,316 @@
+$color_1: white;
+$color_2: #1b2559;
+$color_3: #b0bbd5;
+$color_4: #4318ff;
+$color_5: #7551ff;
+$font-family_1: "DM Sans", sans-serif;
+$background-color_1: transparent;
+$background-color_2: #4318ff;
+$background-color_3: unset;
+$background-color_4: #f4f7fe;
+$background-color_5: #7551ff;
+$background-color_6: rgba(255, 255, 255, 0.1);
+
+@import "https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap";
+/* LIGHT MODE + GENERAL */
+/* DARK MODE */
+.react-calendar {
+  border: unset;
+  background-color: $background-color_1;
+  font-family: $font-family_1;
+}
+
+.react-calendar__navigation__prev2-button {
+  display: none;
+}
+
+.react-calendar__navigation__next2-button {
+  display: none;
+}
+
+.react-calendar__navigation {
+  align-items: center;
+}
+
+abbr[title] {
+  border-bottom: none;
+  -webkit-text-decoration: unset;
+  text-decoration: unset;
+  -webkit-text-decoration: unset;
+  -webkit-text-decoration: unset;
+  text-decoration: unset !important;
+}
+
+.react-calendar__navigation__prev-button {
+  background-color: $background-color_2 !important;
+  border-radius: 10px;
+  min-width: 34px !important;
+  height: 34px !important;
+  color: $color_1;
+}
+
+.react-calendar__navigation__next-button {
+  background-color: $background-color_2 !important;
+  border-radius: 10px;
+  min-width: 34px !important;
+  width: 34px !important;
+  height: 34px !important;
+  color: $color_1;
+}
+
+.react-calendar__navigation__label {
+  font-weight: 700 !important;
+  font-size: 18px;
+
+  &:hover {
+    background-color: $background-color_3 !important;
+    border-radius: 10px;
+  }
+
+  &:focus {
+    background-color: $background-color_3 !important;
+    border-radius: 10px;
+  }
+}
+
+.react-calendar__tile {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px !important;
+  height: 34px !important;
+  color: $color_2;
+}
+
+.react-calendar__month-view__weekdays {
+  background-color: $background-color_4;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+.react-calendar__tile--now {
+  background-color: $background-color_4;
+  border-radius: 10px;
+
+  &:enabled {
+    &:hover {
+      background-color: $background-color_4;
+      border-radius: 10px;
+    }
+
+    &:focus {
+      background-color: $background-color_4;
+      border-radius: 10px;
+    }
+  }
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: $color_3;
+}
+
+.react-calendar__tile--active {
+  background: #4318ff;
+  border-radius: 10px;
+  color: $color_1;
+
+  &:enabled {
+    &:hover {
+      background: #4318ff;
+      border-radius: 10px;
+      color: $color_1;
+    }
+
+    &:focus {
+      background: #4318ff;
+      border-radius: 10px;
+      color: $color_1;
+    }
+  }
+}
+
+.react-calendar__tile--range {
+  background: #f4f7fe;
+  color: $color_4;
+  border-radius: 0px;
+
+  &:enabled {
+    &:hover {
+      background: #f4f7fe;
+      color: $color_4;
+      border-radius: 0px;
+    }
+
+    &:focus {
+      background: #f4f7fe;
+      color: $color_4;
+      border-radius: 0px;
+    }
+  }
+}
+
+.react-calendar__tile--rangeStart {
+  background: #4318ff;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  color: $color_1;
+
+  &:enabled {
+    &:hover {
+      background: #4318ff;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+      color: $color_1;
+    }
+
+    &:focus {
+      background: #4318ff;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+      color: $color_1;
+    }
+  }
+}
+
+.react-calendar__tile--rangeEnd {
+  background: #4318ff;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  color: $color_1;
+
+  &:enabled {
+    &:hover {
+      background: #4318ff;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      color: $color_1;
+    }
+
+    &:focus {
+      background: #4318ff;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+      color: $color_1;
+    }
+  }
+}
+
+body.chakra-ui-dark {
+  .react-calendar {
+    border-radius: 30px;
+  }
+
+  .react-calendar__navigation__prev-button {
+    background-color: $background-color_5 !important;
+  }
+
+  .react-calendar__navigation__next-button {
+    background-color: $background-color_5 !important;
+    color: $color_1;
+  }
+
+  .react-calendar__tile {
+    color: $color_1;
+
+    &:enabled {
+      &:hover {
+        background-color: $background-color_6;
+      }
+
+      &:focus {
+        background-color: $background-color_6;
+      }
+    }
+  }
+
+  .react-calendar__month-view__weekdays {
+    background-color: $background-color_6;
+  }
+
+  .react-calendar__tile--now {
+    background-color: $background-color_6;
+
+    &:enabled {
+      &:hover {
+        background-color: $background-color_6;
+      }
+
+      &:focus {
+        background-color: $background-color_6;
+      }
+    }
+  }
+
+  .react-calendar__month-view__days__day--neighboringMonth {
+    color: $color_3;
+  }
+
+  .react-calendar__tile--active {
+    background: #7551ff;
+    color: $color_1;
+
+    &:enabled {
+      &:hover {
+        background: #7551ff;
+        color: $color_1;
+      }
+
+      &:focus {
+        background: #7551ff;
+        color: $color_1;
+      }
+    }
+  }
+
+  .react-calendar__tile--range {
+    background: rgba(255, 255, 255, 0.1);
+    color: $color_5;
+
+    &:enabled {
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: $color_5;
+      }
+
+      &:focus {
+        background: rgba(255, 255, 255, 0.1);
+        color: $color_5;
+      }
+    }
+  }
+
+  .react-calendar__tile--rangeStart {
+    background: #7551ff;
+    color: $color_1;
+
+    &:enabled {
+      &:hover {
+        background: #7551ff;
+        color: $color_1;
+      }
+
+      &:focus {
+        background: #7551ff;
+        color: $color_1;
+      }
+    }
+  }
+
+  .react-calendar__tile--rangeEnd {
+    background: #7551ff;
+    color: $color_1;
+
+    &:enabled {
+      &:hover {
+        background: #7551ff;
+        color: $color_1;
+      }
+
+      &:focus {
+        background: #7551ff;
+        color: $color_1;
+      }
+    }
+  }
+}
