@@ -1,0 +1,332 @@
+project_name: React ERP Frontend Architecture
+framework: React 18 + TypeScript
+description: |
+  Reusable architecture patterns extracted from Vue ERP app.
+  Designed for scalable React feature-based development.
+
+# Folder Structure
+structure:
+  src:
+    - app/              # Entry point, providers, theme
+    - features/         # Feature modules (domain-driven)
+    - shared/           # Cross-feature utilities
+    - services/         # Global API, auth, i18n
+    - hooks/            # Custom React hooks
+    - types/            # Global TypeScript types
+    - config/           # Constants & configuration
+    - styles/           # Global SCSS/CSS
+    - routes/           # Route definitions
+
+# API Architecture
+api:
+  pattern: "Feature-scoped API clients + React Query"
+  structure:
+    - features/[feature]/api/endpoints.ts    # API endpoints
+    - features/[feature]/api/client.ts       # Axios client class
+    - features/[feature]/api/hooks.ts        # React Query hooks
+  request_flow:
+    - Interceptor attaches JWT bearer token
+    - Request sent to /api/[resource]
+    - Response mapped from API contract
+  response_format:
+    - error: boolean
+    - payload?: T
+    - message?: string
+  pagination:
+    - current_page, items, total_items, total_pages, page_size
+  error_handling:
+    - 401 Unauthorized: Auto-refresh token, retry
+    - Network error: Show offline state
+    - Other errors: Show toast + log
+  retry_strategy:
+    - On 401: Auto-refresh + retry original request
+    - On 500: Retry with exponential backoff (3 times)
+    - On network error: Optional user retry
+
+# Auth Flow
+auth:
+  storage: localStorage
+  tokens: [access_token, refresh_token]
+  login_flow:
+    1. POST /login with credentials
+    2. Receive access_token + refresh_token + user
+    3. Save both tokens to localStorage
+    4. Update auth store (Zustand)
+  protected_routes:
+    - Route wrapper checks isAuthenticated
+    - Redirects to /login if not authenticated
+  token_refresh:
+    - Triggered on 401 response
+    - POST /refresh with refresh_token
+    - Save new access_token
+    - Retry original request
+  logout:
+    - Call GET /logout
+    - Clear localStorage
+    - Reset auth store
+    - Redirect to /login
+  startup_verification:
+    - On app mount, run VERIFY_AUTH action
+    - Validates token and loads user data
+
+# State Management
+state:
+  server_state:
+    - Tool: TanStack Query (React Query)
+    - Purpose: Cache API responses, sync server state
+    - Config: staleTime=5min, cacheTime=30min
+  auth_state:
+    - Tool: Zustand (single global store)
+    - Fields: user, isAuthenticated, isLoading, error
+    - Methods: login, logout, verifyAuth
+  feature_state:
+    - Tool: Zustand (feature-scoped, optional)
+    - Purpose: Complex feature-local state
+    - Rule: Avoid if possible; prefer React hooks
+  ui_state:
+    - Tool: React hooks (useState)
+    - Purpose: UI toggles, form state, filters
+    - Rule: Keep local to component
+
+# i18n Strategy
+i18n:
+  tool: react-i18next
+  structure:
+    - locales/en.ts
+    - locales/de.ts
+    - locales/es.ts
+    - locales/[more]
+  key_organization:
+    - menu: navigation labels
+    - button: action buttons
+    - title: page/dialog titles
+    - message: success/error messages
+    - form: form labels and placeholders
+  key_naming: "menu.offers, button.create, message.deleteSuccess"
+  locale_storage: localStorage['language'] || 'de'
+  lazy_loading: false (keep all locales in memory)
+
+# Component Architecture
+components:
+  atomic_design:
+    atoms:
+      - ui primitives (Button, Input, Badge)
+      - location: shared/components/ui/atoms/
+      - rule: No business logic, feature-agnostic
+    molecules:
+      - compound ui (Form, Modal, Card)
+      - location: features/[feature]/components/molecules/ OR shared/
+      - rule: Combine atoms, minimal state
+    organisms:
+      - complex sections (Table, Panel, Header)
+      - location: features/[feature]/components/organisms/
+      - rule: Consume hooks, business logic, one per feature
+    pages:
+      - route components (OfferList, OfferDetail)
+      - location: features/[feature]/pages/
+      - rule: Layout, use organisms + hooks
+
+  naming:
+    - Component: PascalCase (OfferTable.tsx)
+    - Hook: camelCase + use prefix (useOffers.ts)
+    - Utility: camelCase (formatDate.ts)
+    - Type: PascalCase (Offer.ts)
+    - Constant: UPPER_SNAKE_CASE (OFFER_STATUS.ts)
+
+  best_practices:
+    - One component per file
+    - Max 3 levels of nesting (atoms -> molecules -> organisms)
+    - Props validation with TypeScript
+    - Use React.memo for expensive components
+    - Lazy load pages with React.lazy
+    - Error boundaries around feature sections
+
+# Feature Structure Template
+feature_structure: |
+  features/offers/
+    api/
+      endpoints.ts       # export const OFFERS_ENDPOINTS
+      client.ts          # export class OffersApiClient
+      hooks.ts           # export function useOffers()
+      index.ts           # re-export all
+    components/
+      atoms/             # Checkbox, Badge
+      molecules/         # FilterForm, SearchInput
+      organisms/         # OffersTable, OfferPanel
+      index.ts           # re-export
+    pages/
+      OfferList.tsx      # Main list page (route component)
+      OfferDetail.tsx    # Detail page (route component)
+      index.ts
+    hooks/               # Feature-local hooks only
+      useOfferFilters.ts
+      useOfferForm.ts
+    types/
+      offer.ts           # Offer interface
+      offer.dto.ts       # CreateOfferDTO, UpdateOfferDTO
+      index.ts           # re-export all
+    constants/
+      endpoints.ts       # Already in api/
+      config.ts          # Feature defaults
+    store/               # Optional, if complex state
+      offerStore.ts      # Zustand store
+    index.ts             # Entry point for feature
+
+# Import Rules
+import_rules:
+  allowed:
+    - Feature → Shared (e.g., @/shared/components, @/shared/hooks)
+    - Feature → Services (e.g., @/services/api/client, @/services/auth)
+    - Feature → Types (e.g., @/types/api, @/types/entities)
+    - Feature → Config (e.g., @/config/api)
+  forbidden:
+    - Feature A → Feature B (e.g., projects imports from offers)
+    - Shared → Feature (e.g., shared component imports from feature)
+    - Circular imports
+
+# Query Parameter Handling
+query_params:
+  pattern: "URL search params for pagination/filters"
+  usage:
+    - page: current page number
+    - page_size: items per page
+    - search: search query
+    - sort: column sort (e.g., 'name:asc')
+    - status: filter by status
+  sync_to_url: "Yes, use useSearchParams()"
+  preserve_on_navigation: "Yes, maintain filter state on back"
+
+# Form Handling
+forms:
+  library: react-hook-form
+  validation: zod or yup
+  pattern: "Uncontrolled form with validation schema"
+  dto_pattern: |
+    export interface CreateOfferDTO { name: string; customerId: number; }
+    export interface UpdateOfferDTO extends CreateOfferDTO { id: number; }
+    export interface OfferFormData extends CreateOfferDTO { /* local state */ }
+
+# Data Table Pattern
+tables:
+  library: TanStack Table (react-table)
+  features:
+    - Sorting
+    - Filtering
+    - Pagination
+    - Row selection (for bulk actions)
+    - Expandable rows (for details)
+  pattern: "Column-based definition, reusable DataTable component"
+  bulk_actions: "Multi-select + toolbar (edit, delete, export)"
+
+# Error Handling
+error_handling:
+  api_errors:
+    - 401: Auto-refresh token + retry
+    - 403: Show permission denied message
+    - 404: Show not found message
+    - 500: Show server error + option to retry
+    - Network: Show offline message
+  ui_feedback:
+    - Success: Toast notification
+    - Error: Toast notification + optional fallback UI
+    - Loading: Spinner or skeleton screen
+    - Validation: Inline field error + submit button disabled
+
+# Performance Optimization
+performance:
+  rules:
+    - Use TanStack Query staleTime to avoid constant refetches
+    - Memoize expensive components with React.memo
+    - Lazy load feature pages with React.lazy
+    - Code split per feature route
+    - Debounce search/filter inputs
+    - Virtualize large lists (if >100 items)
+  query_cache:
+    - staleTime: 5 min (default)
+    - gcTime (cacheTime): 30 min
+    - refetchOnWindowFocus: true (configurable)
+
+# Development Workflow
+development:
+  setup:
+    1. npm install
+    2. Setup .env file with API_URL
+    3. Start dev server (npm run dev)
+  file_structure:
+    - Always export from index.ts files
+    - Group related files together
+    - One component per file (except atoms)
+  linting:
+    - ESLint + Prettier
+    - Enforce consistent formatting
+    - No console.logs in production
+  testing:
+    - Unit tests for utils, hooks, types
+    - Integration tests for API + UI
+    - E2E tests for critical flows
+
+# Migration from Vue
+vue_to_react:
+  router: "Vue Router → React Router v6"
+  state_management: "Vuex → Zustand + React Query"
+  components: "Vue SFC → React TSX"
+  hooks: "Vue computed/watch → React hooks"
+  styling: "SCSS/Tailwind → CSS modules / Tailwind"
+  api_service: "axios Vue plugin → standalone axios + hooks"
+  i18n: "vue-i18n → react-i18next"
+  keep_patterns:
+    - Feature-based organization
+    - API endpoint definitions
+    - DTO/Response types structure
+    - Auth flow patterns
+
+# Key Dependencies
+dependencies:
+  core:
+    - react: ^18
+    - react-dom: ^18
+    - react-router-dom: ^6
+    - typescript: ^5
+  data_fetching:
+    - "@tanstack/react-query": ^5
+    - axios: ^1
+  state_management:
+    - zustand: ^4
+  forms:
+    - react-hook-form: ^7
+    - zod: ^3 (validation)
+  ui:
+    - react-toastify: (toast notifications)
+    - (your UI library: shadcn/ui, MUI, etc.)
+  i18n:
+    - react-i18next: ^12
+    - i18next: ^23
+  development:
+    - "@types/react": ^18
+    - "@types/react-dom": ^18
+    - eslint: ^8
+    - prettier: ^3
+
+# AI Refactoring Notes
+ai_refactoring:
+  context:
+    - Always maintain feature isolation
+    - Validate import paths before refactoring
+    - Run lint after changes
+    - Check query key consistency
+  patterns_to_maintain:
+    - Endpoint → Client → Hooks → Component flow
+    - Feature api/hooks.ts for all data operations
+    - Zustand stores at feature or auth level only
+    - Type exports from feature types/index.ts
+  common_tasks:
+    - Adding new feature: Copy offers/ template, rename
+    - Adding new API endpoint: Update endpoints.ts + client.ts + hooks.ts
+    - Adding form: Create useForm hook + validation schema
+    - Adding table: Use TanStack Table pattern
+    - Moving component: Update all import paths
+  validation:
+    - ESLint should pass (npm run lint)
+    - No import errors (check relative paths)
+    - Types should be correct (npm run type-check)
+    - React Query keys should be unique per entity
