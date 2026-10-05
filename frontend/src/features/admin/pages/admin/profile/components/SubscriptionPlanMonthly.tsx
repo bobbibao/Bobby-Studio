@@ -9,8 +9,8 @@ import { ComparisonTable } from '@/features/admin/pages/admin/profile/components
 import { useSubscriptionData } from '@/features/admin/pages/admin/profile/hooks/useSubscriptionData';
 import { SUBSCRIPTION_PLANS, CREDIT_EXCHANGE_RATES } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
 import { useTranslation } from 'react-i18next';
-import { StripePricingResponseDTO } from '@/types/stripePricingResponse.dto';
-import { Price } from '@/types/price';
+import { StripePricingResponseDTO } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
+import { Price } from '@/features/admin/pages/admin/profile/types/price';
 import { FreePlanCallout } from './FreePlanCallout';
 import { CreditPacksSection } from './CreditPacksSection';
 

@@ -4,6 +4,8 @@ import { Button, ButtonProps, useColorModeValue } from '@chakra-ui/react';
 interface FilterButtonProps extends ButtonProps {
   isActive?: boolean;
   label: string;
+  /** Forwarded to the rendered element when `as` is a router link. */
+  to?: string;
 }
 
 export const FilterButton: React.FC<FilterButtonProps> = ({ isActive = false, label, ...props }) => {

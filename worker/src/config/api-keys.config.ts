@@ -46,7 +46,7 @@ export class ApiKeysConfig {
   }
 
   get pythonModelBaseUrl(): string {
-    return this.configService.get<string>('BOBBY_AI_API_URL', 'https://genimageapi.dpdns.org');
+    return this.configService.get<string>('BOBBY_AI_API_URL', '');
   }
 
   get pythonModelTimeout(): number {

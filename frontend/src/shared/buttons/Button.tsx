@@ -13,6 +13,7 @@ interface ButtonProps {
   iconPosition?: 'before' | 'after';
   className?: string;
   type?: 'button' | 'submit';
+  style?: React.CSSProperties;
 }
 
 const Button: React.FC<ButtonProps> = ({

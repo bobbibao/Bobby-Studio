@@ -134,7 +134,7 @@ const SdxlStudio: React.FC = () => {
   const [img2imgStrength, setImg2imgStrength] = useState(0.55);
   const [queueStats, setQueueStats] = useState<SdxlQueueStats | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState<number | null>(null);
-  const { generate, cancel, latestResult, progress, submittedAt, isGenerating, error } = useSdxlGeneration();
+  const { generate, cancel, latestResult, submittedAt, isGenerating, error } = useSdxlGeneration();
 
   const panelBg = useColorModeValue('white', 'zinc.900');
   const softBg = useColorModeValue('zinc.50', 'zinc.950');
@@ -637,7 +637,7 @@ const SdxlStudio: React.FC = () => {
           <Box>
             <Text fontWeight="bold">Ready to visualize your design?</Text>
             <Text color="text.muted" fontSize="sm">
-              {progress.status === 'active' || progress.status === 'progress'
+              {isGenerating
                 ? `Generating${elapsedSeconds ? ` for ${elapsedSeconds}s` : ''}`
                 : 'Your design will be processed and ready in moments.'}
             </Text>

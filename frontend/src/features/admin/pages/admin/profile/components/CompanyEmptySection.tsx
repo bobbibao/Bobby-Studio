@@ -18,7 +18,7 @@ const CompanyEmptySection: React.FC<CompanyEmptySectionProps> = ({ onAction }) =
   const buttonHoverBg = useColorModeValue('zinc.800', 'zinc.100');
   
   return (
-    <Box display="flex" flexDirection="column" align="center" justify="center" h="calc(100vh - 210px)">
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" h="calc(100vh - 210px)">
       <VStack spacing={4} textAlign="center">
         {/* Icon */}
         <Box p={4} bg={iconBg} borderRadius="xl">

@@ -1,4 +1,4 @@
-import { ImageSize } from '@/types/image';
+import { ImageSize } from '@/features/admin/pages/admin/inspiration/types/image';
 
 export const getAllImageSizes = (): string[] => {
   return Object.values(ImageSize);

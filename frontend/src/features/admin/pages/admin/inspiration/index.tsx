@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import FilterModal from '@/features/admin/pages/admin/inspiration/components/FilterDialog/FilterDialog';
 import { ChevronDownIcon } from 'lucide-react';
 import { InputTypeEnum } from '@/constants/attribute-enum';
-import { FilterState } from '@/types/filterDropdown';
+import { FilterState } from '@/features/admin/pages/admin/inspiration/types/filterDropdown';
 import { PaginationType } from '@/types/pagination';
 import { useImageNavigation } from '@/hooks/useImageNavigation';
 import CustomDragPreview from '@/features/admin/pages/admin/project/components/CustomDragPreview';
@@ -464,13 +464,12 @@ const Inspiration: React.FC = () => {
 
         <AnimatePresence mode="wait">
           {!isLoading && userImages.length > 0 && showPagination && (
-            <Box
-              as={motion.div}
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, ease: 'easeInOut' }}
-              w="100%"
+              style={{ width: '100%' }}
             >
               <Box p={4} w="full">
                 <Pagination
@@ -482,7 +481,7 @@ const Inspiration: React.FC = () => {
                   changePage={(page: number) => changePage(page)}
                 />
               </Box>
-            </Box>
+            </motion.div>
           )}
         </AnimatePresence>
       </VStack>

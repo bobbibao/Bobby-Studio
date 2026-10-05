@@ -3,8 +3,6 @@ import {
   getUserImageHistory,
   getUserImageHistoryDetail,
   GetUserImageHistoryQueryParams,
-  GetUserImageHistoryResponse,
-  UserImageHistoryItem
 } from '@/features/user';
 
 // Query key factory

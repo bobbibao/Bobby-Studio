@@ -2,8 +2,6 @@ import { Box, IconButton, Image, Menu, MenuButton, MenuItem, MenuList, Text, use
 import React, { useEffect } from 'react';
 import imagePlaceholder from '../../assets/img/layout/image-placeholder.png';
 import ThreeDotIcon from '../icons/ThreeDotIcon';
-import { ActionEntity, ProjectAttributeEntity } from '@/common/dtos/attribute/common.dto';
-import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import { relativeTimeFormat } from '../../utils/time';
 import { useTranslation } from 'react-i18next';
 import ImagesIcon from '../icons/ImagesIcon';
@@ -23,8 +21,8 @@ export interface CardDataProps {
 
 interface CardProjectProps {
   data: CardDataProps;
-  onEdit?: (project: UserAttributeEntity<ProjectAttributeEntity, ActionEntity>) => void;
-  onDelete?: (project: UserAttributeEntity<ProjectAttributeEntity, ActionEntity>) => void;
+  onEdit?: (project: CardDataProps) => void;
+  onDelete?: (project: CardDataProps) => void;
   onClick?: () => void;
 }
 

@@ -1,6 +1,6 @@
 import { useColorMode } from "@chakra-ui/react";
 
-const ThreeDotIcon = ({ isHovered }: { isHovered: boolean }) => {
+const ThreeDotIcon = ({ isHovered = false }: { isHovered?: boolean }) => {
   const { colorMode } = useColorMode();
   const fillColor = isHovered ? "#ffffff" : colorMode === "light" ? "#6C757D" : "#ffffff"; // Brighter when hovered
   return (

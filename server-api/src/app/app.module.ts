@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
@@ -33,56 +32,41 @@ import { EntitlementModule } from '../modules/entitlement/entitlement.module';
 import { ModelCatalogModule } from '../modules/model-catalog/model-catalog.module';
 import { AuthController } from '../modules/auth/auth.controller';
 import { AdminModule } from '../modules/admin/admin.module';
-import { isRedisConfigured } from 'src/shared/utils/env.utils';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { RuntimeConfigModule } from '../config/runtime-config.module';
+import { HealthModule } from '../modules/health/health.module';
 
-const redisEnabled = isRedisConfigured();
-const cacheModule = redisEnabled
-  ? CacheModule.registerAsync({
-      isGlobal: true,
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('REDIS_HOST'),
-        port: configService.get('REDIS_PORT'),
-        password: configService.get('REDIS_PASSWORD'),
-        db: configService.get('REDIS_DB', 0),
-        ttl: 300, // 5 minutes default
-      }),
-      inject: [ConfigService],
-    })
-  : CacheModule.register({
-      isGlobal: true,
-      ttl: 300,
-    });
-
-const queueModules = redisEnabled
-  ? [ImageGenerationModule]
-  : [];
+const cacheModule = CacheModule.registerAsync({
+  isGlobal: true,
+  useFactory: async (configService: ConfigService) => ({
+    store: redisStore,
+    host: configService.get('REDIS_HOST'),
+    port: configService.get('REDIS_PORT'),
+    password: configService.get('REDIS_PASSWORD'),
+    db: configService.get('REDIS_DB', 0),
+    ttl: 300, // 5 minutes default
+  }),
+  inject: [ConfigService],
+});
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
-    }),
+    RuntimeConfigModule,
+    HealthModule,
     cacheModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ...(redisEnabled
-      ? [
-          BullModule.forRoot({
-            connection: {
-              host: process.env.REDIS_HOST,
-              port: parseInt(process.env.REDIS_PORT),
-              lazyConnect: true,
-            },
-          }),
-        ]
-      : []),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT, 10),
+        password: process.env.REDIS_PASSWORD || undefined,
+        db: parseInt(process.env.REDIS_DB || '0', 10),
+        lazyConnect: true,
+      },
+    }),
     UserModule,
     NotificationModule,
     SubscriptionModule,
@@ -100,7 +84,7 @@ const queueModules = redisEnabled
     EntitlementModule,
     ModelCatalogModule,
     AdminModule,
-    ...queueModules,
+    ImageGenerationModule,
   ],
   controllers: [AppController, AuthController, UserController],
   providers: [AppService, PrismaService, JwtService, ConfigurationService, ConfigurationRepository],

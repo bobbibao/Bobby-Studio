@@ -14,14 +14,24 @@ import {
 import { QUEUE_NAMES } from './shared/constants/queue.constants';
 import { RedisService } from './services/redis.service';
 import { FileLogger } from './services/file-logger.service';
-
-const CONCURRENCY = process.env.WORKER_CONCURRENCY
-  ? parseInt(process.env.WORKER_CONCURRENCY)
-  : 4;
+import { ConfigError, loadWorkerConfig } from './config/worker-config';
+import { startHealthServer } from './health/health-server';
 
 async function bootstrap() {
-  const environment = process.env.NODE_ENV || 'development';
-  const isDeploymentEnvironment = ['staging', 'production'].includes(environment);
+  let workerConfig: ReturnType<typeof loadWorkerConfig>;
+  try {
+    workerConfig = loadWorkerConfig();
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      // Field names and reasons only; values are never printed.
+      console.error(error.message);
+      process.exit(1);
+    }
+    throw error;
+  }
+  const CONCURRENCY = workerConfig.concurrency;
+  const isDeploymentEnvironment = workerConfig.isDeployed;
+  let shuttingDown = false;
   const logger: LoggerService = isDeploymentEnvironment
     ? new FileLogger()
     : new Logger('WorkerBootstrap');
@@ -41,13 +51,7 @@ async function bootstrap() {
 
     logger.log('Worker application context created successfully');
 
-    if (!redisConfig.isEnabled) {
-      logger.warn('REDIS_HOST/REDIS_PORT missing or placeholder. Workers are disabled for local dev.');
-      setInterval(() => {
-        logger.debug('Worker idle (Redis disabled)');
-      }, 5 * 60 * 1000);
-      return;
-    }
+    const healthServer = startHealthServer(workerConfig, () => shuttingDown);
 
     const imageWorker = new Worker(
       QUEUE_NAMES.IMAGE_GENERATION,
@@ -109,7 +113,7 @@ async function bootstrap() {
               delay: 2000,
             },
             delay: 0,
-            jobId: `${result.jobId}:post-process`,
+            jobId: `${result.jobId}-post-process`,
             removeOnComplete: true,
             removeOnFail: true,
           });
@@ -123,7 +127,7 @@ async function bootstrap() {
       },
       {
         connection: redisConfig.connectionConfig,
-        concurrency: Math.max(2, Math.min(4, CONCURRENCY)),
+        concurrency: CONCURRENCY,
         removeOnComplete: { age: 24 * 60 * 60, count: 100 },
         removeOnFail: { age: 24 * 60 * 60, count: 100 },
       },
@@ -243,8 +247,10 @@ async function bootstrap() {
 
     const gracefulShutdown = async (signal: string) => {
       logger.log(`Received ${signal}, shutting down gracefully...`);
+      shuttingDown = true;
 
       try {
+        healthServer.close();
         await Promise.all([
           imageWorker.close(),
           postProcessingWorker.close(),
@@ -275,7 +281,7 @@ async function bootstrap() {
     logger.log('Bobby Worker started successfully');
     logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.log(`Queues: ${QUEUE_NAMES.IMAGE_GENERATION}, ${QUEUE_NAMES.IMAGE_POST_PROCESSING}`);
-    logger.log(`Concurrency: Image=${Math.max(2, Math.min(4, CONCURRENCY))}, PostProcessing=6`);
+    logger.log(`Concurrency: Image=${CONCURRENCY}, PostProcessing=6`);
   } catch (error) {
     logger.error(`Failed to start worker: ${error.message}`, error.stack);
     process.exit(1);

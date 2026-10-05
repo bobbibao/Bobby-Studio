@@ -320,13 +320,12 @@ const Favorite: React.FC = () => {
 
               <AnimatePresence mode="wait">
                 {allImages.length > 0 && showPagination && (
-                  <Box
-                    as={motion.div}
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4, ease: 'easeInOut' }}
-                    w="100%"
+                    style={{ width: '100%' }}
                   >
                     <Box py={4} w="full">
                       <Pagination
@@ -338,7 +337,7 @@ const Favorite: React.FC = () => {
                         changePage={(page: number) => changePage(page)}
                       />
                     </Box>
-                  </Box>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </Box>

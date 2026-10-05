@@ -1,9 +1,14 @@
 /// <reference types='vitest' />
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import * as path from "node:path";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  // Production bundles must never be able to talk to a local Auth Emulator.
+  if (mode === 'production' && loadEnv(mode, __dirname, 'VITE_').VITE_FIREBASE_AUTH_EMULATOR_URL) {
+    throw new Error('VITE_FIREBASE_AUTH_EMULATOR_URL must not be set for production builds.');
+  }
+  return {
   root: __dirname,
   server: {
     port: 4200,
@@ -29,6 +34,10 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "assets"),
     },
   },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+  },
   define: {
     global: "globalThis",
   },
@@ -41,4 +50,5 @@ export default defineConfig({
       },
     },
   },
+};
 });

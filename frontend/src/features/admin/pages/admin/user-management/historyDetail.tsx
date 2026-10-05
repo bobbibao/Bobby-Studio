@@ -26,6 +26,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserImageHistoryDetail } from '@/hooks/useUserHistory';
+import { UserImageHistoryDetail } from '@/features/user';
 import ChevronLeftIcon from '@/shared/icons/ChevronLeftIcon';
 import { imageConstants } from '@/constants/image.constants';
 
@@ -59,12 +60,12 @@ const UserHistoryDetail: React.FC = () => {
     return values.map(value => getModelLabel(value, 'edit')).join(', ');
   };
 
-  const getModelDisplay = () => {
-    const models = data.selectedModels || data.selectedEditingModels;
+  const getModelDisplay = (detail: UserImageHistoryDetail) => {
+    const models = detail.selectedModels || detail.selectedEditingModels;
     if (Array.isArray(models)) {
       return getModelLabelsEdit(models);
     }
-    return getModelLabel(data.model, "generate");
+    return detail.model ? getModelLabel(detail.model, 'generate') : '-';
   };
 
   if (!id) {
@@ -132,6 +133,10 @@ const UserHistoryDetail: React.FC = () => {
     );
   }
 
+  // Local consts keep the narrowing available inside the click handlers below.
+  const referenceImages = data.referenceImages;
+  const resultImages = data.imagePath;
+
   return (
     <Box pt={4} pb={0} px={4} h="100%" overflowY="hidden" display="flex" flexDirection="column" gap={5}>
       {/* Header with Back Button and Title */}
@@ -182,7 +187,7 @@ const UserHistoryDetail: React.FC = () => {
               </Box>
               <Box>
                 <Text fontWeight="medium" color={mutedTextColor}>{t('usermanagement:model')}:</Text>
-                <Text color="text.primary" ml={2}>{getModelDisplay()}</Text>
+                <Text color="text.primary" ml={2}>{getModelDisplay(data)}</Text>
               </Box>
               <Box>
                 <Text fontWeight="medium" color={mutedTextColor}>{t('usermanagement:created_at')}:</Text>
@@ -216,17 +221,17 @@ const UserHistoryDetail: React.FC = () => {
         )}
 
         {/* Images */}
-        {(data.referenceImages || data.imagePath) && (
+        {(referenceImages || resultImages) && (
           <Card bg="bg.surface" borderColor={borderColor} borderRadius="lg">
             <CardBody>
               <Heading size="md" mb={4} color="text.primary">{t('usermanagement:images')}</Heading>
               <VStack align="start" spacing={4}>
-                {data.referenceImages && (
+                {referenceImages && (
                   <Box w="full">
                     <Text fontWeight="medium" color={mutedTextColor} mb={2}>{t('usermanagement:reference_images')}:</Text>
                     <HStack spacing={4} wrap="wrap">
-                      {Array.isArray(data.referenceImages) ? (
-                        data.referenceImages.map((image, index) => (
+                      {Array.isArray(referenceImages) ? (
+                        referenceImages.map((image, index) => (
                           <Image 
                             key={index} 
                             src={image} 
@@ -241,25 +246,25 @@ const UserHistoryDetail: React.FC = () => {
                         ))
                       ) : (
                         <Image 
-                          src={data.referenceImages} 
+                          src={referenceImages} 
                           alt="Reference" 
                           maxW="200px" 
                           maxH="200px" 
                           borderRadius="md"
                           cursor="pointer"
-                          onClick={() => handleImageClick(data.referenceImages)}
+                          onClick={() => handleImageClick(referenceImages)}
                           _hover={{ opacity: 0.8 }}
                         />
                       )}
                     </HStack>
                   </Box>
                 )}
-                {data.imagePath && (
+                {resultImages && (
                   <Box w="full">
                     <Text fontWeight="medium" color={mutedTextColor} mb={2}>{t('usermanagement:result_images')}:</Text>
                     <HStack spacing={4} wrap="wrap">
-                      {Array.isArray(data.imagePath) ? (
-                        data.imagePath.map((image, index) => (
+                      {Array.isArray(resultImages) ? (
+                        resultImages.map((image, index) => (
                           <Image 
                             key={index} 
                             src={image} 
@@ -274,13 +279,13 @@ const UserHistoryDetail: React.FC = () => {
                         ))
                       ) : (
                         <Image 
-                          src={data.imagePath} 
+                          src={resultImages} 
                           alt="Result" 
                           maxW="350px" 
                           maxH="350px" 
                           borderRadius="md"
                           cursor="pointer"
-                          onClick={() => handleImageClick(data.imagePath)}
+                          onClick={() => handleImageClick(resultImages)}
                           _hover={{ opacity: 0.8 }}
                         />
                       )}

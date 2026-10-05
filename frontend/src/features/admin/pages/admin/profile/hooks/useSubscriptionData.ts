@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getCurrentSubscription, getPrices } from '@/features/user';
 import { mapApiResponseToPrice, Price, PlanView } from '@/features/admin/pages/admin/profile/types/price';
-import { SubscriptionResponseDtoV2 } from '@/types/subscriptionResponse.dto';
-import { StripePricingResponseDTO } from '@/types/stripePricingResponse.dto';
+import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
+import { StripePricingResponseDTO } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
 import { set } from 'lodash';
 
 interface UseSubscriptionDataProps {

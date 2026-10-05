@@ -6,7 +6,7 @@ export const uploadImage = async (
   message: string;
   imgUrl: string;
 } | null> => {
-  const response = await uploadWithClient('/upload/image', file);
-  return response.data as { message: string; imgUrl: string } | null;
+  const response = await uploadWithClient<{ message: string; imgUrl: string } | null>('/upload/image', file);
+  return response.data;
 };
 

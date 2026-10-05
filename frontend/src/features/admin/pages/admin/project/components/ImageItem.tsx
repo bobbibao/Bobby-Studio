@@ -3,8 +3,9 @@ import Button from '@/shared/buttons/Button';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { useState, useEffect, useMemo, type MouseEvent } from 'react';
-import { ImageData } from '../@/types';
-import { ActionEntity } from '@/common/dtos/attribute/common.dto';
+import { ImageData } from '@/types';
+import { ActionEntity, GeneratedImageAttributeEntity, OriginalImageAttributeEntity } from '@/common/dtos/attribute/common.dto';
+import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import imagePlaceholder from '@/assets/img/layout/image-placeholder.png';
 import ThreeDotIconVertical from '@/shared/icons/ThreeDotIconVertical';
 import HeartFillIcon from '@/shared/icons/HeartFillIcon';
@@ -25,8 +26,12 @@ import { ImageNavigationArrows } from '@/components/ImageNavigationArrows';
 import ImageInfoOverlay from '@/components/ImageInfoOverlay';
 import { collectModelLabels, extractPromptFromSources, getEditVersionLabel } from '@/utils/imageMeta';
 
+type ImageWithAttribute = ImageData & {
+  matchedAttribute?: UserAttributeEntity<OriginalImageAttributeEntity | GeneratedImageAttributeEntity, ActionEntity>;
+};
+
 const ImageItem: React.FC<{
-  img: ImageData;
+  img: ImageWithAttribute;
   isFavorite?: boolean;
   isBookmarked?: boolean;
   matchedAttribute?: any;
@@ -38,7 +43,7 @@ const ImageItem: React.FC<{
   handleOnClick?: () => void;
   onModalClose?: () => void;
   // Navigation props for image grid navigation
-  allImages?: ImageData[];
+  allImages?: ImageWithAttribute[];
   currentImageIndex?: number;
   onNavigationPrevious?: () => void;
   onNavigationNext?: () => void;
