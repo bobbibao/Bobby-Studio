@@ -6,7 +6,7 @@ import Sidebar from '@/shared/sidebar';
 import { RouteConfig } from '@/types';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNavbarHeading } from '../../slices/navbar';
-import { Box } from '@chakra-ui/react';
+import { Box, useBreakpointValue } from '@chakra-ui/react';
 // import { setNavbarHeading } from '@/slices/navbar';
 import Generate from '@/features/generation';
 import { useUserMode } from '@/common/context/useUserModeContext';
@@ -27,6 +27,8 @@ const Admin: React.FC<AdminProps> = (props) => {
   const { user } = useSelector(selectCurrentUser);
 
   const [open, setOpen] = useState<boolean>(false);
+  // Below the md breakpoint the sidebar is an overlay opened from the navbar, not a permanent rail.
+  const isMobile = useBreakpointValue({ base: true, md: false }) ?? false;
 
   useEffect(() => {
     const handleResize = () => {
@@ -119,7 +121,12 @@ const Admin: React.FC<AdminProps> = (props) => {
   return (
     <Box bg="bg.subtle" display="flex" h="100vh" overflow="hidden">
       {/* Sidebar - hidden in workspace mode */}
-      {!isWorkspace && <Sidebar open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)} />}
+      {!isWorkspace && isMobile && open && (
+        <Box position="fixed" inset={0} zIndex={55} bg="blackAlpha.500" onClick={() => setOpen(false)} aria-hidden />
+      )}
+      {!isWorkspace && (
+        <Sidebar open={open} mobile={isMobile} onOpen={() => setOpen(true)} onClose={() => setOpen(false)} />
+      )}
 
       <Box 
         display="flex" 
@@ -128,7 +135,7 @@ const Admin: React.FC<AdminProps> = (props) => {
         h="100vh" 
         transition="all 0.3s" 
         overflow="hidden" 
-        ml={isWorkspace ? 0 : open ? '200px' : '64px'}
+        ml={isWorkspace || isMobile ? 0 : open ? '200px' : '64px'}
       >
         {/* Navbar - hidden in workspace mode */}
         {!isWorkspace && <Navbar onOpenSidenav={() => setOpen(true)} {...props} />}
