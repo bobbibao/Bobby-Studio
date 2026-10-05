@@ -28,7 +28,7 @@ export class AppService {
       stripe_api_key: { key: 'STRIPE_API_KEY', maskLength: 10 },
       database_url: { key: 'DATABASE_URL', maskLength: 12 },
       shadow_database_url: { key: 'SHADOW_DATABASE_URL', maskLength: 12 },
-      msg: { key: '', maskLength: 0 }, // Không cần mask
+      msg: { key: '', maskLength: 0 }, // No mask needed
     };
 
     const maskedData = Object.entries(sensitiveEnvVars).reduce(

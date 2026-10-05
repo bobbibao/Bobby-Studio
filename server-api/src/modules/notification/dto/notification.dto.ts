@@ -22,6 +22,6 @@ export class NotificationDto {
   @Expose()
   createdAt: Date;
 
-  @Exclude() // Ẩn trường `data`
+  @Exclude() // Hide the `data` field
   data?: any;
 }

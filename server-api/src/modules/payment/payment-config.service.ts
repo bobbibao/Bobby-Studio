@@ -79,7 +79,7 @@ export class PaymentConfigService {
       );
     }
 
-    // Price ID mapping cho dễ lookup
+    // Price ID mapping for easy lookup
     this.priceIdMap = {
       monthly: {
         free: this.freePriceId,
@@ -94,7 +94,7 @@ export class PaymentConfigService {
     };
   }
 
-  //mapping priceId ➝ credit mỗi tháng, ví dụ:
+  // Mapping priceId -> monthly credits, for example:
   getMonthlyCreditByPriceId(priceId: string): number | undefined {
     const creditMap: Record<string, number> = {
       [this.freePriceId]: 100,
@@ -110,7 +110,7 @@ export class PaymentConfigService {
     return credit;
   }
 
-  // Tiện ích phụ để xác định billingCycle từ priceId
+  // Helper that derives the billing cycle from a priceId
   getBillingCycle(priceId: string): BillingCycle | undefined {
     const { monthly, yearly } = this.priceIdMap;
     if (Object.values(monthly).includes(priceId)) return 'monthly';
@@ -118,7 +118,7 @@ export class PaymentConfigService {
     return undefined;
   }
 
-  // Tiện ích phụ để xác định plan từ priceId
+  // Helper that derives the plan from a priceId
   getPlanFromPriceId(priceId: string): PlanType | undefined {
     for (const cycle of ['monthly', 'yearly'] as BillingCycle[]) {
       const plans = this.priceIdMap[cycle];

@@ -10,20 +10,20 @@ export class UsageService {
   async getUsageStatistics(userId: string): Promise<UsageStatisticsDto> {
     const now = new Date();
 
-    // Lấy số lượng `Usage` trong tháng hiện tại
+    // Count `Usage` rows in the current month
     const currentMonthUsage = await this.usageRepository.countUsageInMonth(userId, now);
 
-    // Lấy số lượng `Usage` trong tháng trước
+    // Count `Usage` rows in the previous month
     const lastMonth = subMonths(now, 1);
     const lastMonthUsage = await this.usageRepository.countUsageInMonth(userId, lastMonth);
 
-    // Tính phần trăm tăng trưởng
+    // Compute the growth percentage
     let growthText = 'No usage this month';
     let growthPercentage = 0;
 
     if (currentMonthUsage > 0 && lastMonthUsage === 0) {
       growthText = 'Started using this month';
-      growthPercentage = 100; // Nếu tháng trước không có usage, mặc định tăng 100%
+      growthPercentage = 100; // With no usage last month, growth defaults to 100%
     } else if (lastMonthUsage > 0) {
       growthPercentage = ((currentMonthUsage - lastMonthUsage) / lastMonthUsage) * 100;
       if (growthPercentage > 0) {
@@ -38,7 +38,7 @@ export class UsageService {
     return {
       generatedImages: currentMonthUsage,
       growthText,
-      growthPercentage: parseFloat(growthPercentage.toFixed(2)), // Giữ tối đa 2 số thập phân
+      growthPercentage: parseFloat(growthPercentage.toFixed(2)), // Keep at most two decimals
     };
   }
 }

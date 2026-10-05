@@ -527,15 +527,15 @@ export class PaymentService {
     pageSize = 10,
     startingAfter?: string,
   ): Promise<PaginatedResponse<BillingHistoryItem>> {
-    // Nếu người dùng muốn trang > 1 nhưng không cung cấp startingAfter cursor
-    // chúng ta cần lấy các trang trước để có được cursor đúng
+    // If the caller wants a page > 1 without a startingAfter cursor
+    // we need to walk the earlier pages to obtain the right cursor
     let cursorId = startingAfter;
     if (page > 1 && !startingAfter) {
-      // Lấy cursor cho trang hiện tại
+      // Get the cursor for the current page
       let currentPage = 1;
       let lastInvoiceId: string | undefined;
 
-      // Lặp qua các trang trước để lấy cursor
+      // Walk the earlier pages to find the cursor
       while (currentPage < page) {
         const previousPageParams: any = {
           customer: stripeCustomerId,
@@ -548,7 +548,7 @@ export class PaymentService {
         const previousPageInvoices =
           await this.stripeConnector.listInvoices(previousPageParams);
 
-        // Nếu không còn dữ liệu nữa, trả về trang cuối cùng
+        // When there is no more data, return the last page
         if (
           previousPageInvoices.data.length === 0 ||
           !previousPageInvoices.has_more
@@ -558,13 +558,13 @@ export class PaymentService {
             total: (currentPage - 1) * pageSize,
             page,
             pageSize,
-            message: 'Không có dữ liệu cho trang này',
+            message: 'No data for this page',
             nextCursor: null,
             previousCursor: null,
           };
         }
 
-        // Lưu ID của invoice cuối cùng làm cursor cho trang tiếp theo
+        // Keep the last invoice id as the cursor for the next page
         lastInvoiceId =
           previousPageInvoices.data[previousPageInvoices.data.length - 1].id;
         currentPage++;
@@ -573,7 +573,7 @@ export class PaymentService {
       cursorId = lastInvoiceId;
     }
 
-    // Tham số cho việc lấy dữ liệu trang hiện tại
+    // Parameters for loading the current page
     const listParams: any = {
       customer: stripeCustomerId,
       limit: pageSize,
@@ -585,7 +585,7 @@ export class PaymentService {
 
     const invoices = await this.stripeConnector.listInvoices(listParams);
 
-    // Tính toán các thông tin phân trang
+    // Compute the pagination details
     const totalCountEstimate = page * pageSize + (invoices.has_more ? 1 : 0);
     const previousCursor = page > 1 ? cursorId : null;
     const nextCursor =
@@ -642,11 +642,11 @@ export class PaymentService {
       // 2. Identify cancelDate
       let cancelDate = null;
 
-      // Nếu subscription đã set thời gian hủy cụ thể (hủy theo lịch định sẵn)
+      // If the subscription has a specific cancel time (scheduled cancellation)
       if (latestSub.cancel_at) {
         cancelDate = new Date(latestSub.cancel_at * 1000);
       }
-      // Nếu subscription được đánh dấu hủy vào cuối kỳ hiện tại (soft cancel)
+      // If the subscription is marked to cancel at the end of the current period (soft cancel)
       else if (latestSub.cancel_at_period_end) {
         cancelDate = new Date(latestSub.current_period_end * 1000);
       }
@@ -656,7 +656,7 @@ export class PaymentService {
       // Extract billing interval from price recurring object
       const billingInterval = priceItem?.recurring?.interval || null;
 
-      // 3. Map Stripe subscription về StripeSubscription model
+      // 3. Map the Stripe subscription onto the StripeSubscription model
       return {
         id: latestSub.id,
         userId: userId,
