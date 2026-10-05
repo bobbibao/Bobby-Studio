@@ -17,7 +17,7 @@ import { SubscriptionPlanMonthly } from '@/features/admin/pages/admin/profile/co
 import { SubscriptionPlanAnnually } from '@/features/admin/pages/admin/profile/components/SubscriptionPlanAnnually';
 import { fetchCurrentUser } from '@/slices/currentUserSlice';
 
-// Danh sách tab với nhiều hash
+// Tabs, each reachable through several hashes
 const PROFILE_TABS = [
   {
     index: 0,
@@ -66,7 +66,7 @@ const Profile: React.FC = () => {
   const role = currentUser?.role;
   const plan = currentUser?.subscription?.plan;
 
-  // Lọc danh sách tab dựa trên role - Team tab is hidden by default, only shown for TEAM role
+  // Filter tabs by role. The Team tab is hidden by default and only shown for the TEAM role
   const filteredTabs = PROFILE_TABS.filter(
     (tab) => tab.label !== 'Team' || role === 'TEAM' || plan?.toLowerCase() === 'team' || plan?.toLowerCase() === 'pro'
   );

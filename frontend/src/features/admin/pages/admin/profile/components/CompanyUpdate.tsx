@@ -76,7 +76,7 @@ const validationSchema: yup.ObjectSchema<FormInputs> = yup.object().shape({
 });
 
 interface CompanyUpdateProps {
-  company?: any; // Nếu company không có, nghĩa là đang tạo mới
+  company?: any; // Absent when a company is being created
   refreshData?: () => void;
 }
 

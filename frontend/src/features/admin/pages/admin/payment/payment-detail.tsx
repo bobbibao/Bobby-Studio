@@ -175,7 +175,7 @@ export default function PaymentDetail() {
     if (selectedMethod === 'stripe') {
       await handleUpgradeStripePlan(priceId);
     } else if (selectedMethod === 'visa' || selectedMethod === 'mastercard') {
-      stripeFormRef.current?.triggerSubmit(); // 🟢 Trigger submit từ ngoài
+      stripeFormRef.current?.triggerSubmit(); // Trigger submit from outside
     } else {
       alert('Please select a payment method.');
     }

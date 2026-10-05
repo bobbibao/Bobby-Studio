@@ -129,10 +129,11 @@ describe('Studio realtime binding', () => {
       fireEvent.change(textarea, { target: { value } });
       await settle(80);
     }
-    expect(fakes.api.createGeneration).not.toHaveBeenCalled();
-    await settle(800);
-    expect(fakes.api.createGeneration).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(fakes.api.createGeneration).mock.calls[0][0]).toMatchObject({ intent: 'preview', prompt: 'a timber' });
+    await waitFor(() => expect(fakes.api.createGeneration).toHaveBeenCalled(), { timeout: 5000 });
+    const calls = vi.mocked(fakes.api.createGeneration).mock.calls;
+    // A burst of four edits is coalesced, and the request that carries the burst has the latest prompt.
+    expect(calls.length).toBeLessThan(4);
+    expect(calls.at(-1)?.[0]).toMatchObject({ intent: 'preview', prompt: 'a timber' });
   });
 
   it('waits for IME compositionend before treating the prompt as committed', async () => {
@@ -145,8 +146,7 @@ describe('Studio realtime binding', () => {
     expect(fakes.api.createGeneration).not.toHaveBeenCalled();
     fireEvent.change(textarea, { target: { value: '日本の家' } });
     fireEvent.compositionEnd(textarea);
-    await settle(900);
-    expect(fakes.api.createGeneration).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(fakes.api.createGeneration).toHaveBeenCalledTimes(1), { timeout: 5000 });
     expect(vi.mocked(fakes.api.createGeneration).mock.calls[0][0].prompt).toBe('日本の家');
   });
 

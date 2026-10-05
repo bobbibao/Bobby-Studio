@@ -55,10 +55,10 @@ export const CursorPaginationControls: React.FC<CursorPaginationControlsProps> =
   onPreviousPage
 }) => {
   const { t } = useTranslation();
-  // Với cursor-based pagination, chúng ta không thể nhảy trực tiếp đến trang bất kỳ
-  // Chỉ có thể di chuyển forward hoặc backward từ trang hiện tại
-  // Vì vậy chúng ta giữ UI để người dùng biết họ đang ở trang nào
-  // nhưng chỉ cho phép di chuyển tới/lui 1 trang
+  // With cursor-based pagination we cannot jump straight to an arbitrary page
+  // We can only move forward or backward from the current page
+  // so the UI keeps showing which page the user is on
+  // but only allows moving one page at a time
 
   return (
     <>
@@ -68,7 +68,7 @@ export const CursorPaginationControls: React.FC<CursorPaginationControlsProps> =
             <ChevronLeft size={16} />
           </PaginationButton>
 
-          {/* Chỉ hiển thị trang hiện tại và không cho phép nhảy trang */}
+          {/* Show only the current page; page jumping is not possible */}
           <PaginationButton isActive={true} onClick={() => {}}>
             {page}
           </PaginationButton>

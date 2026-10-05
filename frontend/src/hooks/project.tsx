@@ -696,7 +696,7 @@ export const UserProjectManagement = () => {
       try {
         collectImageInfo(item);
       } catch (error) {
-        console.error('Lỗi khi xử lý item:', item.attributeId, error);
+        console.error('Failed to process item:', item.attributeId, error);
       }
     }
 

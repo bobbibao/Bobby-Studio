@@ -141,7 +141,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({
                     _hover={{ bg: 'bg.subtle' }}
                     onClick={() => handleTreeItemClick(PROJECT_TREE_ITEM.ALL_PROJECT, PROJECT_TREE_ITEM.ALL_PROJECT)}
                   >
-                    <Text
+                    <Text as="span"
                       flex={1}
                       textAlign="left"
                       py={2}
@@ -318,7 +318,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({
               _hover={{ bg: 'bg.subtle' }}
               onClick={() => handleTreeItemClick(PROJECT_TREE_ITEM.UNASSIGNED, PROJECT_TREE_ITEM.UNASSIGNED)}
             >
-              <Text
+              <Text as="span"
                 flex={1}
                 py={2}
                 px={3}
@@ -348,7 +348,7 @@ const FolderTree: React.FC<FolderTreeProps> = ({
               _hover={{ bg: 'bg.subtle' }}
               onClick={() => handleTreeItemClick(PROJECT_TREE_ITEM.UPLOADS, PROJECT_TREE_ITEM.UPLOADS)}
             >
-              <Text
+              <Text as="span"
                 flex={1}
                 py={2}
                 px={3}

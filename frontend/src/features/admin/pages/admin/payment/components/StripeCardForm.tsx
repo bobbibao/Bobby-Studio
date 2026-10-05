@@ -29,14 +29,14 @@ const StripeCardForm = forwardRef<StripeCardFormRef, StripeCardFormProps>(({ pri
       return;
     }
 
-    // 🟢 Gửi paymentMethod.id lên BE để tạo Subscription
+    // Send paymentMethod.id to the API to create the subscription
     const data = await subscriptionAPI.createStripeSubscription(paymentMethod.id, priceId);
 
-    // 🟢 Gọi callback onSubmit
+    // Call the onSubmit callback
     onSubmit();
   };
 
-  // 🟢 Expose `triggerSubmit` để gọi từ bên ngoài
+  // Expose `triggerSubmit` so the parent can call it
   useImperativeHandle(ref, () => ({
     triggerSubmit: handleSubmit,
   }));

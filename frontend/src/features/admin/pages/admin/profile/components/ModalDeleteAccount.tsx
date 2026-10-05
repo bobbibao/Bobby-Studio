@@ -43,7 +43,7 @@ export const ModalDeleteAccount: FC<ModalDeleteAccountProps> = ({
     
     } finally {
       setLoading(false);
-      onClose(); // Đóng modal xác nhận
+      onClose(); // Close the confirmation modal
     }
   };
 
