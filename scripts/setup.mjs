@@ -111,6 +111,7 @@ const apiAdded = ensureEnvFile(
     LOCAL_STORAGE_ROOT: assetsRoot,
     WORKER_SERVICE_SECRET: workerSecret,
     ASSET_URL_SECRET: () => randomSecret(),
+    METRICS_TOKEN: () => randomSecret(),
     IMAGE_PROVIDER: 'openai',
     IMAGE_PROVIDER_MODE: 'simulated',
   },

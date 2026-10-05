@@ -30,7 +30,8 @@ import { ModelCatalogModule } from '../modules/model-catalog/model-catalog.modul
 import { AuthController } from '../modules/auth/auth.controller';
 import { AdminModule } from '../modules/admin/admin.module';
 import { PrismaModule } from '../modules/prisma/prisma.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { RequestLoggingInterceptor } from '../modules/ops/request-logging.interceptor';
 import { AuthGuard } from '../modules/auth/auth.guard';
 import { GenerationModule } from '../modules/generation/generation.module';
 import { CreditsModule } from '../modules/credits/credits.module';
@@ -95,7 +96,7 @@ const cacheModule = CacheModule.registerAsync({
     AdminModule,
   ],
   controllers: [AppController, AuthController, UserController],
-  providers: [{ provide: APP_GUARD, useClass: AuthGuard }, AppService, ConfigurationService, ConfigurationRepository],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }, { provide: APP_INTERCEPTOR, useClass: RequestLoggingInterceptor }, AppService, ConfigurationService, ConfigurationRepository],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
