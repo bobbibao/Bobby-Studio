@@ -15,7 +15,6 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -25,7 +24,8 @@
     "update-email-verified": "ts-node src/script/fetchEmailVerify.ts",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\" --rule \"prettier/prettier: off\" --max-warnings 200",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
-    "format:check": "prettier --check"
+    "format:check": "prettier --check",
+    "test:integration": "jest --config ./test/jest-integration.json"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.0.0",
@@ -94,6 +94,7 @@
     "@types/node": "^20.3.1",
     "@types/passport-google-oauth20": "^2.0.11",
     "@types/passport-jwt": "^3.0.9",
+    "@types/supertest": "^2",
     "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",

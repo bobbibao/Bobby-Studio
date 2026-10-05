@@ -37,7 +37,7 @@ export class PromptEnhancementService {
       });
 
       this.logger.log(
-        `Prompt enhancement successful for prompt: "${enhancePromptDto.originalPrompt}" with inputType: ${enhancePromptDto.inputType || 'TEXT_PROMPT'}`,
+        `Prompt enhancement successful (inputType: ${enhancePromptDto.inputType || 'TEXT_PROMPT'}, promptLength: ${enhancePromptDto.originalPrompt.length})`,
       );
 
       return {

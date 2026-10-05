@@ -8,6 +8,7 @@ import {
   Request,
   Headers,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +22,9 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ImageGenerationService } from './image-generation.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { Public } from '../auth/public.decorator';
+import { WorkerAuthGuard } from '../auth/worker-auth.guard';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { AuthenticatedRequest } from '../identity/principal';
 
 import { SdxlGenerateImageDto } from './dto/sdxl-generation.dto';
 import { JobStatusResponseDto, JobResultDto } from './dto/image-response.dto';
@@ -43,10 +47,24 @@ export class ImageGenerationController {
     private readonly imageGenerationService: ImageGenerationService,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    private readonly prisma: PrismaService,
   ) {}
+
+  /** Non-disclosing ownership check: a job that is not the caller's looks like a job that does not exist. */
+  private async assertOwnsJob(jobId: string, userId: string): Promise<void> {
+    const job = await this.prisma.imageJob.findUnique({
+      where: { id: jobId },
+      select: { userId: true, request: { select: { userId: true } } },
+    });
+    const ownerId = job?.userId ?? job?.request?.userId;
+    if (!job || ownerId !== userId) {
+      throw new NotFoundException('Job not found');
+    }
+  }
 
   @Post('generate-webhook')
   @Public()
+  @UseGuards(WorkerAuthGuard)
   @ApiOperation({
     summary:
       'Handle image generation webhook notifications from various providers',
@@ -65,6 +83,7 @@ export class ImageGenerationController {
 
   @Post('webhook')
   @Public()
+  @UseGuards(WorkerAuthGuard)
   @ApiOperation({
     summary:
       'Backward-compatible webhook endpoint for image generation providers',
@@ -100,17 +119,16 @@ export class ImageGenerationController {
   })
   async generateSdxlImage(
     @Body() generateDto: SdxlGenerateImageDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ jobIds: string[]; requestId: string; message: string }> {
-    const currentRole = req.currentUser?.role || DEFAULT_USER_ROLE;
     const currentUser = req.currentUser;
 
+    // Identity comes only from the verified principal; any userId/userEmail in the body is overridden.
     return this.commandBus.execute(
-      new GenerateImageCommand({
-        ...generateDto,
-        userId: generateDto.userId || currentUser?.id,
-        userEmail: generateDto.userEmail || currentUser?.email,
-      }, currentRole),
+      new GenerateImageCommand(
+        { ...generateDto, userId: currentUser.id, userEmail: currentUser.email },
+        currentUser.role || DEFAULT_USER_ROLE,
+      ),
     );
   }
 
@@ -119,11 +137,11 @@ export class ImageGenerationController {
   @ApiParam({ name: 'jobId', description: 'Job identifier', type: String })
   async retryJob(
     @Param('jobId') jobId: string,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ): Promise<{ jobIds: string[]; requestId: string; message: string }> {
-    const currentRole = req.currentUser?.role || DEFAULT_USER_ROLE;
+    await this.assertOwnsJob(jobId, req.currentUser.id);
     return this.commandBus.execute(
-      new RetryGenerationCommand(jobId, currentRole),
+      new RetryGenerationCommand(jobId, req.currentUser.role || DEFAULT_USER_ROLE),
     );
   }
 
@@ -132,14 +150,15 @@ export class ImageGenerationController {
   @ApiParam({ name: 'jobId', description: 'Job identifier', type: String })
   async cancelJob(
     @Param('jobId') jobId: string,
+    @Request() req: AuthenticatedRequest,
   ): Promise<CancelGenerationResult> {
+    await this.assertOwnsJob(jobId, req.currentUser.id);
     return this.commandBus.execute(
       new CancelGenerationCommand(jobId),
     );
   }
 
   @Get('job/:jobId/status')
-  @Public()
   @ApiOperation({ summary: 'Check the status of an image generation job' })
   @ApiParam({ name: 'jobId', description: 'Job identifier', type: String })
   @ApiResponse({
@@ -150,14 +169,15 @@ export class ImageGenerationController {
   @ApiResponse({ status: 404, description: 'Job not found' })
   async getJobStatus(
     @Param('jobId') jobId: string,
+    @Request() req: AuthenticatedRequest,
   ): Promise<JobStatusResponseDto> {
+    await this.assertOwnsJob(jobId, req.currentUser.id);
     return this.queryBus.execute(
       new GetGenerationStatusQuery(jobId),
     );
   }
 
   @Get('job/:jobId/result')
-  @Public()
   @ApiOperation({
     summary: 'Get the result of a completed image generation job',
   })
@@ -169,14 +189,17 @@ export class ImageGenerationController {
   })
   @ApiResponse({ status: 404, description: 'Job not found' })
   @ApiResponse({ status: 409, description: 'Job not completed yet' })
-  async getJobResult(@Param('jobId') jobId: string): Promise<JobResultDto> {
+  async getJobResult(
+    @Param('jobId') jobId: string,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<JobResultDto> {
+    await this.assertOwnsJob(jobId, req.currentUser.id);
     return this.queryBus.execute(
       new GetGenerationResultQuery(jobId),
     );
   }
 
   @Get('queue/stats')
-  @Public()
   @ApiOperation({ summary: 'Get queue statistics' })
   @ApiResponse({
     status: 200,
@@ -193,7 +216,6 @@ export class ImageGenerationController {
   }
 
   @Get('user/:userId/jobs')
-  @Public()
   @ApiOperation({ summary: 'Get user job history' })
   @ApiParam({ name: 'userId', description: 'User identifier', type: String })
   @ApiResponse({
@@ -202,13 +224,18 @@ export class ImageGenerationController {
     type: [JobStatusResponseDto],
   })
   async getUserJobs(
-    @Param('userId') userId: string,
+    @Param('userId') requestedUserId: string,
+    @Request() req: AuthenticatedRequest,
     @Query('limit') limit: number,
     @Query('inputType') inputType?: InputTypeEnum[],
     @Query('type') type?: string,
   ): Promise<JobStatusResponseDto[]> {
+    // History is always the caller's own; another user's id looks like an empty resource.
+    if (requestedUserId !== req.currentUser.id) {
+      throw new NotFoundException('User not found');
+    }
     return this.queryBus.execute(
-      new GetGenerationHistoryQuery(userId, limit, inputType, type),
+      new GetGenerationHistoryQuery(req.currentUser.id, limit, inputType, type),
     );
   }
 

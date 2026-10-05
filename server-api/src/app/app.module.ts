@@ -2,12 +2,10 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from '../../prisma/prisma.service';
 import { UserModule } from '../modules/user/user.module';
 import { NotificationModule } from '../modules/notification/notification.module';
 import { SubscriptionModule } from '../modules/subscription/subscription.module';
 import { AuthModule } from '../modules/auth/auth.module';
-import { JwtService } from '@nestjs/jwt';
 import { AttributeModule } from '../modules/attribute/attribute.module';
 import { ConfigurationService } from '../modules/profile-config/configuration.service';
 import { ConfigurationRepository } from '../modules/profile-config/configuration.repository';
@@ -32,6 +30,11 @@ import { EntitlementModule } from '../modules/entitlement/entitlement.module';
 import { ModelCatalogModule } from '../modules/model-catalog/model-catalog.module';
 import { AuthController } from '../modules/auth/auth.controller';
 import { AdminModule } from '../modules/admin/admin.module';
+import { PrismaModule } from '../modules/prisma/prisma.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from '../modules/auth/auth.guard';
+import { AssetsModule } from '../modules/assets/assets.module';
+import { IdentityModule } from '../modules/identity/identity.module';
 import { RuntimeConfigModule } from '../config/runtime-config.module';
 import { HealthModule } from '../modules/health/health.module';
 
@@ -51,6 +54,9 @@ const cacheModule = CacheModule.registerAsync({
 @Module({
   imports: [
     RuntimeConfigModule,
+    PrismaModule,
+    IdentityModule,
+    AssetsModule,
     HealthModule,
     cacheModule,
     ScheduleModule.forRoot(),
@@ -87,7 +93,7 @@ const cacheModule = CacheModule.registerAsync({
     ImageGenerationModule,
   ],
   controllers: [AppController, AuthController, UserController],
-  providers: [AppService, PrismaService, JwtService, ConfigurationService, ConfigurationRepository],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }, AppService, ConfigurationService, ConfigurationRepository],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

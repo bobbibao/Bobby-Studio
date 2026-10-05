@@ -12,13 +12,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import UploadService from './upload.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { UserService } from '../user/user.service';
+import { imageUploadOptions } from '../../shared/upload/image-upload.options';
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService, private readonly userService: UserService,) {}
 
   @Post('image')
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', imageUploadOptions))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: any,

@@ -13,12 +13,12 @@ export class NotificationService {
     return notifications.map(n => plainToInstance(NotificationDto, n));
   }
 
-  async markNotificationAsRead(notificationId: string) {
-    return this.notificationRepository.markAsRead(notificationId);
+  async markNotificationAsRead(notificationId: string, userId: string) {
+    return this.notificationRepository.markAsRead(notificationId, userId);
   }
 
-  async deleteNotification(notificationId: string) {
-    return this.notificationRepository.deleteNotification(notificationId);
+  async deleteNotification(notificationId: string, userId: string) {
+    return this.notificationRepository.deleteNotification(notificationId, userId);
   }
 
   async createNotification(userId: string | undefined, title: string, message: string, type: string, data?: any ) {

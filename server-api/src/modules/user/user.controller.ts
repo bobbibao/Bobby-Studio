@@ -16,7 +16,6 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CompanyProfileDTO, PersonalProfileDTO, Survey, Step } from './dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UserProfileDTO } from './dto';
 import {
   AttributeVersion,
@@ -137,16 +136,20 @@ export class UserController {
   }
 
   @Post('profile')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Create user profile' })
   @ApiResponse({ status: 201, description: 'Profile created successfully.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async createProfile(
+    @Request() req,
     @Body()
     createUserProfileDTO: UserProfileDTO<
       PersonalProfileDTO | CompanyProfileDTO
     >,
   ) {
-    const { profileType, userId, profile } = createUserProfileDTO;
+    // The profile always belongs to the authenticated caller; a userId in the body is ignored.
+    const userId: string = req.currentUser.id;
+    const { profileType, profile } = createUserProfileDTO;
     if (profileType === ProfileType.PERSONAL) {
       const userProfile: UserProfileDTO<PersonalProfileDTO> = {
         userId,
@@ -162,50 +165,6 @@ export class UserController {
     };
     return this.userService.createCompanyProfile(userProfile);
   }
-
-  // @Post(':id/upload-avatar')
-  // @UseInterceptors(FilesInterceptor('images')) // 'images' is the field name in the form
-  // async uploadPictureProfile(
-  //   @UploadedFiles() images: Express.Multer.File[],
-  //   @Param('id') id: string
-  // ): Promise<UserAttribute> {
-  //   // upload to S3
-  //   const results: S3.ManagedUpload.SendData[] =
-  //     await this.attributeService.uploadImages(images);
-  //   // build attributes payload
-  //   const attributes: AttributeEntity<
-  //     OriginalImageAttributeEntity,
-  //     ActionEntity
-  //   >[] = results.map((r) => {
-  //     const { Location, Key } = r;
-  //     const image: OriginalImageAttributeEntity = {
-  //       key: Key,
-  //       path: Location,
-  //     };
-  //     const action: ActionEntity = {};
-  //     const attr: AttributeEntity<OriginalImageAttributeEntity, ActionEntity> =
-  //       {
-  //         type: AttributeTypeEnum.PICTURE_PROFILE,
-  //         value: image,
-  //         actions: action,
-  //       };
-  //     return attr;
-  //   });
-  //   // save to DB
-  //   const data: AttributeVersion[] =
-  //     await this.attributeService.upsertAttributes(id, attributes);
-  //   const userAttributes: UserAttributesDto[] = data.map((a) => {
-  //     const userAttribute: UserAttributesDto = {
-  //       userId: id,
-  //       attributeId: a.id,
-  //     };
-  //     return userAttribute;
-  //   });
-  //   const [userAttr] = await this.userAttributeService.assignAttributesToUser(
-  //     userAttributes
-  //   );
-  //   return userAttr;
-  // }
 
   @Get('/active')
   @UseGuards(AuthGuard)

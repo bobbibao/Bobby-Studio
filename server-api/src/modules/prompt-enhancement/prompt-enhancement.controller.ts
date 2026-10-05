@@ -15,20 +15,15 @@ import {
 import { PromptEnhancementService } from './prompt-enhancement.service';
 import { EnhancePromptDto } from './dto/enhance-prompt.dto';
 import { EnhancePromptResponseDto } from './dto/enhance-prompt-response.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Public } from '../auth/public.decorator';
 
 @ApiTags('Prompt Enhancement')
 @Controller('prompt-enhancement')
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
 export class PromptEnhancementController {
   constructor(
     private readonly promptEnhancementService: PromptEnhancementService,
   ) {}
 
   @Post('enhance')
-  @Public() //TODO: REMOMVE THIS
   @ApiOperation({
     summary: 'Enhance a prompt using AI',
     description:
@@ -50,7 +45,6 @@ export class PromptEnhancementController {
   async enhancePrompt(
     @Body() enhancePromptDto: EnhancePromptDto,
   ): Promise<EnhancePromptResponseDto> {
-    console.log('Received enhance prompt request:', enhancePromptDto);
     return await this.promptEnhancementService.enhancePrompt(enhancePromptDto);
   }
 

@@ -1,6 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { PrismaService } from '../../../prisma/prisma.service';
 import { RoleController } from './role.controller';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
@@ -20,7 +19,6 @@ import { VizpointModule } from '../vizpoint/vizpoint.module';
   ],
   providers: [
     RoleService,
-    PrismaService,
   ],
   exports: [RoleService],
   controllers: [RoleController],
