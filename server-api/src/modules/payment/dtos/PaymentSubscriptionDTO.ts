@@ -1,4 +1,4 @@
-// DTO StripeSubscription với cancelDate
+// StripeSubscription DTO including cancelDate
 export class PaymentSubscriptionDTO {
   id: string;
   userId: string;
@@ -18,6 +18,6 @@ export class PaymentSubscriptionDTO {
   usedCredit: number;
   curUsers: number;
   maxUsers: number;
-  cancelDate: Date | null; // Trường cancelDate mới
+  cancelDate: Date | null; // New cancelDate field
   billingInterval: 'day' | 'week' | 'month' | 'year' | null; // Billing period: monthly or yearly
 }

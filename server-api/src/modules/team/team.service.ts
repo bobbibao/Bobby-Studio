@@ -120,9 +120,9 @@ export class TeamService {
   }
 
 
-  // ✅ Tạo link invite có thời gian hết hạn
+  // Create an invite link with an expiry
   generateInviteLink(teamId: string, userId: string) {
-    const expiresIn = 60 * 60; // 1 giờ
+    const expiresIn = 60 * 60; // 1 hour
     const token = jwt.sign(
       { teamId, inviterId: userId, exp: Math.floor(Date.now() / 1000) + expiresIn },
       this.inviteSecret
@@ -130,7 +130,7 @@ export class TeamService {
     return { inviteLink: `team/invite/${token}` };
   }
 
-  // ✅ Xác thực link invite
+  // Validate the invite link
   validateInviteToken(token: string) {
     try {
       const decoded = jwt.verify(token, this.inviteSecret) as { teamId: string; inviterId: string };
@@ -140,7 +140,7 @@ export class TeamService {
     }
   }
 
-  // ✅ Thêm user vào team khi họ bấm "Join"
+  // Add the user to the team when they press "Join"
   async joinTeamViaInvite(token: string, userId: string) {
     try {
       const decoded = jwt.verify(token, this.inviteSecret) as { teamId: string };

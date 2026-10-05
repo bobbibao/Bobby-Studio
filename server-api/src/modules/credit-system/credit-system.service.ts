@@ -18,7 +18,7 @@ export class CreditSystemService {
     return 0;
   }
 
-  // Tìm theo model (endpoint id) + quality
+  // Look up by model (endpoint id) + quality
   async getCreditsByModelAndQuality(modelId: string, quality: string) {
     const model = await this.prisma.model.findUnique({
       where: { id: modelId },

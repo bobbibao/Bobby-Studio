@@ -10,7 +10,7 @@ export class VizpointRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Lấy ra tổng số freeVizPoints và subscriptionVizPoints hiện có của người dùng
+   * Returns the user's current freeVizPoints and subscriptionVizPoints totals
    */
   async getUserVizPoints(userId: string): Promise<VizPointsDto> {
     const user = await this.prisma.user.findUnique({
@@ -36,7 +36,7 @@ export class VizpointRepository {
   }
 
   /**
-   * Kiểm tra user có đủ credit để generate ảnh không
+   * Checks whether the user has enough credit to generate an image
    */
   async hasEnoughVizPoints(userId: string, cost: number): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
@@ -67,7 +67,7 @@ export class VizpointRepository {
       where: { id: userId },
       data: {
         usedFreeCredit: 0,
-        freeCreditRenewalAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Đặt thời gian reset sau 30 ngày
+        freeCreditRenewalAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Reset after 30 days
       },
     });
   }
@@ -89,11 +89,11 @@ export class VizpointRepository {
   }
 
   /**
-   * Xử lý logic reset free credits hàng tháng
-   * Có thể gọi từ một cronjob
+   * Monthly reset of free credits
+   * Can be called from a cron job
    */
   async getMonthlyFreeCreditsReset(): Promise<User[]> {
-    // Lấy danh sách user cần reset free credits
+    // Load the users whose free credits need a reset
     const usersToReset = await this.prisma.user.findMany({
       where: {
         OR: [
@@ -106,14 +106,14 @@ export class VizpointRepository {
   }
 
   /**
-   * Trừ credit của user, ưu tiên free trước, paid sau
-   * Trả về true nếu trừ thành công, false nếu không đủ credit
-   * @param userId ID của người dùng
-   * @param amount Số credit cần trừ
-   * @returns Boolean cho biết trừ thành công hay không
+   * Deducts the user's credit, free credit first and paid credit after
+   * Returns true when the deduction succeeds and false when credit is insufficient
+   * @param userId The user id
+   * @param amount The credit amount to deduct
+   * @returns Whether the deduction succeeded
    */
   async consumeVizPoints(userId: string, amount: number): Promise<boolean> {
-    // Sử dụng transaction để đảm bảo tính nhất quán của dữ liệu
+    // Use a transaction to keep the data consistent
 
     return this.prisma.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
@@ -123,7 +123,7 @@ export class VizpointRepository {
       if (!user) {
         throw new Error('User not found');
       }
-      // Tính số credit còn lại của mỗi loại
+      // Compute the remaining credit of each kind
       const freeVizPointsRemaining = Math.max(
         0,
         user.freeCredit - user.usedFreeCredit,
@@ -133,15 +133,15 @@ export class VizpointRepository {
         user.paidCredit - user.usedPaidCredit,
       );
 
-      // Tổng số credit còn lại
+      // Total remaining credit
       const totalVizPointsRemaining =
         freeVizPointsRemaining + paidVizPointsRemaining;
-      // Kiểm tra xem có đủ credit không
+      // Check whether the credit is sufficient
       if (totalVizPointsRemaining < amount) {
-        return false; // Không đủ credit để trừ
+        return false; // Not enough credit to deduct
       }
 
-      // Ưu tiên trừ free credit trước
+      // Deduct free credit first
       const freeToConsume = Math.min(freeVizPointsRemaining, amount);
       const paidToConsume = Math.min(
         paidVizPointsRemaining,
@@ -150,7 +150,7 @@ export class VizpointRepository {
 
       const freeCreditAfterConsumption = user.usedFreeCredit + freeToConsume;
       const paidCreditAfterConsumption = user.usedPaidCredit + paidToConsume;
-      // Cập nhật dữ liệu
+      // Update the data
       await tx.user.update({
         where: { id: userId },
         data: {
@@ -159,7 +159,7 @@ export class VizpointRepository {
         },
       });
 
-      // Tạo lịch sử sử dụng credit
+      // Record the credit usage history
       await tx.usage.create({
         data: {
           userId: userId,
@@ -171,7 +171,7 @@ export class VizpointRepository {
         },
       });
 
-      return true; // Trừ credit thành công
+      return true; // Deduction succeeded
     });
   }
 }

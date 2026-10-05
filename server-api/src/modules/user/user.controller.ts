@@ -56,7 +56,7 @@ export class UserController {
     const profile = await this.userService.getPersonalProfile(userId);
     return {
       ...profile,
-      language: user.language, // Thêm field language vào
+      language: user.language, // Include the language field
     };
   }
 
