@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useToast, Button, Text, VStack, Spinner, Alert, AlertIcon, Center, Box, HStack } from '@chakra-ui/react'
 import { sendEmailVerification, verifyEmail } from '@/features/auth'
 import { EmailIcon } from '@chakra-ui/icons'
@@ -22,6 +22,11 @@ export default function ModalEmailVerify({ isOpen, onClose, userEmail}: Props) {
   
   const [isResending, setIsResending] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+    const timer = setTimeout(() => setCooldownSeconds((seconds) => seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldownSeconds]);
 
   const handleResend = async () => {
     if (isResending || cooldownSeconds > 0) return;
@@ -34,15 +39,6 @@ export default function ModalEmailVerify({ isOpen, onClose, userEmail}: Props) {
       
       // Start cooldown period (40 seconds)
       setCooldownSeconds(40);
-      const countdown = setInterval(() => {
-        setCooldownSeconds((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdown);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
       
       toast({
         title: translatorProfileNS('verification_email_resent'),
@@ -80,7 +76,7 @@ export default function ModalEmailVerify({ isOpen, onClose, userEmail}: Props) {
       }
       const token = await user.getIdToken(true);
       sessionStorage.setItem('authToken', token);
-      verifyEmail();
+      await verifyEmail();
       navigate('/');
       onClose();
       
@@ -140,9 +136,9 @@ export default function ModalEmailVerify({ isOpen, onClose, userEmail}: Props) {
         >
           {cooldownSeconds > 0 ? `${translatorProfileNS('resend')} (${cooldownSeconds}s)` : translatorProfileNS('resend')}
         </Button>
-        {/* <Button className='flex-1' colorScheme="purple" onClick={handleCheckVerified}>
+        <Button className='flex-1' colorScheme="purple" onClick={handleCheckVerified}>
           {translatorProfileNS('im_verified')}
-        </Button> */}
+        </Button>
       </HStack>
       
     </ModalCommon>

@@ -34,6 +34,33 @@ export class AssetService {
     return `${this.config.publicApiUrl}/api/assets/${assetId}/content?${query.toString()}`;
   }
 
+  /** Refresh local asset paths in owned library responses without changing stored references. */
+  async withOwnedAssetUrls<T>(data: T, userId: string): Promise<T> {
+    const urls = new Map<string, Promise<string>>();
+    const apiOrigin = new URL(this.config.publicApiUrl).origin;
+    const visit = async (value: unknown): Promise<unknown> => {
+      if (Array.isArray(value)) return Promise.all(value.map(visit));
+      if (!value || typeof value !== 'object' || value instanceof Date) return value;
+      const entries = await Promise.all(Object.entries(value).map(async ([key, child]) => {
+        if (['path', 'thumbnail', 'imagePath'].includes(key) && typeof child === 'string') {
+          let url: URL;
+          try { url = new URL(child, apiOrigin); } catch { return [key, child]; }
+          const match = /^\/api\/assets\/([0-9a-f-]{36})\/content$/i.exec(url.pathname);
+          if (url.origin === apiOrigin && match) {
+            const id = match[1];
+            const thumbnail = key === 'thumbnail' || url.searchParams.get('thumbnail') === 'true';
+            const cacheKey = `${id}:${thumbnail}`;
+            if (!urls.has(cacheKey)) urls.set(cacheKey, this.getOwned(id, userId).then(() => this.signedUrl(id, { thumbnail })));
+            return [key, await urls.get(cacheKey)];
+          }
+        }
+        return [key, await visit(child)];
+      }));
+      return Object.fromEntries(entries);
+    };
+    return await visit(data) as T;
+  }
+
   /**
    * Validates and stores an uploaded input image. The declared type is ignored: the bytes are decoded
    * (bounded by pixel count) and only real PNG/JPEG/WebP images are accepted.

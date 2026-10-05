@@ -26,7 +26,7 @@ i18n
       // Dynamically load language files based on language and namespace
       import(`./locales/${language}/${namespace}.json`)
         .then((resources) => {
-          callback(null, resources);
+          callback(null, resources.default);
         })
         .catch((error) => {
           callback(error, null);
@@ -36,6 +36,8 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
+    supportedLngs: ['en', 'vi', 'de'],
+    load: 'languageOnly',
     ns: namespaces,
     defaultNS: 'common',
     interpolation: {

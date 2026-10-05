@@ -1,0 +1,8 @@
+{
+  "num_inference_steps": "Steps",
+  "guidance_scale": "Guidance",
+  "generation_time": "Generation Time",
+  "image_size": "Image Size",
+  "not_available": "Not available",
+  "ai_model": "AI Model"
+}

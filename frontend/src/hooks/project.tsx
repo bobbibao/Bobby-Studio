@@ -569,13 +569,10 @@ export const UserProjectManagement = () => {
 
         // Remove images from source folder
         if (project.attributeId === payload.from.projectId && project.value?.folders) {
-          const fromFolder = project.value.folders[payload.from.folderIndex];
-          if (fromFolder) {
-            fromFolder.images = (fromFolder.images || []).filter((img: any) => {
-              const imgId = img.id || img.attributeId;
-              return !imageIds.includes(imgId);
-            });
-          }
+          project.value.folders.forEach((folder, index) => {
+            if (project.attributeId === payload.to.projectId && index === payload.to.folderIndex) return;
+            folder.images = (folder.images || []).filter((img: any) => !imageIds.includes(img.id || img.attributeId));
+          });
         }
 
         // Remove images from main project images if they exist there
@@ -593,6 +590,10 @@ export const UserProjectManagement = () => {
       };
 
       const action = await dispatch(upsertUserProjects(transformedPayload));
+      if (upsertUserProjects.rejected.match(action)) {
+        toast({ description: translatorNotificationNS('something_wrong_when_moving_image'), status: 'error' });
+        throw new Error('Failed to move images');
+      }
       await dispatch(updateLocalProjects(updateProj));
 
       if (isUnassigned) {

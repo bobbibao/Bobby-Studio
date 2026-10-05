@@ -44,6 +44,8 @@ export class AuthService {
   async emailVerification(email: string, language: string): Promise<void> {
     try {
       const verifyLink = await admin.auth().generateEmailVerificationLink(email);
+      // The official emulator exposes the generated OOB code locally; it does not deliver email.
+      if (process.env.FIREBASE_AUTH_EMULATOR_HOST) return;
       const { subject, html } = await this.emailService.buildVerificationEmail(language, verifyLink);
       await this.resendService.sendEmail(email, subject, html);
     } catch (error) {

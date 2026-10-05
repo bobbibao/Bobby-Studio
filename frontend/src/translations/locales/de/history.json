@@ -1,0 +1,8 @@
+{
+  "num_inference_steps": "Schritte",
+  "guidance_scale": "Guidance",
+  "generation_time": "Generierungszeit",
+  "image_size": "Bildgröße",
+  "not_available": "Nicht verfügbar",
+  "ai_model": "KI-Modell"
+}

@@ -1,6 +1,7 @@
 import moment from 'moment';
-import 'moment/dist/locale/de';
+import 'moment/locale/de';
 import 'moment/locale/en-gb';
+import 'moment/locale/vi';
 
 export const SHORT_DATE_FORMAT = 'DD/MM/YYYY';
 export const SHORT_DATE_FORMAT_ISO = 'YYYY-MM-DD';
@@ -21,10 +22,8 @@ const getDaysToNow = (date: string | number, now: string | number): number => {
 export const DATE_TIME_FROM_NOW_FORMAT = 'DD/MM/YYYY HH:mm';
 
 export const relativeTimeFormat = (timeUtc: number | string, addition = 0, locale: string) => {
-  moment.locale(locale);
-  if (locale === 'vi') moment.locale('en');
-
-  const time = moment.utc(timeUtc).add(addition, 'seconds').local();
+  const language = locale.split('-')[0];
+  const time = moment.utc(timeUtc).add(addition, 'seconds').local().locale(['en', 'de', 'vi'].includes(language) ? language : 'en');
   return time.fromNow();
 };
 

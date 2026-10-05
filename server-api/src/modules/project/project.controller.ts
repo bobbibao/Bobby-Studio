@@ -36,6 +36,7 @@ import { OwnUserScopeGuard } from '../auth/own-user-scope.guard';
 import { AuthenticatedRequest } from '../identity/principal';
 // import { EntitlementService } from './entitlement.service';
 import { EntitlementService } from '../entitlement/entitlement.service';
+import { AssetService } from '../assets/asset.service';
 
 @Controller('projects')
 @UseGuards(AuthGuard)
@@ -44,6 +45,7 @@ export class ProjectController {
     private readonly attributeService: AttributeService,
     private readonly userAttributeService: UserAttributeService,
     private readonly entitlementService: EntitlementService,
+    private readonly assets: AssetService,
   ) {}
 
   @Post()
@@ -131,11 +133,12 @@ export class ProjectController {
       handledInputType =
         typeof inputType === 'string' ? [inputType] : inputType;
     }
-    return this.attributeService.getUserProjects(
+    const projects = await this.attributeService.getUserProjects(
       userId,
       orderBy,
       handledInputType,
       creationType,
     );
+    return this.assets.withOwnedAssetUrls(projects, userId);
   }
 }
