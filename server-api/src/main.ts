@@ -8,6 +8,7 @@ import { FileLogger } from './service/logger-service/file-logger.service';
 import { ConfigError, loadRuntimeConfig } from './config/runtime-config';
 import { initializeFirebaseAdmin } from './config/firebase-admin';
 import { configureApp } from './app/configure-app';
+import { RedisIoAdapter } from './modules/ops/redis-io.adapter';
 
 async function bootstrap() {
   let config: ReturnType<typeof loadRuntimeConfig>;
@@ -32,6 +33,9 @@ async function bootstrap() {
   });
 
   configureApp(app, config);
+  const ioAdapter = new RedisIoAdapter(app, config);
+  ioAdapter.connect();
+  app.useWebSocketAdapter(ioAdapter);
 
   if (!config.isDeployed) {
     const swagger = new DocumentBuilder().setTitle('Bobby Studio API').setVersion('1.0').addBearerAuth().build();

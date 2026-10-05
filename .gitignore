@@ -12,3 +12,5 @@ tools/playwright-report/
 .env
 .env.local
 *.env.local
+backups/
+.env.bak-*

@@ -16,13 +16,14 @@ import { SubmitGenerationUseCase } from '../../application/generation/submit-gen
 import { BullMqGenerationQueue, GENERATION_QUEUE_NAME } from '../../infrastructure/queue/bullmq-generation.queue';
 import { CreditsModule } from '../credits/credits.module';
 import { ModelCatalogModule } from '../model-catalog/model-catalog.module';
+import { MetricsController } from '../ops/metrics.controller';
 import { GenerationEventsGateway } from './generation-events.gateway';
 import { GenerationsController } from './generations.controller';
 import { InternalGenerationsController } from './internal-generations.controller';
 
 @Module({
   imports: [BullModule.registerQueue({ name: GENERATION_QUEUE_NAME }), CreditsModule, ModelCatalogModule],
-  controllers: [GenerationsController, InternalGenerationsController],
+  controllers: [GenerationsController, InternalGenerationsController, MetricsController],
   providers: [
     GenerationEventsGateway,
     BullMqGenerationQueue,

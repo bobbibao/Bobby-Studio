@@ -7,6 +7,7 @@ import { configureApp } from '../../src/app/configure-app';
 import { initializeFirebaseAdmin } from '../../src/config/firebase-admin';
 import { loadRuntimeConfig } from '../../src/config/runtime-config';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RedisIoAdapter } from '../../src/modules/ops/redis-io.adapter';
 
 export interface TestUser {
   uid: string;
@@ -14,12 +15,17 @@ export interface TestUser {
   token: string;
 }
 
-export async function createTestApp(): Promise<INestApplication> {
+export async function createTestApp(options: { redisAdapter?: boolean } = {}): Promise<INestApplication> {
   const config = loadRuntimeConfig();
   initializeFirebaseAdmin(config);
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
   const app = moduleRef.createNestApplication({ rawBody: true });
   configureApp(app, config);
+  if (options.redisAdapter) {
+    const adapter = new RedisIoAdapter(app, config);
+    adapter.connect();
+    app.useWebSocketAdapter(adapter);
+  }
   await app.init();
   return app;
 }
