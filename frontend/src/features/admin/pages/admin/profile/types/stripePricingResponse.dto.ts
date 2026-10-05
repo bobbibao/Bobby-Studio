@@ -25,6 +25,20 @@ export interface StripeDeletedProduct {
     deleted: true;
 }
 
+/** Subset of the Stripe Price object returned by `GET /subscription/prices/:priceId`. */
+export interface StripePrice {
+    id: string;
+    object: 'price';
+    active: boolean;
+    currency: string;
+    unit_amount: number | null;
+    product: string;
+    recurring: {
+        interval: 'day' | 'week' | 'month' | 'year';
+        interval_count: number;
+    } | null;
+}
+
 export interface StripePricingResponseDTO {
     id: string;
     unit_amount: number | null;

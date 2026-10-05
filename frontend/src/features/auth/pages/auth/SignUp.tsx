@@ -26,6 +26,7 @@ const validationSchema = yup.object({
 });
 
 export default function SignUp() {
+  const inputBg = useColorModeValue('zinc.50', 'zinc.800');
   const { t, i18n } = useTranslation();
   const translatorProfileNS = (key: string) => t(`profile:${key}`);
   const translatorNotificationNS = (key: string) => t(`notification:${key}`);
@@ -161,7 +162,7 @@ export default function SignUp() {
                     id="email"
                     placeholder={translatorProfileNS('enter_your_email')}
                     isInvalid={!!errors.email}
-                    bg={useColorModeValue('zinc.50', 'zinc.800')}
+                    bg={inputBg}
                     color="text.primary"
                     borderColor="border.default"
                     _placeholder={{ color: 'text.subtle' }}
@@ -195,7 +196,7 @@ export default function SignUp() {
                         type={showPassword ? 'text' : 'password'}
                         placeholder={translatorProfileNS('create_a_password')}
                         isInvalid={!!errors.password}
-                        bg={useColorModeValue('zinc.50', 'zinc.800')}
+                        bg={inputBg}
                         color="text.primary"
                         borderColor="border.default"
                         _placeholder={{ color: 'text.subtle' }}

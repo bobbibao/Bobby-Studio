@@ -24,83 +24,42 @@ export interface JobStatusData {
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private client?: Redis;
   private readonly logger = new Logger(RedisService.name);
-  private connectionRetries = 0;
-  private readonly maxRetries = 5;
-  private readonly retryDelay = 1000;
   private readonly isEnabled = isRedisConfigured();
+  private lastErrorLogAt = 0;
 
   async onModuleInit() {
     if (!this.isEnabled) {
-      this.logger.warn('REDIS_HOST/REDIS_PORT missing or placeholder. Redis disabled for local dev.');
+      this.logger.warn('REDIS_HOST/REDIS_PORT missing or placeholder. Redis projection disabled.');
       return;
     }
-    await this.connectWithRetry();
+    this.connect();
   }
 
-  private async connectWithRetry() {
-    try {
-      this.client = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379', 10),
-        password: process.env.REDIS_PASSWORD,
-        db: parseInt(process.env.REDIS_DB || '0', 10),
-        connectTimeout: 10000,
-        lazyConnect: true,
-        enableReadyCheck: true,
-        maxRetriesPerRequest: null,
-      });
+  /**
+   * Redis is a projection and queue transport, never the durable authority. An outage must not
+   * crash the API: ioredis reconnects with capped backoff while readiness reports the failure.
+   */
+  private connect() {
+    this.client = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      password: process.env.REDIS_PASSWORD,
+      db: parseInt(process.env.REDIS_DB || '0', 10),
+      connectTimeout: 10000,
+      enableReadyCheck: true,
+      maxRetriesPerRequest: 2,
+      retryStrategy: (attempt) => Math.min(attempt * 250, 5000),
+    });
 
-      this.client.on('connect', () => {
-        this.logger.log('Redis connected successfully');
-        this.connectionRetries = 0;
-      });
-
-      this.client.on('ready', () => {
-        this.logger.log('Redis connection ready');
-      });
-
-      this.client.on('error', (err) => {
-        this.logger.error(`Redis connection error: ${err.message}`, err.stack);
-        if (this.connectionRetries < this.maxRetries) {
-          this.scheduleReconnect();
-        }
-      });
-
-      this.client.on('close', () => {
-        this.logger.warn('Redis connection closed');
-        if (this.connectionRetries < this.maxRetries) {
-          this.scheduleReconnect();
-        }
-      });
-
-      this.client.on('reconnecting', () => {
-        this.logger.log('Redis reconnecting...');
-      });
-
-      await this.client.connect();
-    } catch (error) {
-      this.logger.error(
-        `Failed to connect to Redis: ${error.message}`,
-        error.stack,
-      );
-      if (this.connectionRetries < this.maxRetries) {
-        this.scheduleReconnect();
-      } else {
-        throw new Error(
-          `Failed to connect to Redis after ${this.maxRetries} attempts`,
-        );
+    this.client.on('ready', () => this.logger.log('Redis connection ready'));
+    this.client.on('error', (err) => {
+      // Throttled: a long outage would otherwise log on every reconnect attempt.
+      const now = Date.now();
+      if (now - this.lastErrorLogAt > 30000) {
+        this.lastErrorLogAt = now;
+        this.logger.error(`Redis connection error: ${err.message}`);
       }
-    }
-  }
-
-  private scheduleReconnect() {
-    this.connectionRetries++;
-    setTimeout(() => {
-      this.logger.log(
-        `Attempting Redis reconnection (${this.connectionRetries}/${this.maxRetries})`,
-      );
-      this.connectWithRetry();
-    }, this.retryDelay * this.connectionRetries);
+    });
   }
 
   async onModuleDestroy() {

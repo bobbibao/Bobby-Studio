@@ -1,0 +1,39 @@
+# Local development infrastructure for machines with Docker.
+# Everything binds to loopback only. Used by scripts/dev.mjs when a Docker daemon is available;
+# hosts without Docker use native PostgreSQL/Redis and the Firebase CLI instead.
+name: bobby-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports: ["127.0.0.1:5432:5432"]
+    environment:
+      POSTGRES_USER: postgres
+      # Loopback-only development database; scripts/setup.mjs creates the application role.
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    # noeviction + AOF: queued jobs must not be evicted or lost on restart.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports: ["127.0.0.1:6379:6379"]
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  auth-emulator:
+    build:
+      context: ./tools
+      dockerfile: Dockerfile.emulator
+    ports: ["127.0.0.1:9099:9099"]
+
+volumes:
+  pgdata:
+  redisdata:

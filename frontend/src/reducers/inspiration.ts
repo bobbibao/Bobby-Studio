@@ -4,7 +4,7 @@ import { GenerateImageResponse, UploadImageResponse, VImage } from '@/common/dto
 import { InspirationMethodEnum } from '@/constants/attribute-enum';
 import { HistoryJobDto } from '@/actions/history';
 
-const getProgressStateKey = (method: InspirationMethodEnum) => {
+const getProgressStateKey = (method: InspirationMethodEnum | undefined) => {
   const methodToStateMap = {
     [InspirationMethodEnum.BASIC_TEXT_TO_IMAGE]: 'currentImageGenerationProgress',
     [InspirationMethodEnum.PRO_TEXT_TO_IMAGE]: 'currentImageGenerationProgress',
@@ -16,7 +16,7 @@ const getProgressStateKey = (method: InspirationMethodEnum) => {
     [InspirationMethodEnum.PRO_IMAGE_TO_IMAGE]: 'currentSeasonalTransformationProgress',
   } as const;
 
-  if (!(method in methodToStateMap)) {
+  if (!method || !(method in methodToStateMap)) {
     return 'currentImageGenerationProgress'; // fallback for unhandled methods
   }
   return methodToStateMap[method as keyof typeof methodToStateMap];

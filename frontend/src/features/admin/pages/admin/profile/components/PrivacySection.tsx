@@ -11,10 +11,10 @@ import { useTranslation } from 'react-i18next';
 type FormValues = PrivacySettingsDto;
 
 const schema = yup.object({
-  dataProcessing: yup.boolean(),
-  newsletter: yup.boolean(),
-  termsAccepted: yup.boolean(),
-  privacyAccepted: yup.boolean(),
+  dataProcessing: yup.boolean().default(false),
+  newsletter: yup.boolean().default(false),
+  termsAccepted: yup.boolean().default(false),
+  privacyAccepted: yup.boolean().default(false),
 }).required();
 
 
@@ -176,11 +176,13 @@ export function PrivacySection() {
                         <Controller
                           control={control}
                           name={setting.key}
-                          render={({ field }) => (
+                          render={({ field: { value, onChange, onBlur, name, ref } }) => (
                             <Switch
-                              {...field}
-                              isChecked={!!field.value}
-                              onChange={(event) => field.onChange(event.target.checked)}
+                              name={name}
+                              ref={ref}
+                              onBlur={onBlur}
+                              isChecked={!!value}
+                              onChange={(event) => onChange(event.target.checked)}
                               // isDisabled={!editing}
                               colorScheme="purple"
                               size="lg"
@@ -203,7 +205,7 @@ export function PrivacySection() {
         mx={-4} 
         mb={-4} 
         display="flex" 
-        justify="center" 
+        justifyContent="center" 
         borderTopWidth="1px" 
         borderColor={useColorModeValue('border.default', 'whiteAlpha.200')}
         bg={useColorModeValue('whiteAlpha.800', 'blackAlpha.700')}

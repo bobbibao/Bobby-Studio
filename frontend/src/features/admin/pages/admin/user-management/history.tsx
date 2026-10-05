@@ -30,13 +30,13 @@ import { SearchIcon, ChevronDownIcon, ViewIcon } from '@chakra-ui/icons';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueries } from '@tanstack/react-query';
-import { useUserImageHistory, useUserImageHistoryDetail, GetUserImageHistoryQueryParams } from '@/hooks/useUserHistory';
+import { useUserImageHistory, useUserImageHistoryDetail } from '@/hooks/useUserHistory';
 import { useUserById } from '@/hooks/useUser';
 import ChevronLeftIcon from '@/shared/icons/ChevronLeftIcon';
 import { FilterButton } from '@/components/FilterButton';
 import { ViewSwitcher } from '@/components/ViewSwitcher';
 import ImageCard from '@/shared/card/ImageCard';
-import { getUserImageHistoryDetail } from '@/features/user';
+import { getUserImageHistoryDetail, GetUserImageHistoryQueryParams } from '@/features/user';
 import { imageConstants } from '@/constants/image.constants';
 
 const UserHistory: React.FC = () => {
@@ -102,7 +102,7 @@ const UserHistory: React.FC = () => {
       : [],
   });
   const gridItems = useMemo(
-    () => detailQueries.map((query) => query.data).filter(Boolean),
+    () => detailQueries.flatMap((query) => (query.data ? [query.data] : [])),
     [detailQueries]
   );
   const isGridLoading = viewMode === 'grid' && detailQueries.some((query) => query.isLoading);
@@ -121,9 +121,10 @@ const UserHistory: React.FC = () => {
     const model = models.find(m => m.value === value);
     return model ? model.label : value;
   };
-  const getModelLabelsEdit = (values: string[] | undefined) => {
+  const getModelLabels = (values: string | string[] | undefined, inputType: string) => {
     if (!values) return '-';
-    return values.map(value => getModelLabel(value, 'edit')).join(', ');
+    const list = Array.isArray(values) ? values : [values];
+    return list.map(value => getModelLabel(value, inputType)).join(', ');
   }
 
   const handleInputTypeChange = (inputType: 'edit' | 'generate' | '') => {
@@ -490,7 +491,7 @@ const UserHistory: React.FC = () => {
                                   py={4}
                                 >
                                   <Text fontSize="sm" color={mutedTextColor}>
-                                    {item.inputType === "generate" ? getModelLabel(item.modelName, item.inputType) : getModelLabelsEdit(item.modelName, item.inputType)}
+                                    {getModelLabels(item.modelName, item.inputType)}
                                   </Text>
                                 </Td>
                                 <Td

@@ -798,7 +798,6 @@ export const MyAccountSection: React.FC = () => {
           borderRadius="xl"
           borderWidth="1px"
           borderColor="red.500"
-          borderOpacity={0.2}
           bg="red.50"
           p={6}
           shadow="none"
@@ -850,7 +849,7 @@ export const MyAccountSection: React.FC = () => {
         mb={-4}
         mt="auto"
         display="flex"
-        justify="center"
+        justifyContent="center"
         borderTopWidth="1px"
         borderColor={useColorModeValue('border.default', 'whiteAlpha.200')}
         bg={useColorModeValue('whiteAlpha.800', 'blackAlpha.700')}

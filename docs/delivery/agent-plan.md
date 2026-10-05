@@ -1,8 +1,62 @@
 # Bobby Studio autonomous delivery plan
 
-**All application tasks below are PLANNED.** This session has produced architecture, instructions and an interactive design prototype; it has not completed A0–A8. The final target is a production-quality product with simulated external image inference during development, not an unfinished application behind a demo UI.
+Task definitions below are the plan; the **Current state** and **Status** sections record verified progress. The final target is a production-quality product with simulated external image inference during development, not an unfinished application behind a demo UI.
 
 Read [AGENTS](../../AGENTS.md), [architecture](../architecture/overview.md), [contracts](../architecture/generation-contracts.md), [cleanup inventory](cleanup-plan.md) and [autonomous runbook](autonomous-execution.md). New work is English; existing Vietnamese source copy is migrated in A6.
+
+## Current state
+
+*Update at every milestone boundary. After a restart re-read AGENTS.md and this block, then continue.*
+
+- **Milestone:** A0 closing → A1 next. Branch `claude/epic-clarke-f0he4y`.
+- **Verified (A0):** see evidence table below.
+- **In progress:** none uncommitted beyond the A0 commit.
+- **Next concrete step:** A1. Replace `AuthGuard` (bypass headers, fake password, no global guard) with Firebase-verified principal + fail-closed global guard; owner checks on `image-generation` routes; authenticated Socket.IO; service-authenticated worker claim/callback; remove CMS token from `frontend/src/config.ts`; additive Prisma migration (sessions, idempotency, outbox, reservations, results).
+- **Blockers / human steps:**
+  - The credential-like CMS token in `frontend/src/config.ts` (and git history) is **exposed and must be revoked/rotated by its owner**; its value also appeared once in this session's tool output when the file was printed. Removal from source (A1) does not revoke it.
+  - No Firebase cloud project, GCS bucket, OpenAI or Gemini credentials were provided; staging deployment and live-provider verification are outside what can be evidenced (recorded as gaps, not claimed).
+- **Non-obvious decisions:**
+  - No Docker daemon in the cloud sandbox: local PostgreSQL 16 / Redis 7 run natively, `docker-compose.dev.yml` is provided for Docker hosts but is **unverified** here. Firebase Auth Emulator runs from `tools/` (`firebase-tools`, own lockfile) and is verified.
+  - `tools/` holds dev/CI tooling (emulator now, Playwright later) with its own lockfile; root `package.json` has scripts only (no dependencies, no lockfile).
+  - Compiled API entrypoint is `dist/src/main` (Prisma service lives outside `src/`); `start:prod` and `main` were corrected.
+  - Frontend env with the emulator URL lives in `.env.development.local`; `vite build` (production mode) fails if `VITE_FIREBASE_AUTH_EMULATOR_URL` is set.
+  - Existing seed (`prisma/tools/seed.ts`) deletes and recreates the model catalog: not safe to re-run on real data; replaced during catalog consolidation (A1).
+  - Dead frontend code that did not compile (learning-center*, style-guide, ProfileFormOld, several unused components) was deleted after confirming zero importers by `tsc` reachability from `main.tsx`; the remaining dead files are inventoried for A6.
+  - Worker legacy pipeline (Python connector, GCS connector, webhook service, Redis metadata) is intentionally untouched in A0 and replaced in A2/A3.
+
+## Baseline (2026-10-05, commit 82958dc) and A0 evidence
+
+| Check | Baseline | After A0 |
+| --- | --- | --- |
+| Frontend install | corrupt cache when apps install in parallel | `yarn install --frozen-lockfile` per app, sequential (scripted) |
+| Frontend `tsc -p tsconfig.app.json` | 236 errors (181 in app source: missing lib/target/module settings, 20+ stale imports, real bugs such as undefined `userId`, `Box align/justify` ignored at runtime) | **0 errors** |
+| Frontend `vite build` | failed: `src/styles.css` never existed | passes (Tailwind entry restored, preflight off because Chakra resets) |
+| Frontend tests | Jest with missing Nx preset, sample greeting test | Vitest + jsdom; smoke test passes; Jest/ts-jest removed |
+| Frontend lint | script used removed `--ext` flag | `yarn lint`: 0 errors, 463 warnings (ratchet `--max-warnings 500`); 30 hook-order errors fixed |
+| API build / typecheck | build passed; `node dist/main` path wrong | `yarn typecheck`, `yarn build` pass; `start:prod` = `node dist/src/main` |
+| API lint | `--fix` only; 3065 prettier errors | `yarn lint:check` non-mutating, 0 errors, 162 warnings (prettier rule not enforced on legacy files; new files are formatted) |
+| API tests | 2 suites failed (path aliases) | 3 suites pass (incl. 8 config-validation tests, V02) |
+| Worker build / lint / test | no ESLint config | `yarn lint:check` 0 errors, 7 warnings; `yarn test` passes with no tests |
+| Fresh DB migrations | not run | `prisma migrate deploy` applies both migrations on an empty DB; drift vs `schema.prisma` limited to column defaults (additive fix in A1) |
+| Compiled boot | API crashed on Firebase init without service account | API + worker boot from compiled output; `/api/health/ready` and `:3100/health/ready` return 200 only with DB/Redis/storage/API reachable |
+| Outage behavior | API process exited after 5 failed Redis reconnects | verified: Redis down → readiness 503, liveness 200, process stays up, readiness recovers when Redis returns |
+| External calls | worker defaulted to a public inference host and rewrote localhost URLs to it | defaults and rewrite removed; `loadWorkerConfig` requires loopback base URL for `simulated` mode |
+
+Commands: `node scripts/setup.mjs` (idempotent; `--rotate-secrets`, `--skip-db`, `--skip-install`), `node scripts/dev.mjs start|stop|status [--build] [--only=a,b]`, `node scripts/doctor.mjs [--json]`. Image simulator: not implemented yet (A2); doctor reports it as a warning.
+
+## Status
+
+| Task | Status | Evidence / remaining |
+| --- | --- | --- |
+| A0 | **verified except**: V01 gate for the image simulator (A2) and Docker-compose path (no daemon available) | table above |
+| A1 | planned | |
+| A2 | planned | |
+| A3 | planned | |
+| A4 | planned | |
+| A5 | planned | |
+| A6 | planned | |
+| A7 | planned | |
+| A8 | planned | |
 
 ## Dependencies and work ownership
 

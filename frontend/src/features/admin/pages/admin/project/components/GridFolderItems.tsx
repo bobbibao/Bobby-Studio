@@ -32,12 +32,13 @@ import { useNavigate } from 'react-router-dom';
 import Empty from '@/components/Empty';
 import LoadingPage from '@/components/LoadingPage';
 import Button from '@/shared/buttons/Button';
+import { ImageData } from '@/types';
 import { ProjectFilters } from '@/types/project';
 import ImageItem from './ImageItem';
 import ModalMoveImage from './ModalMoveImage';
-import { MoveImagesToFolderAction, MoveImageToFolderAction } from '@/types/project';
+import { MoveImagesToFolderAction, MoveImageToFolderAction } from '@/features/admin/pages/admin/project/types/project';
 import { UserProjectManagement } from '@/hooks/project';
-import { SelectedMovingImageState } from '@/types/project';
+import { SelectedMovingImageState } from '@/features/admin/pages/admin/project/types/project';
 import { GenerateInputTypeEnum, GenerateInputTypeToTextMap } from '@/constants/attribute-enum';
 import { orderBy, set } from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +46,7 @@ import { FilterState } from '../../inspiration/types/filterDropdown';
 import { ChevronDownIcon } from 'lucide-react';
 import FilterModal from '../../inspiration/components/FilterDialog/FilterDialog';
 import ModalMoveImages from './ModalMoveImages';
-import { BreadcrumbItemType } from '@/types/breadcrumb';
+import { BreadcrumbItemType } from '@/features/admin/pages/admin/project/types/breadcrumb';
 import useLayoutStore from '@/store/layoutStore';
 import Pagination from '@/components/Pagination';
 import { useImageNavigation } from '@/hooks/useImageNavigation';
@@ -653,7 +654,7 @@ const GridFolderItems: React.FC<GridFolderItemsProps> = ({
             py={3}
             zIndex={100}
             minW="600px"
-            justify="space-between"
+            justifyContent="space-between"
           >
             <HStack spacing={3}>
               <Box bg="brand.600" color="white" px={2} py={1} rounded="sm" fontWeight="medium" fontSize="sm" lineHeight="1">

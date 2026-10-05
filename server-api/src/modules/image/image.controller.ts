@@ -11,6 +11,7 @@ import { Request, Response } from 'express';
 import { ImageService } from './image.service';
 import { AuthGuard } from '../auth/auth.guard';
 import * as admin from 'firebase-admin';
+import sharp = require('sharp');
 @Controller('images')
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
@@ -51,8 +52,6 @@ export class ImageController {
         ETag: id,
         'Last-Modified': new Date().toUTCString(),
       });
-
-      const sharp = require('sharp');
 
       if (format === 'jpg') {
         res.setHeader('Content-Type', 'image/jpeg');

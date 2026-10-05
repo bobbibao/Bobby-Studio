@@ -10,6 +10,7 @@ import {
   Collapse,
   useBoolean,
   useColorModeValue,
+  useColorMode,
 } from '@chakra-ui/react';
 import { ChevronDownIcon, Switch } from '@chakra-ui/icons';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +24,7 @@ import { ModalConfirmUpgradeSubscription } from './ModalConfirmUpgradeSubscripti
 import { useSubscriptionData } from '../hooks/useSubscriptionData';
 import { SUBSCRIPTION_PLANS, CREDIT_EXCHANGE_RATES } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
 import PricingSubscriptionSkeleton from './PricingSubscriptionSkeleton';
-import { SubscriptionResponseDtoV2 } from '@/types/subscriptionResponse.dto';
+import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
 import { CreditPacksSection } from './CreditPacksSection';
 import { useNavigate } from 'react-router-dom';
 import { fetchCurrentUser } from '@/slices/currentUserSlice';
@@ -36,6 +37,8 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => {
+  const { colorMode } = useColorMode();
+  const pickColor = <T,>(light: T, dark: T): T => (colorMode === 'dark' ? dark : light);
   const { t } = useTranslation();
   const bgGradient = useColorModeValue('linear(to-br, white, zinc.50)', 'linear(to-br, whiteAlpha.200, whiteAlpha.50)');
   const borderColor = useColorModeValue('zinc.200', 'whiteAlpha.300');
@@ -60,12 +63,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
       w="full"
       p={8}
       borderRadius="2xl"
-      bg={useColorModeValue('white', 'transparent')}
+      bg={pickColor('white', 'transparent')}
       bgGradient={bgGradient}
-      color={useColorModeValue('zinc.900', 'white')}
+      color={pickColor('zinc.900', 'white')}
       position="relative"
       overflow="hidden"
-      boxShadow={useColorModeValue('none', 'xl')}
+      boxShadow={pickColor('none', 'xl')}
       borderWidth="1px"
       borderColor={borderColor}
       className="backdrop-blur-xl"
@@ -81,8 +84,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
         <Box flex="1">
           <Flex align="center" gap={3} mb={2}>
             <Badge
-              bg={useColorModeValue('black', 'whiteAlpha.200')}
-              color={useColorModeValue('white', 'white')}
+              bg={pickColor('black', 'whiteAlpha.200')}
+              color={pickColor('white', 'white')}
               variant="solid"
               fontSize="0.9em"
               px={3}
@@ -120,8 +123,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
             value={percentage}
             size="sm"
             borderRadius="full"
-            colorScheme={useColorModeValue('blackAlpha', 'whiteAlpha')}
-            bg={useColorModeValue('zinc.200', 'whiteAlpha.300')}
+            colorScheme={pickColor('blackAlpha', 'whiteAlpha')}
+            bg={pickColor('zinc.200', 'whiteAlpha.300')}
             mb={hasExtraCredits ? 4 : 6}
           />
 
@@ -139,7 +142,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
                 size="sm"
                 borderRadius="full"
                 colorScheme="green"
-                bg={useColorModeValue('zinc.200', 'whiteAlpha.300')}
+                bg={pickColor('zinc.200', 'whiteAlpha.300')}
                 mb={6}
               />
             </>
@@ -147,10 +150,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
 
           <Flex gap={3}>
             <Button
-              bg={useColorModeValue('black', 'white')}
-              color={useColorModeValue('white', 'black')}
+              bg={pickColor('black', 'white')}
+              color={pickColor('white', 'black')}
               _hover={{
-                bg: useColorModeValue('black', 'white'),
+                bg: pickColor('black', 'white'),
                 transform: 'scale(1.02)',
               }}
               transition="all 0.2s"
@@ -162,7 +165,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
             </Button>
             <Button
               variant="outline"
-              color={useColorModeValue('black', 'white')}
+              color={pickColor('black', 'white')}
               _hover={{
                 bg: 'red.600',
                 color: 'white',
@@ -172,7 +175,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
               }}
               transition="all 0.2s"
               borderWidth="1px"
-              borderColor={useColorModeValue('zinc.300', 'whiteAlpha.300')}
+              borderColor={pickColor('zinc.300', 'whiteAlpha.300')}
               fontWeight="medium"
               size="md"
               onClick={onCancel}
@@ -227,6 +230,8 @@ const ReceiptIcon = () => (
 
 // Billing History Section - matching Credit Packs styling
 const BillingHistorySection: React.FC = () => {
+  const { colorMode } = useColorMode();
+  const pickColor = <T,>(light: T, dark: T): T => (colorMode === 'dark' ? dark : light);
   const { t } = useTranslation();
   const textColor = useColorModeValue('zinc.900', 'white');
   const mutedTextColor = useColorModeValue('zinc.500', 'zinc.400');
@@ -278,6 +283,8 @@ const BillingHistorySection: React.FC = () => {
 };
 
 export function SubscriptionSection() {
+  const { colorMode } = useColorMode();
+  const pickColor = <T,>(light: T, dark: T): T => (colorMode === 'dark' ? dark : light);
   const { t } = useTranslation();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
   const [showComparison, { toggle: toggleComparison }] = useBoolean(false);
@@ -325,7 +332,7 @@ export function SubscriptionSection() {
             <Flex align="center" gap={4}>
               <Text
                 fontWeight="bold"
-                color={billingCycle === 'monthly' ? useColorModeValue('brand.600', 'white') : 'zinc.500'}
+                color={billingCycle === 'monthly' ? pickColor('brand.600', 'white') : 'zinc.500'}
                 cursor="pointer"
                 onClick={() => setBillingCycle('monthly')}
                 transition="color 0.2s"
@@ -342,7 +349,7 @@ export function SubscriptionSection() {
 
               <Text
                 fontWeight="bold"
-                color={billingCycle === 'yearly' ? useColorModeValue('brand.600', 'white') : 'zinc.500'}
+                color={billingCycle === 'yearly' ? pickColor('brand.600', 'white') : 'zinc.500'}
                 cursor="pointer"
                 onClick={() => setBillingCycle('yearly')}
                 transition="color 0.2s"

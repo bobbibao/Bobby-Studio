@@ -1,0 +1,14 @@
+{
+  "name": "bobby-studio",
+  "private": true,
+  "description": "Orchestration scripts for Bobby Studio. Each application keeps its own package.json and lockfile.",
+  "license": "UNLICENSED",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "dev:start": "node scripts/dev.mjs start",
+    "dev:stop": "node scripts/dev.mjs stop",
+    "dev:status": "node scripts/dev.mjs status"
+  }
+}

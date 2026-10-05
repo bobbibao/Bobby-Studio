@@ -31,11 +31,16 @@ const schema = yup.object().shape({
   emails: yup
     .array()
     .of(
-      yup.string().email('invalid_email_address').required('email_is_required')
+      yup.object({
+        value: yup.string().email('invalid_email_address').required('email_is_required'),
+      })
     )
+    .defined()
     .min(1, 'at_least_one_email_is_required')
     .max(MAX_EMAIL_VALUES, 'you_can_only_add_up_to_3_emails'),
 });
+
+type InviteFormValues = yup.InferType<typeof schema>;
 
 const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const { t } = useTranslation();
@@ -47,9 +52,9 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
     handleSubmit,
     formState: { errors, isSubmitting },
     reset
-  } = useForm({
+  } = useForm<InviteFormValues>({
     resolver: yupResolver(schema),
-    defaultValues: { emails: [""] }
+    defaultValues: { emails: [{ value: "" }] }
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -59,7 +64,7 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
 
   useEffect(() => {
     if (isOpen && fields.length === 0) {
-      append(""); // Chỉ thêm nếu chưa có input
+      append({ value: "" }); // Chỉ thêm nếu chưa có input
     }
     setTimeout(() => firstInputRef.current?.focus(), 0); // Đảm bảo focus chạy sau khi render
   }, [isOpen]);
@@ -67,7 +72,7 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
 
   const addEmail = () => {
     if (fields.length < MAX_EMAIL_VALUES) {
-      append("");
+      append({ value: "" });
     } else {
       toast({
         title: t('notification:limit_reached'),
@@ -80,11 +85,11 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
 
 
   const handleClose = () => {
-    reset({ emails: [""] });
+    reset({ emails: [{ value: "" }] });
     onClose();
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: InviteFormValues) => {
     try {
       // Simulate API call
       // await onSubmitProp(data);
@@ -97,7 +102,7 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
     } catch (error) {
       toast({
         title: t('notification:failed_to_send_invitations'),
-        description: error.message,
+        description: error instanceof Error ? error.message : undefined,
         status: "error",
         duration: 3000
       });
@@ -128,7 +133,7 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
                       <EmailIcon color="gray.400" />
                     </InputLeftElement>
                     <Controller
-                      name={`emails.${index}`}
+                      name={`emails.${index}.value`}
                       control={control}
                       render={({ field }) => (
                         <Input
@@ -155,7 +160,7 @@ const InviteCollaboratorsModal = ({ isOpen, onClose }: { isOpen: boolean; onClos
                     )}
                   </InputGroup>
                   <FormErrorMessage fontSize="sm">
-                    {errors.emails?.[index]?.message ? translatorProfileNS(errors.emails?.[index]?.message) : errors.emails?.[index]?.message}
+                    {errors.emails?.[index]?.value?.message ? translatorProfileNS(errors.emails[index].value.message) : errors.emails?.[index]?.value?.message}
                   </FormErrorMessage>
                 </FormControl>
               ))}

@@ -81,9 +81,6 @@ export class StorageService implements IStorageService {
     this.logger.log(`Fetching image buffer from URL: ${imageUrl}`);
 
     try {
-      // ✅ rewrite localhost -> production domain
-      imageUrl = imageUrl.replace(/^http:\/\/localhost:8001/, 'https://genimageapi.dpdns.org');
-
       if (imageUrl.startsWith('data:image/')) {
         const base64Data = imageUrl.replace(/^data:image\/[^;]+;base64,/, '');
         return {

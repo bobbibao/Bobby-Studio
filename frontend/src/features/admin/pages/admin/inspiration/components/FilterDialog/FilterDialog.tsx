@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Checkbox, Flex, Heading, VStack, Divider, Text } from '@chakra-ui/react';
-import { FilterState } from '@/types/filterDropdown';
+import { FilterState } from '@/features/admin/pages/admin/inspiration/types/filterDropdown';
 import { GenerateInputTypeEnum, GenerateInputTypeToTextMap } from '@/constants/attribute-enum';
 import { FilterButton } from '@/components/FilterButton';
 

@@ -25,7 +25,7 @@ import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import { useTranslation } from 'react-i18next';
 import { GetUnassignedUserImagesAction } from '@/features/admin/pages/admin/project/types/project';
 import FolderTree from '@/components/FolderTree';
-import { BreadcrumbItemType } from '@/types/breadcrumb';
+import { BreadcrumbItemType } from '@/features/admin/pages/admin/project/types/breadcrumb';
 import { PaginationType } from '@/types/pagination';
 import { getProjectLimit, getProjectLimitMessage, resolvePlan } from '@/utils/subscriptionRestrictions';
 import { useNavigate } from 'react-router-dom';

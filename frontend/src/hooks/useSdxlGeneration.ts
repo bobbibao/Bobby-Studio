@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import SdxlGenerationAPI  from '@/features/generation';
+import { sdxlGenerationApiClient } from '@/features/generation/api/client';
 import { useAuthentication } from '@/hooks/useAuthentication';
 import { useAppDispatch, useAppSelector } from '@/store';
 import {
@@ -59,7 +59,7 @@ export const useSdxlGeneration = () => {
       );
 
       try {
-        const response = await SdxlGenerationAPI.generate(
+        const response = await sdxlGenerationApiClient.generate(
           {
             ...request,
             userId: request.userId || user?.id,

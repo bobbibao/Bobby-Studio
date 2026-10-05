@@ -1,6 +1,5 @@
 import { extendTheme } from '@chakra-ui/react';
-import { mode } from '@chakra-ui/theme-tools';
-import { ThemeComponentProps } from '@chakra-ui/theme/dist/types/theme.types';
+import { mode, StyleFunctionProps } from '@chakra-ui/theme-tools';
 
 import Button from './components/button';
 import Radio from './components/radio';
@@ -114,7 +113,7 @@ const theme = extendTheme({
     },
   },
   styles: {
-    global: (props: ThemeComponentProps) => ({
+    global: (props: StyleFunctionProps) => ({
       body: {
         bg: 'bg.canvas',
         color: 'text.primary',

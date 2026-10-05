@@ -23,7 +23,7 @@ import { selectCurrentUser } from '@/selectors/user';
 import { useSelector } from 'react-redux';
 import * as usageAPI from '@/features/user';
 import { useCallback, useEffect, useState } from 'react';
-import { UsageStatisticsDto } from '@/features/admin/pages/admin/profile/types/UsageStatistics.dto';
+import { UsageStatisticsDto } from '@/features/admin/pages/admin/profile/types/usageStatistics.dto';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import ButtonCommon from '@/shared/buttons/Button';
@@ -372,11 +372,11 @@ export function OverviewSection() {
                     h={2}
                     borderRadius="full"
                     bg={progressBg}
-                    sx={(theme) => ({
+                    sx={{
                       '& > div[role="progressbar"]': {
-                        backgroundColor: theme.colors.purple[600],
+                        backgroundColor: 'purple.600',
                       },
-                    })}
+                    }}
                     _dark={{
                       '& > div[role="progressbar"]': {
                         backgroundColor: 'white',
@@ -403,11 +403,11 @@ export function OverviewSection() {
                       h={2}
                       borderRadius="full"
                       bg={progressBg}
-                      sx={(theme) => ({
+                      sx={{
                         '& > div[role="progressbar"]': {
-                          backgroundColor: theme.colors.green[500],
+                          backgroundColor: 'green.500',
                         },
-                      })}
+                      }}
                       _dark={{
                         '& > div[role="progressbar"]': {
                           backgroundColor: 'green.400',

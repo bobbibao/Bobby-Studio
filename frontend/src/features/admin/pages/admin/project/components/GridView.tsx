@@ -1,10 +1,8 @@
 import React from 'react';
 import CardProject, { CardDataProps } from '@/shared/card/CardProject';
-import { ActionEntity, ProjectAttributeEntity } from '@/common/dtos/attribute/common.dto';
-import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import { UserProjectManagement } from '@/hooks/project';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
-import { IProject } from '@/types/project';
+import { IProject } from '@/features/admin/pages/admin/project/types/project';
 import { Box, SimpleGrid } from '@chakra-ui/react';
 import { getUserProjects } from '@/actions/project';
 import { useSelector } from 'react-redux';
@@ -12,7 +10,7 @@ import { RootState } from '@/store';
 
 const GridView: React.FC<{
   data: CardDataProps[];
-  onEdit?: (project: UserAttributeEntity<ProjectAttributeEntity, ActionEntity>) => void;
+  onEdit?: (project: CardDataProps) => void;
   onSelectProject?: (project: IProject) => void;
   handleDeleterojects?: (id: string) => void;
   onDelete?: (projectId: string) => void;

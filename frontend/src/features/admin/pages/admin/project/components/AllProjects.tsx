@@ -28,6 +28,7 @@ import { ViewSwitcher } from '@/components/ViewSwitcher';
 import AddIconThin from '@/shared/icons/AddIconThin';
 import { countActiveFilters, FilterField } from '@/utils/filterUtils';
 import { ProjectFilters } from '@/types/project';
+import { CardDataProps } from '@/shared/card/CardProject';
 
 interface AllProjectsProps {
   data: UserAttributeEntity<ProjectAttributeEntity, ActionEntity>[];
@@ -74,7 +75,7 @@ const AllProjects: React.FC<AllProjectsProps> = ({
     setSelectedViewOption(view);
   };
 
-  const openModalEdit = (project: UserAttributeEntity<ProjectAttributeEntity, ActionEntity>) => {
+  const openModalEdit = (project: CardDataProps) => {
     setEditProjectMode(true);
     const selectProject = data.find((elt) => elt.attributeId === project.projectAttributeId) || null;
     setCurrentProjectEdit(selectProject);

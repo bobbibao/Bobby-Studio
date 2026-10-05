@@ -66,6 +66,9 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ isOpen, routes }) => {
   };
 
   // Active state: Bright Skin = zinc.950 bg, zinc.50 icon | Dark Skin = zinc.50 bg, zinc.950 icon
+  const tooltipBg = useColorModeValue('zinc.950', 'white');
+  const tooltipColor = useColorModeValue('white', 'zinc.900');
+  const tooltipShadow = useColorModeValue('lg', 'xl');
   const activeBg = useColorModeValue('zinc.950', 'zinc.50');
   const activeTextColor = useColorModeValue('zinc.50', 'zinc.950');
   const inactiveTextColor = useColorModeValue('text.primary', 'text.primary');
@@ -217,10 +220,6 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ isOpen, routes }) => {
       if (!shouldShowTooltip) {
         return <React.Fragment key={index}>{interactiveElement}</React.Fragment>;
       }
-
-      const tooltipBg = useColorModeValue('zinc.950', 'white');
-      const tooltipColor = useColorModeValue('white', 'zinc.900');
-      const tooltipShadow = useColorModeValue('lg', 'xl');
 
       const shouldWrapTooltipChild = route.isLinkDisabled && route.extraComponent !== 'switch';
 

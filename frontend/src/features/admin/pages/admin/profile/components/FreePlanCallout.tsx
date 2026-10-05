@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Flex, Text, useColorModeValue, Button } from '@chakra-ui/react';
+import { Box, Flex, Text, useColorModeValue, useColorMode, Button } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { FREE_PLAN } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
-import { SubscriptionResponseDtoV2 } from '@/types/subscriptionResponse.dto';
+import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
 
 interface FreePlanCalloutProps {
   onGetStarted: () => void;
@@ -42,6 +42,8 @@ const ArrowRightIcon = () => (
 );
 
 export const FreePlanCallout: React.FC<FreePlanCalloutProps> = ({ onGetStarted, currentSubscription }) => {
+  const { colorMode } = useColorMode();
+  const pickColor = <T,>(light: T, dark: T): T => (colorMode === 'dark' ? dark : light);
   const { t } = useTranslation();
 
   // Check if user has a paid subscription (anything other than free or no subscription)
@@ -122,9 +124,9 @@ export const FreePlanCallout: React.FC<FreePlanCalloutProps> = ({ onGetStarted, 
             borderRadius="lg"
             borderWidth="1px"
             borderStyle="dashed"
-            borderColor={useColorModeValue('zinc.300', 'zinc.600')}
+            borderColor={pickColor('zinc.300', 'zinc.600')}
             bg="transparent"
-            color={useColorModeValue('zinc.400', 'zinc.500')}
+            color={pickColor('zinc.400', 'zinc.500')}
             fontSize="sm"
             fontWeight="normal"
             cursor="default"
@@ -142,14 +144,14 @@ export const FreePlanCallout: React.FC<FreePlanCalloutProps> = ({ onGetStarted, 
             px={4}
             borderRadius="lg"
             borderWidth="1px"
-            borderColor={useColorModeValue('zinc.300', 'zinc.600')}
-            bg={useColorModeValue('white', 'transparent')}
-            color={useColorModeValue('zinc.900', 'white')}
+            borderColor={pickColor('zinc.300', 'zinc.600')}
+            bg={pickColor('white', 'transparent')}
+            color={pickColor('zinc.900', 'white')}
             fontSize="sm"
             fontWeight="medium"
             rightIcon={hasPaidSubscription ? undefined : <ArrowRightIcon />}
             _hover={{
-              bg: useColorModeValue('zinc.50', 'zinc.700'),
+              bg: pickColor('zinc.50', 'zinc.700'),
             }}
             onClick={onGetStarted}
           >

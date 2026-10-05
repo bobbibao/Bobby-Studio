@@ -10,7 +10,7 @@ import imagePlaceholder from '@/assets/img/layout/image-placeholder.png';
 // import { UserAttributeEntity } from 'apps/bobby-api/src/attribute/dto/user-attribute.dto';
 import { relativeTimeFormat } from '@/utils/time';
 import { BadgeGenerationType } from '@/components/BadgeGenerationType';
-import { IProject } from '@/types/project';
+import { IProject } from '@/features/admin/pages/admin/project/types/project';
 import { useTranslation } from 'react-i18next';
 import imageUtils from '@/utils/image';
 import { useAuth } from '@/common/context/useAuthContext';

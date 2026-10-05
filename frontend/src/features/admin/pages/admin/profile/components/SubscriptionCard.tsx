@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { ModalCancelSubscription } from '@/features/admin/pages/admin/profile/components/ModalCancelSubscription';
 import Button from '@/shared/buttons/Button';
 import { useTranslation } from 'react-i18next';
-import { SubscriptionResponseDtoV2 } from '@/types/subscriptionResponse.dto';
-import { StripePricingResponseDTO } from '@/types/StripePricingResponse.dto';
+import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
+import { StripePricingResponseDTO } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
 
 type User = {
   name: string;

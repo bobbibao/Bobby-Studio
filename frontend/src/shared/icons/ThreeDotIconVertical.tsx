@@ -1,8 +1,9 @@
 
-const ThreeDotIconVertical = ({ className = '' }: { className?: string }) => {
+const ThreeDotIconVertical = ({ className = '', color }: { className?: string; color?: string }) => {
   return (
     <svg
       className={className}
+      style={color ? { color } : undefined}
       width="16"
       height="16"
       viewBox="0 0 16 16"
