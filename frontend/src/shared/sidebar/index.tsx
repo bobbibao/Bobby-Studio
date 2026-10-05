@@ -11,9 +11,11 @@ interface SidebarProps {
   open: boolean;
   onOpen?: () => void;
   onClose?: () => void;
+  /** Overlay mode for narrow viewports: hidden until opened, with its own background. */
+  mobile?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false }) => {
   const sidebarVariants = {
     open: {
       width: 200,
@@ -36,15 +38,20 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen }) => {
   const toggleButtonColor = useColorModeValue('zinc.600', 'white');
   const toggleButtonHoverColor = useColorModeValue('brand.600', 'brand.400');
 
+  const overlayBg = useColorModeValue('white', 'zinc.900');
+  const logoFilter = useColorModeValue('invert(1)', 'invert(0)');
+  if (mobile && !open) return null;
+
   return (
     <Box
       as={motion.div}
       position="fixed"
       h="full"
-      zIndex={50}
+      zIndex={mobile ? 60 : 50}
       display="flex"
       flexDirection="column"
-      bg="transparent"
+      bg={mobile ? overlayBg : 'transparent'}
+      boxShadow={mobile ? 'xl' : undefined}
       initial={false}
       animate={open ? 'open' : 'closed'}
       variants={sidebarVariants}
@@ -66,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen }) => {
             w="auto"
             objectFit="contain"
             mt="1px"
-            filter={useColorModeValue('invert(1)', 'invert(0)')}
+            filter={logoFilter}
           />
         </Flex>
         <Box

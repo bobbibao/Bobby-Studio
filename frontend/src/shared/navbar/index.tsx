@@ -21,9 +21,11 @@ import {
   IconButton,
   Divider,
   useColorModeValue,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { Menu as MenuIcon } from 'lucide-react';
 import { INSPIRATION_TABS } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import HistoryMenu from './HistoryJobMenu';
@@ -39,6 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
   const navbarAllowBack = useSelector((state: RootState) => state.navbar.allowBack);
   const navbarHeading = useSelector((state: RootState) => state.navbar.heading);
   const toast = useToast();
+  const isMobile = useBreakpointValue({ base: true, md: false }) ?? false;
 
   // Check if we're on the workspace page
   const tab = searchParams.get('tab');
@@ -123,7 +126,18 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
       bg="transparent"
       px={4}
     >
-      <Flex align="center" gap={2}>
+      <Flex align="center" gap={2} minW={0}>
+        {isMobile && (
+          <IconButton
+            aria-label="Open navigation"
+            icon={<MenuIcon size={20} />}
+            variant="ghost"
+            h="11"
+            w="11"
+            minW="11"
+            onClick={onOpenSidenav}
+          />
+        )}
         {navbarAllowBack && (
           <>
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3 }}>
@@ -175,8 +189,22 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
         </Box>
       </Flex>
 
-      <HStack spacing={2} mr={2} position="relative" align="center" h="16">
-        {shouldUseWorkspaceGhostButton ? (
+      <HStack spacing={2} mr={isMobile ? 0 : 2} position="relative" align="center" h="16">
+        {isMobile ? (
+          <IconButton
+            aria-label={translatorCommonNS('workspace')}
+            icon={<GenerateIcon />}
+            h="10"
+            w="10"
+            minW="10"
+            rounded="lg"
+            bg="black"
+            color="white"
+            _dark={{ bg: 'white', color: 'black' }}
+            _hover={{ bg: 'black' }}
+            onClick={handleGenerateClick}
+          />
+        ) : shouldUseWorkspaceGhostButton ? (
           <Box
             as="button"
             type="button"
