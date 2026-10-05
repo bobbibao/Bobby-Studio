@@ -18,7 +18,6 @@ import { UploadModule } from '../modules/upload/upload.module';
 import { TeamModule } from '../modules/team/team.module';
 import { PrivacyModule } from '../modules/privacy/privacy.module';
 import { VizpointModule } from '../modules/vizpoint/vizpoint.module';
-import { ImageGenerationModule } from '../modules/image-generation/image-generation.module';
 import { PromptEnhancementModule } from '../modules/prompt-enhancement/prompt-enhancement.module';
 import { ValidationMiddleware } from 'src/middleware';
 import { BullModule } from '@nestjs/bullmq';
@@ -33,6 +32,8 @@ import { AdminModule } from '../modules/admin/admin.module';
 import { PrismaModule } from '../modules/prisma/prisma.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '../modules/auth/auth.guard';
+import { GenerationModule } from '../modules/generation/generation.module';
+import { CreditsModule } from '../modules/credits/credits.module';
 import { AssetsModule } from '../modules/assets/assets.module';
 import { IdentityModule } from '../modules/identity/identity.module';
 import { RuntimeConfigModule } from '../config/runtime-config.module';
@@ -89,8 +90,9 @@ const cacheModule = CacheModule.registerAsync({
     ImageModule,
     EntitlementModule,
     ModelCatalogModule,
+    CreditsModule,
+    GenerationModule,
     AdminModule,
-    ImageGenerationModule,
   ],
   controllers: [AppController, AuthController, UserController],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }, AppService, ConfigurationService, ConfigurationRepository],

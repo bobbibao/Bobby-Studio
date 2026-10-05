@@ -62,7 +62,7 @@ import { AdminGuard } from '../auth/admin.guard';
 import { OwnUserScopeGuard } from '../auth/own-user-scope.guard';
 import { imageUploadOptions } from '../../shared/upload/image-upload.options';
 // import { EntitlementService } from './entitlement.service';
-import { EntitlementService } from 'src/service/entitlement/entitlement.service';
+import { EntitlementService } from '../entitlement/entitlement.service';
 import { UserService } from '../user/user.service';
 
 @ApiTags('Attributes')

@@ -1,14 +1,10 @@
-import { forwardRef, Module } from '@nestjs/common';
-// import { ModelCatalogService } from './model-catalog.service';
-import { ModelCatalogService } from 'src/service/model-catalog/model-catalog.service';
+import { Module } from '@nestjs/common';
 import { ModelCatalogController } from './model-catalog.controller';
-import { UserModule } from '../user/user.module';
+import { ModelCatalogService } from './model-catalog.service';
 
 @Module({
-  imports: [forwardRef(() => UserModule)],  
-  providers: [ModelCatalogService],
   controllers: [ModelCatalogController],
+  providers: [ModelCatalogService],
   exports: [ModelCatalogService],
 })
 export class ModelCatalogModule {}
-

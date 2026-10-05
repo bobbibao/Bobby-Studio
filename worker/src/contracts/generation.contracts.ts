@@ -58,6 +58,8 @@ export const API_ERROR_CODES = [
   'INVALID_INPUT',
   'NOT_FOUND',
   'ALREADY_COMPLETED',
+  'NOT_ENTITLED',
+  'EXPIRED',
   'UNAVAILABLE',
 ] as const;
 export type ApiErrorCode = (typeof API_ERROR_CODES)[number];
@@ -193,7 +195,9 @@ export interface AssetDescriptor {
 
 /** Response of POST /api/internal/generations/:id/claim (service credential required). */
 export type ClaimResponse =
-  | { action: 'skip'; reason: 'terminal' | 'cancelled' | 'superseded' | 'unknown_job' | 'delivery_only' | 'expired' }
+  | { action: 'skip'; reason: 'terminal' | 'cancelled' | 'superseded' | 'unknown_job' | 'expired' }
+  /** Another execution of the same session is still running; retry the claim later. */
+  | { action: 'defer'; retryAfterMs: number }
   | {
       action: 'run';
       attemptId: string;
@@ -240,4 +244,69 @@ export interface WorkerEventV1<T extends WorkerEventType = WorkerEventType> {
 export interface WorkerEventAck {
   acknowledged: true;
   applied: boolean;
+  /**
+   * Why nothing changed. `duplicate`: this event was already applied (safe to continue). `stale_attempt`:
+   * the attempt was superseded (stop). `terminal`: the job already ended, for example it was cancelled
+   * (do not start paid work). `no_effect`: valid but without a state change.
+   */
+  reason?: 'duplicate' | 'stale_attempt' | 'terminal' | 'no_effect';
+}
+
+// ---------------------------------------------------------------- catalog, credits, uploads, sessions
+
+export interface CatalogModel {
+  id: string;
+  displayName: string;
+  provider: 'openai' | 'gemini';
+  /** True for development/staging profiles; the UI shows "Simulated inference" as environment metadata. */
+  isSimulated: boolean;
+  capabilities: {
+    modes: GenerationMode[];
+    sizes: GenerationSize[];
+    qualities: GenerationQuality[];
+    negativePrompt: boolean;
+    seed: boolean;
+    cancellation: boolean;
+    partialImages: boolean;
+  };
+  limits: { maxPromptChars: number; maxInputImageBytes: number; inputMimeTypes: string[] };
+  creditEstimate: Record<GenerationQuality, number>;
+  /** False when the caller's plan does not include the model; shown disabled, never hidden-granted. */
+  entitled: boolean;
+}
+
+/** GET /api/models */
+export interface CatalogResponse {
+  plan: string;
+  models: CatalogModel[];
+}
+
+/** GET /api/credits/balance */
+export interface CreditBalance {
+  available: number;
+  reserved: number;
+}
+
+/** POST /api/studio-sessions */
+export interface StudioSessionResponse {
+  id: string;
+  latestRevision: number;
+}
+
+/** POST /api/uploads (multipart field `file`; PNG, JPEG or WebP). */
+export interface UploadResponse {
+  assetId: string;
+  mimeType: string;
+  width: number;
+  height: number;
+  byteSize: number;
+  sha256: string;
+  /** Short-lived signed URL. */
+  url: string;
+}
+
+/** POST /api/generations/:id/save: promotes a completed preview into the library without re-inference. */
+export interface SaveGenerationResponse {
+  generation: GenerationSnapshot;
+  libraryItemId: string;
 }

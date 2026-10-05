@@ -1,31 +1,18 @@
-import { Controller, Get, Logger, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '../auth/auth.guard';
-// import { ModelCatalogService } from './model-catalog.service';
-import { ModelCatalogService } from 'src/service/model-catalog/model-catalog.service';
-import { ModelsResponseDto } from './dto/model-response.dto';
+import { CatalogResponse } from '../../application/generation/contracts';
+import { AuthenticatedRequest } from '../identity/principal';
+import { ModelCatalogService } from './model-catalog.service';
 
 @ApiTags('Model Catalog')
 @ApiBearerAuth()
-@UseGuards(AuthGuard)
 @Controller('models')
 export class ModelCatalogController {
-  constructor(private readonly modelCatalogService: ModelCatalogService) {}
+  constructor(private readonly catalog: ModelCatalogService) {}
 
   @Get()
-  @ApiOperation({
-    summary: 'Get model catalog filtered by the current user plan',
-  })
-  async getModels(@Request() req): Promise<ModelsResponseDto> {
-    const plan = this.modelCatalogService.getPlanOrDefault(
-      req.currentUser?.role,
-    );
-    const models = await this.modelCatalogService.getCatalogForPlan(plan);
-
-    return {
-      plan,
-      models,
-    };
+  @ApiOperation({ summary: 'Models of the active provider profile with the caller plan entitlement' })
+  getModels(@Request() req: AuthenticatedRequest): Promise<CatalogResponse> {
+    return this.catalog.getCatalogForPlan(req.currentUser.role);
   }
 }
-

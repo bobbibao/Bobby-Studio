@@ -57,6 +57,10 @@ export default async function globalSetup(): Promise<void> {
     IMAGE_PROVIDER: dev.IMAGE_PROVIDER ?? 'openai',
     IMAGE_PROVIDER_MODE: 'simulated',
     ALLOWED_CORS_DOMAINS: 'http://localhost:4200',
+    // Tests drive the dispatcher and reconciler explicitly instead of relying on timers.
+    GENERATION_DISPATCHER: 'off',
+    GENERATION_RECONCILER: 'off',
+    GENERATION_MIN_PREVIEW_INTERVAL_MS: '0',
   });
   (globalThis as { __BOBBY_TEST_DB__?: { adminUrl: string; dbName: string } }).__BOBBY_TEST_DB__ = {
     adminUrl: devUrl.toString().replace(devUrl.pathname, '/postgres'),

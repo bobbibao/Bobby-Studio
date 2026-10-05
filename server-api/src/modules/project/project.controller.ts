@@ -35,7 +35,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { OwnUserScopeGuard } from '../auth/own-user-scope.guard';
 import { AuthenticatedRequest } from '../identity/principal';
 // import { EntitlementService } from './entitlement.service';
-import { EntitlementService } from 'src/service/entitlement/entitlement.service';
+import { EntitlementService } from '../entitlement/entitlement.service';
 
 @Controller('projects')
 @UseGuards(AuthGuard)
