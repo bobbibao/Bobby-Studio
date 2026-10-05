@@ -1,0 +1,20 @@
+{
+  "what_would_you_like_to_create": "Explore Tools",
+  "what_would_you_like_to_create_today": "What would you like to create today?",
+  "explore_tools": "Explore Tools",
+  "line_drawing_to_image_description": "Transform architectural sketches into detailed visualizations. Convert hand-drawn plans or digital outlines into realistic renderings while preserving original design intent.",
+  "text_to_image_description": "Create architectural visualizations using descriptive text. Input your design concept, materials, and environment to generate high-quality images matching your vision.",
+  "image_to_image_description": "Generate new architectural images inspired by your reference photo. Create variations with similar design language while exploring different styles and compositions.",
+  "upscaling_description": "Increase resolution and enhance details of architectural images. Sharpen features and improve clarity without distortion, making visuals ready for presentation and printing.",
+  "edit_image_description": "Make targeted modifications to architectural visualizations. Change materials, adjust lighting, or alter specific elements while maintaining overall image consistency.",
+  "elevation_description": "Transform 2D elevation drawings into photorealistic visualizations. Upload your technical facade plans and let AI generate detailed architectural renderings with accurate materials and proportions.",
+  "custom_styles_description": "Upload your own design styles and apply them to visualizations.",
+  "image_to_animation_description": "Transform visualizations into dynamic, animated videos.",
+  "expand_image_borders_description": "Expand images beyond their borders - with AI-generated, seamless context.",
+  "remove_objects_description": "Intelligently remove unwanted objects - for perfect visualizations.",
+  "replace_objects_description": "Swap objects, add elements, or modify parts of the image.",
+  "change_season_description": "Transform the season of your visualization - from summer to winter.",
+  "change_time_of_day_description": "Adjust the time of day to present different lighting conditions.",
+  "change_facade_colors_description": "Create color variations for facades - automatically and in real-time.",
+  "optimize_quality_description": "Optimize image quality and sharpness - for professional presentations."
+}

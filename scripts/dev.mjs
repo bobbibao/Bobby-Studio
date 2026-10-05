@@ -20,8 +20,16 @@ import {
   httpOk,
   log,
   run,
+  readEnvFile,
   waitFor,
 } from './lib/common.mjs';
+
+const simulatorPort = Number(process.env.SIMULATOR_PORT || readEnvFile(path.join(ROOT, 'image-simulator/.env')).get('SIMULATOR_PORT') || PORTS.simulator);
+
+const apiPort = Number(process.env.PORT || readEnvFile(path.join(ROOT, 'server-api/.env')).get('PORT') || PORTS.api);
+const workerPort = Number(process.env.WORKER_HEALTH_PORT || readEnvFile(path.join(ROOT, 'worker/.env')).get('WORKER_HEALTH_PORT') || PORTS.workerHealth);
+
+const frontendPort = Number(process.env.DEV_FRONTEND_PORT || readEnvFile(path.join(ROOT, 'frontend/.env.development.local')).get('DEV_FRONTEND_PORT') || PORTS.frontend);
 
 const [command = 'status', ...rest] = process.argv.slice(2);
 const flags = new Set(rest.filter((arg) => arg.startsWith('--') && !arg.includes('=')));
@@ -92,35 +100,35 @@ const apps = [
   {
     name: 'auth-emulator',
     dir: 'tools',
-    cmd: ['node_modules/.bin/firebase', 'emulators:start', '--only', 'auth', '--project', 'demo-bobby-studio', '--config', 'firebase.json'],
+    cmd: [process.execPath, 'node_modules/firebase-tools/lib/bin/firebase.js', 'emulators:start', '--only', 'auth', '--project', 'demo-bobby-studio', '--config', 'firebase.json'],
     ready: () => httpOk(`http://127.0.0.1:${PORTS.authEmulator}/`),
   },
   {
     name: 'simulator',
     dir: 'image-simulator',
-    cmd: ['node', 'dist/main.js'],
+    cmd: [process.execPath, 'dist/main.js'],
     build: ['yarn', 'build'],
-    ready: () => httpOk(`http://127.0.0.1:${PORTS.simulator}/health`),
+    ready: () => httpOk(`http://127.0.0.1:${simulatorPort}/health`),
   },
   {
     name: 'api',
     dir: 'server-api',
-    cmd: ['node', 'dist/src/main'],
+    cmd: [process.execPath, 'dist/src/main.js'],
     build: ['yarn', 'build'],
-    ready: () => httpOk(`http://127.0.0.1:${PORTS.api}/api/health/ready`),
+    ready: () => httpOk(`http://127.0.0.1:${apiPort}/api/health/ready`),
   },
   {
     name: 'worker',
     dir: 'worker',
-    cmd: ['node', 'dist/main'],
+    cmd: [process.execPath, 'dist/main.js'],
     build: ['yarn', 'build'],
-    ready: () => httpOk(`http://127.0.0.1:${PORTS.workerHealth}/health/ready`),
+    ready: () => httpOk(`http://127.0.0.1:${workerPort}/health/ready`),
   },
   {
     name: 'frontend',
     dir: 'frontend',
-    cmd: ['node_modules/.bin/vite', '--host', '127.0.0.1', '--port', String(PORTS.frontend), '--strictPort'],
-    ready: () => httpOk(`http://127.0.0.1:${PORTS.frontend}/`),
+    cmd: [process.execPath, 'node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', String(frontendPort), '--strictPort'],
+    ready: () => httpOk(`http://127.0.0.1:${frontendPort}/`),
   },
 ];
 
@@ -175,7 +183,7 @@ async function startApp(app) {
     if (built.status !== 0) throw new Error(`${app.name}: build failed`);
   }
   const out = openSync(path.join(LOG_DIR, `${app.name}.log`), 'a');
-  const child = spawn(app.cmd[0], app.cmd.slice(1), { cwd: dir, detached: true, stdio: ['ignore', out, out], env: process.env });
+  const child = spawn(app.cmd[0], app.cmd.slice(1), { cwd: dir, detached: true, windowsHide: true, stdio: ['ignore', out, out], env: process.env });
   child.unref();
   closeSync(out);
   writeFileSync(pidFile(app.name), String(child.pid));
@@ -188,7 +196,7 @@ async function startApp(app) {
 async function start() {
   await startInfra();
   for (const app of apps) await startApp(app);
-  log('\nStack is up. Frontend: http://127.0.0.1:' + PORTS.frontend);
+  log('\nStack is up. Frontend: http://127.0.0.1:' + frontendPort);
 }
 
 async function stop() {

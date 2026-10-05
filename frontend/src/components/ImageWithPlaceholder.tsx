@@ -87,7 +87,6 @@ export const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
 
       setImageState('loading');
       setBlobUrl(remoteUrl);
-      console.log(`🖼️ Frontend loading image from URL: ${remoteUrl}`);
       return;
     }
 
@@ -142,7 +141,7 @@ export const ImageWithPlaceholder: React.FC<ImageWithPlaceholderProps> = ({
   };
 
   const handleImageError = () => {
-    console.error(`❌ Failed to load image: ${blobUrl}`);
+    console.error('Failed to load image');
     setImageState('error');
   };
 

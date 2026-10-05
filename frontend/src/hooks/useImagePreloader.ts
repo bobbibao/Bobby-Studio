@@ -21,28 +21,21 @@ export const useImagePreloader = (images: ImageData[], format: string = 'webp') 
   const [loadedCount, setLoadedCount] = useState(0);
 
   // Use refs to track state and prevent unnecessary effects
-  const currentImagesRef = useRef<string>('');
+  const currentImagesRef = useRef<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const blobUrlsRef = useRef<Set<string>>(new Set());
 
   const preloadImages = useCallback(
     async (imageList: ImageData[]) => {
+      const imageKeys = JSON.stringify(imageList ?? []);
+      if (imageKeys === currentImagesRef.current) return;
+      currentImagesRef.current = imageKeys;
+
       if (!imageList || imageList.length === 0) {
+        abortControllerRef.current?.abort();
         setPreloadedImages({});
         setLoadedCount(0);
         setIsPreloading(false);
-        return;
-      }
-
-      // Create a stable key from image keys to prevent unnecessary re-runs
-      const imageKeys = imageList
-        .map((img) => img.key)
-        .filter(Boolean)
-        .sort()
-        .join(',');
-
-      // Don't reload if images haven't changed
-      if (imageKeys === currentImagesRef.current) {
         return;
       }
 
@@ -51,7 +44,6 @@ export const useImagePreloader = (images: ImageData[], format: string = 'webp') 
         abortControllerRef.current.abort();
       }
 
-      currentImagesRef.current = imageKeys;
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 

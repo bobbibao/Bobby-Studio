@@ -14,7 +14,7 @@ test.describe('identity', () => {
     page.on('request', (request) => {
       const url = new URL(request.url());
       if (!['127.0.0.1', 'localhost'].includes(url.hostname)) externalHosts.add(url.hostname);
-      if (url.port === '3000') {
+      if (url.port === new URL(process.env.E2E_API_URL ?? 'http://127.0.0.1:3000/api').port) {
         apiAuth.push({ url: `${url.pathname}`, authorized: Boolean(request.headers()['authorization']) });
       }
     });

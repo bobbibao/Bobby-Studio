@@ -13,7 +13,7 @@ const GridView: React.FC<{
   onEdit?: (project: CardDataProps) => void;
   onSelectProject?: (project: IProject) => void;
   handleDeleterojects?: (id: string) => void;
-  onDelete?: (projectId: string) => void;
+  onDelete?: (projectId: string) => void | Promise<void>;
 }> = ({ data = [], onEdit, onSelectProject, onDelete }) => {
   const { deleteProject } = UserProjectManagement();
   const dispatch = useAppDispatch();
@@ -23,11 +23,10 @@ const GridView: React.FC<{
     try {
       // Call the parent callback immediately to update the UI optimistically
       if (onDelete) {
-        onDelete(project.projectAttributeId);
+        await onDelete(project.projectAttributeId);
+      } else {
+        await deleteProject(project.projectAttributeId);
       }
-
-      // Delete the project from the server
-      await deleteProject(project.projectAttributeId);
 
       // Refresh the projects data to ensure the tree is updated
       if (user?.id) {

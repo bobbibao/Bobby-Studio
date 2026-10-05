@@ -1,5 +1,7 @@
 # Verification and operations
 
+Current application evidence: [Windows Chrome QA, 2026-10-06](browser-qa.md). The historical planning notes below are not the latest execution report.
+
 **Target runbook, not evidence that the application is complete.** The baseline lacked installed application dependencies. Application build, migration and E2E execution have not been verified by the planning changes.
 
 The design prototype was independently checked with JavaScript syntax validation, local-link checks, skill/YAML validation and Chrome/Playwright interaction checks. Prototype evidence is not application acceptance. Temporary verification tooling was installed outside the repository; no application test files or dependencies were added for the planning work.

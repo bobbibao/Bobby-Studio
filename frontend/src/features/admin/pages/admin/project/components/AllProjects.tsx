@@ -60,7 +60,7 @@ const AllProjects: React.FC<AllProjectsProps> = ({
 
   const assignedProjectImage = useSelector(projectImagesSelector);
 
-  const { editProjectTitleAndDescription } = UserProjectManagement();
+  const { editProjectTitleAndDescription, deleteProject } = UserProjectManagement();
   const [selectedViewOption, setSelectedViewOption] = useState<'grid' | 'list'>('grid');
   const [projectsList, setProjectsList] = useState<any[]>([]);
   const [openModal, setOpenModal] = useState(false);
@@ -101,7 +101,6 @@ const AllProjects: React.FC<AllProjectsProps> = ({
       setProjectsList((prevList) => prevList.filter((project) => project.projectAttributeId !== projectId));
 
       // Call the delete function from hook
-      const { deleteProject } = UserProjectManagement();
       await deleteProject(projectId);
 
       // Trigger parent reload

@@ -1,0 +1,20 @@
+{
+  "what_would_you_like_to_create": "Bạn muốn tạo cái gì?",
+  "line_drawing_to_image_description": "Biến những bản phác thảo kiến trúc thành hình ảnh trực quan sống động. Dù là kế hoạch vẽ tay hay bản outline kỹ thuật số, hệ thống sẽ chuyển chúng thành các bản render chân thực, đồng thời vẫn giữ trọn vẹn ý tưởng và tinh thần thiết kế ban đầu",
+  "text_to_image_description": "Tạo hình ảnh trực quan hóa của kiến trúc chỉ từ mô tả bằng văn bản. Bạn chỉ cần nhập ý tưởng thiết kế, vật liệu và bối cảnh mong muốn, hệ thống sẽ tạo ra những hình ảnh chất lượng cao, chân thực và phù hợp với tầm nhìn của bạn.",
+  "image_to_image_description": "Tạo ra những hình ảnh kiến trúc mới được lấy cảm hứng từ ảnh tham chiếu của bạn. Hệ thống giúp tạo các biến thể mang cùng ngôn ngữ thiết kế, đồng thời khám phá thêm nhiều phong cách và bố cục khác nhau.",
+  "upscaling_description": "Tăng độ phân giải và nâng cao mức độ chi tiết cho hình ảnh kiến trúc. Làm sắc nét các đường nét mà không gây biến dạng, giúp hình ảnh đạt chất lượng cao, sẵn sàng cho thuyết trình hoặc in ấn.",
+  "edit_image_description": "Thực hiện các sửa đổi được nhắm mục tiêu để trực quan hóa kiến trúc. Thay đổi vật liệu, điều chỉnh ánh sáng hoặc thay đổi các phần tử cụ thể trong khi duy trì tính nhất quán của hình ảnh tổng thể.",
+  "elevation_description": "Biến bản phác thảo 2D thành hình ảnh thực tế. Chỉ cần tải lên bản vẽ phác thảo kỹ thuật của bạn, và AI sẽ tạo ra các bản render kiến trúc chi tiết với vật liệu chính xác kết hợp với tỷ lệ chuẩn.",
+  "explore_tools": "Khám phá các công cụ",
+  "what_would_you_like_to_create_today": "Hôm nay bạn muốn tạo ra thứ gì?",
+  "custom_styles_description": "Tải lên phong cách thiết kế của riêng bạn và áp dụng chúng vào hình ảnh.",
+  "image_to_animation_description": "Biến hình ảnh thành video động.",
+  "expand_image_borders_description": "Mở rộng hình ảnh vượt ra ngoài viền - với ngữ cảnh được tạo ra bởi AI một cách liền mạch.",
+  "remove_objects_description": "Xóa các đối tượng không mong muốn một cách thông minh - để có hình ảnh hoàn hảo theo ý muốn.",
+  "replace_objects_description": "Thêm hoặc thay đổi đối tượng, thành phần của hình ảnh.",
+  "change_season_description": "Biến đổi mùa của hình ảnh của bạn. Ví dụ: từ mùa hè sang mùa đông, ...",
+  "change_time_of_day_description": "Điều chỉnh thời gian trong ngày để thể hiện các điều kiện ánh sáng một cách khác nhau.",
+  "change_facade_colors_description": "Tạo các biến thể màu sắc cho mặt ngoài của vật thể kết hợp với tự động và theo thời gian thực.",
+  "optimize_quality_description": "Tối ưu hóa chất lượng và độ sắc nét của hình ảnh."
+}

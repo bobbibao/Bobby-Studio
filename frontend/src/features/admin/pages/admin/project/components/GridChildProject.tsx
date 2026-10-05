@@ -19,10 +19,11 @@ import Button from '@/shared/buttons/Button';
 import CardFolder from '@/shared/card/CardFolder';
 import { ImageData, OptionType } from '@/types';
 import { ProjectFilters } from '@/types/project';
-import { MoveImageToFolderAction, SelectedMovingImageState } from '@/features/admin/pages/admin/project/types/project';
+import { MoveImageToFolderAction, MoveImagesToFolderAction, SelectedMovingImageState } from '@/features/admin/pages/admin/project/types/project';
 import ModalCreateFolder from './ModalCreateFolder';
 import ModalCreateProject from './ModalCreateProject';
 import ModalMoveImage from './ModalMoveImage';
+import ModalMoveImages from './ModalMoveImages';
 import FilterModal from '../../inspiration/components/FilterDialog/FilterDialog';
 import { FilterState } from '../../inspiration/types/filterDropdown';
 import { useImageNavigation } from '@/hooks/useImageNavigation';
@@ -240,6 +241,21 @@ const GridChildProject: React.FC<GridChildProjectProps> = ({
     } catch (error) {}
   };
 
+  const movingImages: SelectedMovingImageState[] = selectedImages.map((img) => ({
+    projectId: parentProjectId,
+    folderName: img.folderName || '',
+    folderIndex: folderData.findIndex((folder) => folder.name === img.folderName),
+    imageIndex: imageData.indexOf(img),
+    imageId: img.id || img.attributeId,
+    imagePath: img.path || img.value?.path || '',
+    imageData: img,
+  }));
+
+  const handleMoveImagesToFolder = async (payload: MoveImagesToFolderAction) => {
+    await moveImages(payload);
+    setSelectedImages([]);
+  };
+
   const openEditProjectModal = () => {
     setIsOpenEditProjectModal(true);
   };
@@ -431,7 +447,7 @@ const GridChildProject: React.FC<GridChildProjectProps> = ({
               {folderData.map((item, index) => (
                 <CardFolder
                   // id={item.id as string}
-                  key={item.id}
+                  key={item.id ?? `${parentProjectId}:${item.name}:${index}`}
                   name={item.name}
                   updatedAt={''}
                   onClick={() => handleCardFolderClick(item.name)}
@@ -546,13 +562,13 @@ const GridChildProject: React.FC<GridChildProjectProps> = ({
           </HStack>
         </Box>
       )}
-      {/* <ModalMoveImages
+      <ModalMoveImages
         projects={projects}
         isOpen={openModalMoveImages}
         onClose={onClose}
         onMove={handleMoveImagesToFolder}
-        selectedImages={selectedImages}
-      /> */}
+        selectedImages={movingImages}
+      />
       <ModalCreateFolder
         editMode={editFolderMode}
         modelData={folderData[currentFolderEdit as number]}
