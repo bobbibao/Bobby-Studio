@@ -1,4 +1,6 @@
-# API & Auth Architecture for React
+> Historical generic examples. Bobby currently has Firebase-based authentication and local bypass code; the target requires explicit local auth and server-side ownership. Use [audit](../docs/architecture/source-audit.md) and [generation contracts](../docs/architecture/generation-contracts.md). The sample login/refresh endpoints below are not evidence those endpoints exist in Bobby.
+
+# API & Auth Architecture for React (historical)
 
 ## API Service Layer
 
