@@ -32,7 +32,7 @@ import {
   type StrokeTool,
 } from '../canvas/types';
 import { usePanZoom } from './usePanZoom';
-import { focusRing, panelStyle, touchSize } from './styles';
+import { focusRing, touchSize } from './styles';
 import { ZoomControls } from './ZoomControls';
 
 type Tool = StrokeTool | 'pan';
@@ -106,15 +106,22 @@ export function SketchCanvas({ strokes, aspect, canUndo, canRedo, limitReached, 
     redraw();
   }, [dpr, redraw, viewport.height, viewport.width]);
 
-  // Never leave the scheduler waiting for a stroke that can no longer finish.
+  // Parents re-render mid-stroke (the drawing flag itself changes their state); keep the latest callbacks in
+  // refs so a new function identity can never cut a stroke short.
+  const onDrawingChangeRef = useRef(onDrawingChange);
+  onDrawingChangeRef.current = onDrawingChange;
+  const onStrokeRef = useRef(onStroke);
+  onStrokeRef.current = onStroke;
+
+  // Never leave the scheduler waiting for a stroke that can no longer finish (unmount only).
   useEffect(
     () => () => {
       if (activeRef.current) {
         activeRef.current = null;
-        onDrawingChange(false);
+        onDrawingChangeRef.current(false);
       }
     },
-    [onDrawingChange]
+    []
   );
 
   const toPaper = (event: { clientX: number; clientY: number }) => {
@@ -148,8 +155,8 @@ export function SketchCanvas({ strokes, aspect, canUndo, canRedo, limitReached, 
     } catch {
       // already released
     }
-    onStroke({ tool: active.tool, size: active.size, points: active.points });
-    onDrawingChange(false);
+    onStrokeRef.current({ tool: active.tool, size: active.size, points: active.points });
+    onDrawingChangeRef.current(false);
   };
 
   const onPointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {
@@ -180,7 +187,7 @@ export function SketchCanvas({ strokes, aspect, canUndo, canRedo, limitReached, 
       points: [point.x, point.y],
     };
     activeRef.current = active;
-    onDrawingChange(true);
+    onDrawingChangeRef.current(true);
     drawLive(active, 0);
   };
 
@@ -325,10 +332,10 @@ export function SketchCanvas({ strokes, aspect, canUndo, canRedo, limitReached, 
         position="relative"
         flex="1"
         minH={{ base: '260px', md: '320px' }}
-        {...panelStyle}
         bg="bg.muted"
         borderRadius="12px"
         overflow="hidden"
+        sx={{ boxShadow: 'inset 0 0 0 1px var(--chakra-colors-border-default)' }}
         _focusVisible={focusRing}
       >
         <canvas

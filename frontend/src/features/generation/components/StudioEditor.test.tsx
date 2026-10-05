@@ -179,6 +179,26 @@ describe('Studio draft recovery and user scoping', () => {
   });
 });
 
+describe('Studio session recovery', () => {
+  it('rebuilds the version strip from REST after a reload of the same tab, without creating a new session', async () => {
+    const fakes = createFakes();
+    const first = mount('user-a', fakes);
+    fireEvent.change(await promptBox(), { target: { value: 'Keep this version' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+    await waitFor(() => expect(fakes.api.createGeneration).toHaveBeenCalled());
+    await act(async () => {
+      fakes.emit(hintFor(fakes.server.complete('job-1')));
+    });
+    await screen.findByRole('img', { name: /Generated image for: Keep this version/ });
+    first.unmount();
+
+    mount('user-a', fakes);
+    expect(await screen.findByRole('img', { name: /Generated image for: Keep this version/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Final 1/ })).toBeTruthy();
+    expect(fakes.api.createStudioSession).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('Studio responsive layouts', () => {
   it('mobile: single column with Input/Result tabs and a reachable primary action', async () => {
     installDomStubs({ width: 390 });

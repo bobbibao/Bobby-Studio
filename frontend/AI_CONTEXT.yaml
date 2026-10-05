@@ -24,9 +24,10 @@ current_stack:
   database: PostgreSQL + Prisma, with duplicate Sequelize model catalog paths
   rendering: External Python adapter currently wired; Sharp for post-processing
 current_entrypoints:
-  studio: src/features/admin/pages/admin/generate/components/SdxlStudio/SdxlStudio.tsx
+  studio: src/features/generation/components/StudioEditor.tsx
   generation_feature: src/features/generation
-  generation_hook: src/hooks/useSdxlGeneration.ts
+  realtime_scheduler: src/features/generation/scheduler/scheduler.ts
+  generation_hook: src/features/generation/hooks/useRealtimeGeneration.ts
   socket_hook: src/hooks/useJobSocket.ts
   api_client: src/services/api/client.ts
   theme: src/theme/index.ts

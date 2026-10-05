@@ -32,7 +32,7 @@ export function useStudioSession(
     const store = getBrowserStore('session');
     const stored = readStoredSession(store, userId);
     if (stored) {
-      setState({ status: 'ready', session: stored });
+      setState((current) => (current.session?.sessionId === stored.sessionId ? current : { status: 'ready', session: stored }));
       return undefined;
     }
     let cancelled = false;

@@ -9,7 +9,7 @@ import type {
 import { hasInk } from '../canvas/strokes';
 import { pollDelayMs, QUIET_SIGNAL_MS, replayDelayMs } from './backoff';
 import { buildCreateRequest, requestFingerprint, sameInput } from './input';
-import { classifyHint, isNonterminal, mergeAccepted, mergeSnapshot, touchSignal, type AcceptedExtras } from './jobs';
+import { classifyHint, isNonterminal, mergeAccepted, mergeSnapshot, pruneJobs, touchSignal, type AcceptedExtras } from './jobs';
 import type {
   AdoptedJob,
   ApiProblem,
@@ -430,7 +430,7 @@ export function createRealtimeScheduler(options: SchedulerOptions): RealtimeSche
 
   function applyAccepted(accepted: GenerationAccepted, extras: AcceptedExtras): JobEntry | null {
     const result = mergeAccepted(jobs, accepted, { desiredRevision: revision, now: now() }, extras);
-    jobs = result.jobs;
+    jobs = pruneJobs(result.jobs, selectedJobId);
     lastSubmittedRevision = Math.max(lastSubmittedRevision, accepted.clientRevision);
     return result.entry;
   }
@@ -591,7 +591,7 @@ export function createRealtimeScheduler(options: SchedulerOptions): RealtimeSche
     if (!result.accepted) {
       return false;
     }
-    jobs = result.jobs;
+    jobs = pruneJobs(result.jobs, selectedJobId);
     ports.storeSnapshot(snapshot);
     if (result.newlyListed) {
       selectedJobId = null; // follow the newest output again
