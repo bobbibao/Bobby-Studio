@@ -8,7 +8,17 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { HistoryJobDto } from '../attribute/dto/user-attribute.dto';
+import { CurrentUser } from '../identity/principal';
+import { PrincipalService } from '../identity/principal.service';
+
+/** Room that receives every event for one user; joined automatically after authentication. */
+export const userRoom = (userId: string) => `user:${userId}`;
+
+interface AuthenticatedSocket extends Socket {
+  data: { user?: CurrentUser };
+}
 
 // Type for frontend GenerateImageResponse structure
 interface GenerateImageResponse {
@@ -36,11 +46,13 @@ interface GenerateImageResponse {
 
 @WebSocketGateway({
   cors: {
-    origin: (process.env.ALLOWED_CORS_DOMAINS || '').split(','),
+    origin: (process.env.ALLOWED_CORS_DOMAINS || '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
     credentials: true,
   },
   transports: ['websocket', 'polling'],
-  allowEIO3: true,
 })
 export class JobStatusGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -50,33 +62,74 @@ export class JobStatusGateway
 
   private logger: Logger = new Logger('JobStatusGateway');
 
+  constructor(
+    private readonly principals: PrincipalService,
+    private readonly prisma: PrismaService,
+  ) {}
+
   afterInit(server: Server) {
     this.logger.log('Socket.io gateway initialized');
   }
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
+  /**
+   * The handshake must carry a valid Firebase ID token (auth.token). Unauthenticated sockets are
+   * disconnected before they can join any room.
+   */
+  async handleConnection(client: AuthenticatedSocket) {
+    const token = this.extractToken(client);
+    if (!token) {
+      client.emit('authError', { message: 'Missing credentials' });
+      client.disconnect(true);
+      return;
+    }
+    try {
+      client.data.user = await this.principals.authenticateToken(token);
+    } catch {
+      client.emit('authError', { message: 'Invalid or expired credentials' });
+      client.disconnect(true);
+      return;
+    }
+    await client.join(userRoom(client.data.user.id));
+    client.emit('authenticated', { userId: client.data.user.id });
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+    this.logger.debug(`Client disconnected: ${client.id}`);
   }
 
+  /** A socket may join a job room only when the job belongs to its authenticated user. */
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(client: Socket, jobId: string) {
-    client.join(jobId);
-    // this.logger.log(`Client ${client.id} joined room: ${jobId}`);
-    client.emit('roomJoined', {
-      jobId,
-      message: 'Successfully joined job room',
-    });
+  async handleJoinRoom(client: AuthenticatedSocket, jobId: string) {
+    const user = client.data.user;
+    if (!user || typeof jobId !== 'string' || !(await this.ownsJob(jobId, user.id))) {
+      client.emit('roomError', { jobId, message: 'Job not found' });
+      return;
+    }
+    await client.join(jobId);
+    client.emit('roomJoined', { jobId, message: 'Successfully joined job room' });
   }
 
   @SubscribeMessage('leaveRoom')
-  handleLeaveRoom(client: Socket, jobId: string) {
-    client.leave(jobId);
-    this.logger.log(`Client ${client.id} left room: ${jobId}`);
+  async handleLeaveRoom(client: AuthenticatedSocket, jobId: string) {
+    if (typeof jobId !== 'string') return;
+    await client.leave(jobId);
     client.emit('roomLeft', { jobId, message: 'Successfully left job room' });
+  }
+
+  private extractToken(client: Socket): string | null {
+    const fromAuth = client.handshake.auth?.token;
+    if (typeof fromAuth === 'string' && fromAuth) return fromAuth;
+    const header = client.handshake.headers.authorization;
+    const match = typeof header === 'string' ? /^Bearer\s+(.+)$/i.exec(header.trim()) : null;
+    return match ? match[1].trim() : null;
+  }
+
+  private async ownsJob(jobId: string, userId: string): Promise<boolean> {
+    const job = await this.prisma.imageJob.findUnique({
+      where: { id: jobId },
+      select: { userId: true, request: { select: { userId: true } } },
+    });
+    return !!job && (job.userId ?? job.request?.userId) === userId;
   }
 
   emitJobStatus(
@@ -99,8 +152,4 @@ export class JobStatusGateway
     );
   }
 
-  // Emit specific job events
-  joinJobRoom(client: any, jobId: string) {
-    client.join(jobId);
-  }
 }

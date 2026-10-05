@@ -91,7 +91,7 @@ const simulatorKey = rotate
   : (existingWorker.get('IMAGE_PROVIDER_API_KEY') ?? existingSimulator.get('SIMULATOR_API_KEY') ?? `sim-local-${randomSecret(24)}`);
 
 const dbUrl = (name) => `postgresql://bobby:${encodeURIComponent(dbPassword)}@127.0.0.1:${PORTS.postgres}/${name}`;
-const secretKeys = rotate ? ['WORKER_SERVICE_SECRET', 'JWT_SECRET', 'DATABASE_URL', 'SHADOW_DATABASE_URL'] : [];
+const secretKeys = rotate ? ['WORKER_SERVICE_SECRET', 'ASSET_URL_SECRET', 'DATABASE_URL', 'SHADOW_DATABASE_URL'] : [];
 
 const apiAdded = ensureEnvFile(
   apiEnvFile,
@@ -110,7 +110,7 @@ const apiAdded = ensureEnvFile(
     STORAGE_DRIVER: 'local',
     LOCAL_STORAGE_ROOT: assetsRoot,
     WORKER_SERVICE_SECRET: workerSecret,
-    JWT_SECRET: () => randomSecret(),
+    ASSET_URL_SECRET: () => randomSecret(),
     IMAGE_PROVIDER: 'openai',
     IMAGE_PROVIDER_MODE: 'simulated',
   },

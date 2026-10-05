@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
@@ -16,17 +16,20 @@ export class NotificationRepository {
     });
   }
 
-  async markAsRead(notificationId: string) {
-    return this.prisma.notification.update({
-      where: { id: notificationId },
-      data: { isRead: true }, // Giả sử có trường isRead: boolean
+  /** Scoped to the owner: another user's notification id behaves like a missing one. */
+  async markAsRead(notificationId: string, userId: string) {
+    const result = await this.prisma.notification.updateMany({
+      where: { id: notificationId, userId },
+      data: { isRead: true },
     });
+    if (result.count === 0) throw new NotFoundException('Notification not found');
+    return { id: notificationId, isRead: true };
   }
 
-  async deleteNotification(notificationId: string) {
-    return this.prisma.notification.delete({
-      where: { id: notificationId },
-    });
+  async deleteNotification(notificationId: string, userId: string) {
+    const result = await this.prisma.notification.deleteMany({ where: { id: notificationId, userId } });
+    if (result.count === 0) throw new NotFoundException('Notification not found');
+    return { id: notificationId };
   }
 
   async createNotification(data: { userId?: string; title: string; message: string; data?: object; type: string }) {

@@ -14,7 +14,6 @@ import { UserModule } from '../user/user.module';
 import { ImageGenerationConfigService } from './image-generation-config.service';
 import { AttributeModule } from '../attribute/attribute.module';
 import { GCSConnector } from '../../connectors/gcs.connector';
-import { PrismaService } from '../../../prisma/prisma.service';
 import { EntitlementModule } from '../entitlement/entitlement.module';
 import { CreditSystemModule } from '../credit-system/credit-system.module';
 
@@ -80,7 +79,6 @@ import { GoogleConnector } from '../../connectors/google.connector';
     RedisService,
     JobStatusGateway,
     GCSConnector,
-    PrismaService,
     CreditSystemService,
     ModelCatalogService,
     GoogleConnector,

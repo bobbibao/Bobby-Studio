@@ -9,6 +9,7 @@ const devEnv = {
   STORAGE_DRIVER: 'local',
   LOCAL_STORAGE_ROOT: '/var/lib/bobby/assets',
   WORKER_SERVICE_SECRET: 'x'.repeat(32),
+  ASSET_URL_SECRET: 'y'.repeat(32),
   IMAGE_PROVIDER: 'openai',
   IMAGE_PROVIDER_MODE: 'simulated',
 };

@@ -707,6 +707,16 @@ export class AttributeService {
   }
 
   // New: fetch actions for a given attribute id/version
+  /** True when every id is either unused so far or already owned by the user. */
+  async ownsOrIsUnused(userId: string, attributeIds: string[]): Promise<boolean> {
+    return this.attributeRepository.ownsOrIsUnused(userId, attributeIds);
+  }
+
+  /** Owner of the attribute, or any user when a version of it is published to the gallery. */
+  async canReadAttribute(userId: string, attributeId: string): Promise<boolean> {
+    return this.attributeRepository.canReadAttribute(userId, attributeId);
+  }
+
   async getAttributeActions(
     attributeId: string,
     version?: string,

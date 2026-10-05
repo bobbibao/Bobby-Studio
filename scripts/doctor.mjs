@@ -22,7 +22,7 @@ for (const app of ['server-api', 'worker', 'frontend', 'tools']) {
 
 // Environment files: names and permissions only.
 const envChecks = [
-  ['server-api/.env', ['APP_ENV', 'DATABASE_URL', 'REDIS_HOST', 'FIREBASE_PROJECT_ID', 'STORAGE_DRIVER', 'WORKER_SERVICE_SECRET', 'IMAGE_PROVIDER', 'IMAGE_PROVIDER_MODE']],
+  ['server-api/.env', ['APP_ENV', 'DATABASE_URL', 'REDIS_HOST', 'FIREBASE_PROJECT_ID', 'STORAGE_DRIVER', 'WORKER_SERVICE_SECRET', 'ASSET_URL_SECRET', 'IMAGE_PROVIDER', 'IMAGE_PROVIDER_MODE']],
   ['worker/.env', ['APP_ENV', 'REDIS_HOST', 'API_INTERNAL_URL', 'WORKER_SERVICE_SECRET', 'IMAGE_PROVIDER', 'IMAGE_PROVIDER_MODE', 'IMAGE_PROVIDER_BASE_URL', 'IMAGE_PROVIDER_API_KEY']],
   ['frontend/.env.development.local', ['VITE_BOBBY_BE_API', 'VITE_FIREBASE_PROJECT_ID', 'VITE_FIREBASE_API_KEY']],
 ];

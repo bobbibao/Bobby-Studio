@@ -1296,12 +1296,6 @@ export class ImageGenerationService {
     jobId?: string,
   ): Promise<{ status: string }> {
     try {
-      const expectedSecret = process.env.IMAGE_GENERATION_WEBHOOK_SECRET;
-      // if (signature !== expectedSecret && !webhookData.webhook_events_filter) {
-      //   this.logger.warn('Invalid webhook signature received');
-      //   return { status: 'unauthorized' };
-      // }
-
       const provider = this.determineProvider(webhookData);
       this.logger.log(`📥 Received webhook from provider: ${provider}`);
 

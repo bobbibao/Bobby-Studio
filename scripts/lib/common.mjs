@@ -23,7 +23,11 @@ export const PORTS = {
 export const FIREBASE_DEMO_PROJECT = 'demo-bobby-studio';
 
 export function log(message = '') {
-  process.stdout.write(`${message}\n`);
+  try {
+    process.stdout.write(`${message}\n`);
+  } catch {
+    /* stdout closed (for example piped to head) */
+  }
 }
 
 export function run(command, args, options = {}) {

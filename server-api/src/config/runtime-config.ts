@@ -35,6 +35,8 @@ export interface RuntimeConfig {
   };
   storage: { driver: StorageDriver; localRoot?: string; gcsBucket?: string };
   workerServiceSecret: string;
+  /** Signs short-lived asset access URLs (HMAC); never reused for other purposes. */
+  assetUrlSecret: string;
   imageProvider: { id: ImageProviderId; mode: ImageProviderMode };
 }
 
@@ -175,6 +177,11 @@ export function loadRuntimeConfig(env: Env = process.env): RuntimeConfig {
     problems.push(`WORKER_SERVICE_SECRET is required and must be at least ${MIN_SECRET_LENGTH} characters`);
   }
 
+  const assetUrlSecret = env.ASSET_URL_SECRET ?? '';
+  if (!isSet(assetUrlSecret) || assetUrlSecret.length < MIN_SECRET_LENGTH) {
+    problems.push(`ASSET_URL_SECRET is required and must be at least ${MIN_SECRET_LENGTH} characters`);
+  }
+
   // Provider profile. Live inference is always an explicit choice.
   const providerId = oneOf<ImageProviderId>('IMAGE_PROVIDER', env.IMAGE_PROVIDER, IMAGE_PROVIDERS, problems);
   const providerMode = oneOf<ImageProviderMode>(
@@ -210,6 +217,7 @@ export function loadRuntimeConfig(env: Env = process.env): RuntimeConfig {
       gcsBucket: storageDriver === 'gcs' ? env.BOBBY_GCS_BUCKET_NAME : undefined,
     },
     workerServiceSecret,
+    assetUrlSecret,
     imageProvider: { id: providerId, mode: providerMode },
   };
 }

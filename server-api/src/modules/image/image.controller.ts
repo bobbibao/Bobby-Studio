@@ -9,31 +9,40 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ImageService } from './image.service';
-import { AuthGuard } from '../auth/auth.guard';
-import * as admin from 'firebase-admin';
+import { Public } from '../auth/public.decorator';
+import { AssetAccessService } from '../assets/asset-access.service';
+import { AttributeService } from '../attribute/attribute.service';
+import { PrincipalService } from '../identity/principal.service';
 import sharp = require('sharp');
+
+const MAX_QUALITY_FORMATS = new Set(['webp', 'jpg']);
+
 @Controller('images')
 export class ImageController {
-  constructor(private readonly imageService: ImageService) {}
+  constructor(
+    private readonly imageService: ImageService,
+    private readonly access: AssetAccessService,
+    private readonly principals: PrincipalService,
+    private readonly attributes: AttributeService,
+  ) {}
 
+  /**
+   * Library image delivery. Authorized by a short-lived signed `access` token (for <img> tags) or
+   * by a Bearer token whose user owns the image or sees it published. There is no anonymous access.
+   */
   @Get(':id')
+  @Public()
   async getImage(
     @Param('id') id: string,
-    @Query('code') code: string,
+    @Query('access') access: string,
     @Query('thumbnail') thumbnail: string,
-    @Query('format') format: string = 'webp',
+    @Query('format') requestedFormat: string = 'webp',
     @Res() res: Response,
     @Req() req: Request,
   ) {
-    if (code) {
-      try {
-        const decoded = await admin.auth().verifyIdToken(code);
-        if (!decoded || !decoded.sub) {
-          return res.status(401).send('Unauthorized');
-        }
-      } catch (error) {
-        return res.status(401).send(`Invalid token: ${error.message}`);
-      }
+    const format = MAX_QUALITY_FORMATS.has(requestedFormat) ? requestedFormat : 'webp';
+    if (!(await this.isAuthorized(id, access, req))) {
+      return res.status(404).send('Image not found');
     }
 
     try {
@@ -48,9 +57,9 @@ export class ImageController {
 
       res.set({
         'Content-Disposition': `inline; filename="${id}"`,
-        'Cache-Control': 'public, max-age=31536000',
+        // Private: the same URL is authorized per request, so shared caches must not keep it.
+        'Cache-Control': 'private, max-age=300',
         ETag: id,
-        'Last-Modified': new Date().toUTCString(),
       });
 
       if (format === 'jpg') {
@@ -75,6 +84,19 @@ export class ImageController {
       }
     } catch (error) {
       return res.status(404).send('Image not found');
+    }
+  }
+
+  private async isAuthorized(id: string, access: string | undefined, req: Request): Promise<boolean> {
+    if (this.access.verify(id, access)) return true;
+    const header = req.headers.authorization ?? '';
+    const match = /^Bearer\s+(.+)$/i.exec(header.trim());
+    if (!match) return false;
+    try {
+      const user = await this.principals.authenticateToken(match[1].trim());
+      return await this.attributes.canReadAttribute(user.id, id);
+    } catch {
+      return false;
     }
   }
 }
