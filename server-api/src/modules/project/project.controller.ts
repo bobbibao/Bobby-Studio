@@ -10,6 +10,7 @@ import {
   HttpException,
   HttpStatus,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateProjectsDto } from '../attribute/dto/create-project.dto';
 import { AttributeService } from '../attribute/attribute.service';
@@ -31,8 +32,10 @@ import {
 import { AttributeVersion } from '@prisma/client';
 import { UserAttributeService } from '../attribute/user-attribute.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { OwnUserScopeGuard } from '../auth/own-user-scope.guard';
+import { AuthenticatedRequest } from '../identity/principal';
 // import { EntitlementService } from './entitlement.service';
-import { EntitlementService } from 'src/service/entitlement/entitlement.service';
+import { EntitlementService } from '../entitlement/entitlement.service';
 
 @Controller('projects')
 @UseGuards(AuthGuard)
@@ -46,9 +49,19 @@ export class ProjectController {
   @Post()
   async upsertProjects(
     @Body() createProjectsDto: CreateProjectsDto,
-    @Request() req,
+    @Request() req: AuthenticatedRequest,
   ): Promise<UserAttributesDto[]> {
-    const { userId, projects } = createProjectsDto;
+    // Projects always belong to the authenticated caller; a userId in the body is ignored.
+    const userId = req.currentUser.id;
+    const { projects } = createProjectsDto;
+
+    // Updating an existing project requires owning it; foreign ids look like missing resources.
+    const referencedIds = projects
+      .map((p: Project & { attributeId?: string }) => p.attributeId ?? p.id)
+      .filter((id): id is string => typeof id === 'string' && id.length > 0);
+    if (!(await this.attributeService.ownsOrIsUnused(userId, referencedIds))) {
+      throw new NotFoundException('Project not found');
+    }
 
     // Get user role from request (set by AuthGuard)
     const userRole = req.currentUser?.role;
@@ -106,6 +119,7 @@ export class ProjectController {
   }
 
   @Get('user/:userId')
+  @UseGuards(OwnUserScopeGuard)
   async getProjects(
     @Param('userId') userId: string,
     @Query('orderBy') orderBy?: 'asc' | 'desc',

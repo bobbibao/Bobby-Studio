@@ -1,6 +1,5 @@
 import { RootState } from '@/store';
 import { createSelector } from '@reduxjs/toolkit';
-import { MOCK_UNASSIGNED_ATTRIBUTES } from '../features/admin/pages/admin/project/data';
 
 export const projectImagesSelector = createSelector(
   [(state: RootState) => state.projectManagement.projects, (state: RootState) => state.projectManagement.assignedAttributes],
@@ -69,8 +68,9 @@ export const projectImagesSelector = createSelector(
           projectAttributeId: project.attributeId || '',
           folderName: folders[0]?.name || '',
           folderIndex: 0,
-          imageId: MOCK_UNASSIGNED_ATTRIBUTES[0].key,
-          imagePath: MOCK_UNASSIGNED_ATTRIBUTES[0].path,
+          // No image yet: the card renders its own placeholder instead of fabricated imagery.
+          imageId: '',
+          imagePath: '',
           type: '',
           numberOfImages: 0,
           updatedAt: project?.createdAt || null,

@@ -14,12 +14,12 @@ export class NotificationController {
   }
 
   @Patch(':id/read')
-  async markAsRead(@Param('id') id: string) {
-    return this.notificationService.markNotificationAsRead(id);
+  async markAsRead(@Request() req, @Param('id') id: string) {
+    return this.notificationService.markNotificationAsRead(id, req.currentUser.id);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.notificationService.deleteNotification(id);
+  async delete(@Request() req, @Param('id') id: string) {
+    return this.notificationService.deleteNotification(id, req.currentUser.id);
   }
 }

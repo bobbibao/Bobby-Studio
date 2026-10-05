@@ -2614,6 +2614,29 @@ export class AttributeRepository {
     return thumbnail ? thumbnailPath : imagePath;
   }
 
+  async ownsOrIsUnused(userId: string, attributeIds: string[]): Promise<boolean> {
+    if (attributeIds.length === 0) return true;
+    const existing = await this.prisma.attributeVersion.findMany({
+      where: { id: { in: attributeIds } },
+      select: { id: true },
+      distinct: ['id'],
+    });
+    if (existing.length === 0) return true;
+    const owned = await this.prisma.userAttribute.findMany({
+      where: { userId, attributeId: { in: existing.map((row) => row.id) } },
+      select: { attributeId: true },
+    });
+    return owned.length === existing.length;
+  }
+
+  async canReadAttribute(userId: string, attributeId: string): Promise<boolean> {
+    const [owned, published] = await Promise.all([
+      this.prisma.userAttribute.findUnique({ where: { userId_attributeId: { userId, attributeId } }, select: { userId: true } }),
+      this.prisma.attributeVersion.findFirst({ where: { id: attributeId, isPublished: true }, select: { id: true } }),
+    ]);
+    return !!owned || !!published;
+  }
+
   // Fetch actions for a specific attribute (optionally for a specific version)
   async getAttributeActions(
     attributeId: string,

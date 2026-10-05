@@ -1,0 +1,16 @@
+# Local development state: assets, logs, pids, generated runtime data
+.data/
+
+# Dependencies and compiled output for the tooling package
+tools/node_modules/
+tools/.firebase/
+tools/*-debug.log
+tools/test-results/
+tools/playwright-report/
+
+# Generated local environment files (secrets); examples are committed instead
+.env
+.env.local
+*.env.local
+backups/
+.env.bak-*

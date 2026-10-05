@@ -1,12 +1,11 @@
 import { apiClient } from '@/services/api/client';
 import { BillingHistoryResponse } from '@/types/billing';
-import Stripe from 'stripe';
-import { UsageStatisticsDto } from '@/features/admin/pages/admin/profile/types/UsageStatistics.dto';
+import { UsageStatisticsDto } from '@/features/admin/pages/admin/profile/types/usageStatistics.dto';
 import CheckPaymentMethodResponse from '@/features/admin/pages/admin/profile/types/checkPaymentMethodResponse.dto';
 import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
 import { CancelSubscriptionResponseDto } from '@/features/admin/pages/admin/profile/types/cancelSubscriptionResponse.dto';
 import { UpgradeSubscriptionResponseDto } from '@/features/admin/pages/admin/profile/types/upgradeSubscriptionResponse.dto';
-import { StripePricingResponseDTO } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
+import { StripePrice, StripePricingResponseDTO } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
 
 export interface GetUsersQueryParams {
   page?: number;
@@ -59,7 +58,7 @@ export interface UpdateUserResponse {
 export interface GetUserImageHistoryQueryParams {
   inputType?: 'edit' | 'generate';
   method?: string;
-  resolution?: '1K' | '2K' | '4K';
+  resolution?: string;
   aspectRatio?: string;
   selectedEditingModels?: string;
   page?: number;
@@ -72,12 +71,31 @@ export interface UserImageHistoryItem {
   userId: string;
   inputType: 'edit' | 'generate';
   method?: string;
-  modelName?: string[];
+  // A single model name for generated images, a list of model names for edits.
+  modelName?: string | string[];
   resolution?: string;
   aspectRatio?: string;
   selectedEditingModels?: string[];
   batchEditId?: string | null;
   jobId?: string;
+  createdAt: string;
+}
+
+export interface UserImageHistoryDetail {
+  id: string;
+  inputType: 'edit' | 'generate';
+  method?: string;
+  provider: string | null;
+  model: string | null;
+  selectedModels: string[] | null;
+  selectedEditingModels: string[] | null;
+  imageSize: string | null;
+  resolution: string | null;
+  aspectRatio: string | null;
+  prompt: string | null;
+  enhancedPrompt: string | null;
+  imagePath: string | string[] | null;
+  referenceImages: string | string[] | null;
   createdAt: string;
 }
 
@@ -160,8 +178,8 @@ export const userApiClient = {
     return response.data;
   },
 
-  getPrice: async (priceId: string): Promise<Stripe.Price> => {
-    const response = await apiClient.get<Stripe.Price>(`/subscription/prices/${priceId}`);
+  getPrice: async (priceId: string): Promise<StripePrice> => {
+    const response = await apiClient.get<StripePrice>(`/subscription/prices/${priceId}`);
     return response.data;
   },
 
@@ -271,8 +289,8 @@ export const userApiClient = {
     return response.data;
   },
 
-  getUserImageHistoryDetail: async (id: string): Promise<UserImageHistoryItem> => {
-    const response = await apiClient.get<UserImageHistoryItem>(`/admin/detail-history/${id}`);
+  getUserImageHistoryDetail: async (id: string): Promise<UserImageHistoryDetail | null> => {
+    const response = await apiClient.get<UserImageHistoryDetail | null>(`/admin/detail-history/${id}`);
     return response.data;
   },
 

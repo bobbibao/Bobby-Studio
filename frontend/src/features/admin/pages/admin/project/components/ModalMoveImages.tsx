@@ -9,7 +9,7 @@ import ChevronRightIcon from '@/shared/icons/ChevronRightIcon';
 import ChevronLeftIcon from '@/shared/icons/ChevronLeftIcon';
 import { useToast, useColorMode } from '@chakra-ui/react';
 
-import { MoveImagesToFolderAction, SelectedMovingImageState } from '@/types/project';
+import { MoveImagesToFolderAction, SelectedMovingImageState } from '@/features/admin/pages/admin/project/types/project';
 import { useTranslation } from 'react-i18next';
 
 interface SelectedFolder {

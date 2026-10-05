@@ -10,7 +10,7 @@ export class TeamRepository {
   constructor(private prisma: PrismaService) {}
 
   async createTeam(name: string, ownerId: string): Promise<Team> {
-    // Kiểm tra xem ownerId đã có team chưa
+    // Check whether the owner already has a team
     const existingTeam = await this.prisma.team.findFirst({
       where: { ownerId },
     });
@@ -19,7 +19,7 @@ export class TeamRepository {
       throw new Error('Owner already has a team.');
     }
 
-    // Nếu chưa có, mới tạo team
+    // Only create a team when none exists
     return this.prisma.team.create({
       data: {
         name,
@@ -67,10 +67,10 @@ export class TeamRepository {
       members: userType
         ? {
             some: {
-              role: userType, // Lọc theo cột `role` trong `TeamMember`
+              role: userType, // Filter by the `role` column of `TeamMember`
             },
           }
-        : undefined, // Nếu `userType` không có thì lấy tất cả
+        : undefined, // Without `userType`, return everyone
     };
 
     const [teams, total] = await Promise.all([
@@ -119,12 +119,12 @@ export class TeamRepository {
     const skip = (page - 1) * pageSize;
     const take = Number(pageSize);
 
-    // Lấy thông tin team và danh sách thành viên có phân trang
+    // Load the team and a page of its members
     const team = await this.prisma.team.findUnique({
       where: { id: teamId },
       include: {
         members: {
-          where: userType ? { role: userType } : undefined, // Lọc theo userType nếu có
+          where: userType ? { role: userType } : undefined, // Filter by userType when provided
           include: {
             user: {
               select: {
@@ -156,7 +156,7 @@ export class TeamRepository {
       };
     }
 
-    // Đếm tổng số thành viên của team (áp dụng bộ lọc userType nếu có)
+    // Count the team's members (with the userType filter when provided)
     const totalMembers = await this.prisma.teamMember.count({
       where: {
         teamId,
@@ -165,7 +165,7 @@ export class TeamRepository {
     });
 
     return {
-      data: [team], // Trả về mảng vì Team là duy nhất
+      data: [team], // Returned as an array because the team is unique
       total: totalMembers,
       page,
       pageSize,
@@ -267,7 +267,7 @@ export class TeamRepository {
   }
 
   async getOrCreateTeamMembersByOwner(userId: string): Promise<GetTeamMembersResponseDto> {
-    // Tìm team mà userId là owner
+    // Find the team the user owns
     let team = await this.prisma.team.findUnique({
       where: { ownerId: userId },
       include: {
@@ -286,7 +286,7 @@ export class TeamRepository {
       },
     });
 
-    // Nếu chưa có team nào, tự động tạo
+    // Create a team automatically when none exists
     if (!team) {
       team = await this.prisma.team.create({
         data: {

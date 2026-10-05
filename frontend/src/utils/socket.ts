@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { getToken } from '@/services/auth/tokenStorage';
 
 interface SocketManager {
   socket: Socket | null;
@@ -32,6 +33,10 @@ export const connectSocket = (url: string, onConnectionError?: (error: Error) =>
       upgrade: true,
       rememberUpgrade: true,
       withCredentials: true, // Important for CORS with credentials
+      // Fresh Firebase ID token on every (re)connection; the server rejects unauthenticated sockets.
+      auth: (callback) => {
+        void getToken().then((token) => callback({ token }));
+      },
     });
 
     // Handle connection events

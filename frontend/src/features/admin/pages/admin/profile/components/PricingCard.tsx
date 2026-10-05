@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Divider, Text, Flex, useColorModeValue, Badge, Button } from '@chakra-ui/react';
+import { Box, Divider, Text, Flex, useColorModeValue, useColorMode, Badge, Button } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from '@/utils';
 import { getPlanChangeType } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
-import { SubscriptionResponseDtoV2 } from '@/types/subscriptionResponse.dto';
+import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
 
 // Coin/Credits icon
 const CoinIcon = () => (
@@ -44,13 +44,15 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
     const { t } = useTranslation();
     const translatorProfileNS = (key: string, options?: Record<string, any>) =>
       t(`profile:${key}`, options);
+    const { colorMode } = useColorMode();
+    const pickColor = <T,>(light: T, dark: T): T => (colorMode === 'dark' ? dark : light);
     const { currentPlan, view, unitAmount, plan: planType } = plan;
 
     // Determine if this plan change is an upgrade or downgrade
     const targetPlanName = view?.plan || planType || '';
     const planChangeType = getPlanChangeType(
       currentSubscription?.plan,
-      currentSubscription?.interval,
+      currentSubscription?.billingInterval,
       targetPlanName,
       intervalLabel
     );
@@ -176,7 +178,7 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
             {/* Best Value Badge - always show for Pro */}
             {isPro && (
               <Badge
-                bg={useColorModeValue('zinc.100', 'zinc.700')}
+                bg={pickColor('zinc.100', 'zinc.700')}
                 color={textColor}
                 px={2}
                 py={0.5}
@@ -184,7 +186,7 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
                 fontSize="xs"
                 fontWeight="medium"
                 borderWidth="1px"
-                borderColor={useColorModeValue('zinc.200', 'zinc.600')}
+                borderColor={pickColor('zinc.200', 'zinc.600')}
               >
                 {translatorProfileNS('pricing_card.best_value')}
               </Badge>

@@ -8,7 +8,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import store from '@/store';
 import { AuthProvider } from '@/common/context/useAuthContext';
 import { UserModeProvider } from '@/common/context/useUserModeContext';
-import { JobSocketProvider } from '@/common/context/useJobSocketContext';
 import theme from '@/theme';
 import ToastNotification from '@/app/ToastNotification';
 import '@/translations';
@@ -25,7 +24,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
               <UserModeProvider>
                 <AuthProvider>
                   <ToastNotification />
-                  <JobSocketProvider>{children}</JobSocketProvider>
+                  {children}
                 </AuthProvider>
               </UserModeProvider>
             </ChakraProvider>

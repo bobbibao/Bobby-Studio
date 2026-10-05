@@ -1,4 +1,5 @@
 import { Controller, Req, Post, Headers, BadRequestException } from '@nestjs/common';
+import { Public } from '../auth/public.decorator';
 import { PaymentService } from '../payment/payment.service';
 import RequestWithRawBody from './requestWithRawBody.interface';
 import StripeWebhookService from './stripe-webhook.service';
@@ -7,6 +8,8 @@ import StripeWebhookService from './stripe-webhook.service';
 export class StripeWebhookController {
   constructor(private readonly paymentService: PaymentService, private readonly stripeWebhookService: StripeWebhookService) {}
 
+  // Authenticated by Stripe's signature over the raw body, not by a user token.
+  @Public()
   @Post()
   async handleIncomingEvents(@Headers('stripe-signature') signature: string, @Req() request: RequestWithRawBody) {
     if (!signature) {

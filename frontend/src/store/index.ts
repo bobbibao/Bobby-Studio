@@ -11,11 +11,8 @@ import { navbarReducer } from '../slices/navbar';
 import { projectManagement } from '../reducers/project';
 import { currentUserReducer } from '../slices/currentUserSlice';
 import surveyFormReducer from '../slices/formSlice';
-import { cmsReducer } from '../slices/cms';
-import inspiration from '../reducers/inspiration';
 import { canvasReducer } from '../slices/canvasSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { modelsReducer } from '../slices/models';
 
 // Redux Persist configuration
 const editorConfigsPersistConfig = {
@@ -57,11 +54,8 @@ const store = configureStore({
     projectManagement,
     currentUser: currentUserReducer,
     survey: surveyFormReducer,
-    cms: cmsReducer,
-    inspiration,
     canvas: persistedCanvasReducer,
     toast: toastReducer,
-    models: modelsReducer,
   },
 
   middleware: (getDefaultMiddleware) =>

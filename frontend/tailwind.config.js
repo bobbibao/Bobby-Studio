@@ -340,5 +340,7 @@ module.exports = {
       },
     }),
   },
+  // Chakra UI provides the CSS reset; Tailwind preflight would conflict with it.
+  corePlugins: { preflight: false },
   plugins: [],
 };

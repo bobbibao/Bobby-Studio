@@ -24,7 +24,7 @@ import StripeCardForm, { StripeCardFormRef } from './components/StripeCardForm';
 import VisaIcon from '@/shared/icons/VisaIcon';
 import MasterCardIcon from '@/shared/icons/MasterCardIcon';
 import StripeIcon from '@/shared/icons/StripeIcon';
-import Stripe from 'stripe';
+import { StripePrice } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
 import { useQueryParamsURL } from '@/hooks/useQueryParamsURL';
 import { useTranslation } from 'react-i18next';
 
@@ -111,7 +111,7 @@ export default function PaymentDetail() {
   const priceId = params.priceId || '';
   const toast = useToast();
   const stripeFormRef = useRef<StripeCardFormRef>(null);
-  const [price, setPrice] = useState<Stripe.Price | null>(null);
+  const [price, setPrice] = useState<StripePrice | null>(null);
   const [urlResponse, setUrlResponse] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const colors = {
@@ -175,7 +175,7 @@ export default function PaymentDetail() {
     if (selectedMethod === 'stripe') {
       await handleUpgradeStripePlan(priceId);
     } else if (selectedMethod === 'visa' || selectedMethod === 'mastercard') {
-      stripeFormRef.current?.triggerSubmit(); // 🟢 Trigger submit từ ngoài
+      stripeFormRef.current?.triggerSubmit(); // Trigger submit from outside
     } else {
       alert('Please select a payment method.');
     }

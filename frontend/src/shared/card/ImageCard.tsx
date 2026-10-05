@@ -27,7 +27,9 @@ import { collectModelLabels, extractPromptFromSources, getEditVersionLabel } fro
 const ImageCard: React.FC<{
   id: string;
   img: {
-    key: string;
+    id?: string;
+    key?: string;
+    folderName?: string;
     path?: string;
     thumbnail?: string;
     dimensions?: string | null;
@@ -39,6 +41,9 @@ const ImageCard: React.FC<{
   hasAction?: boolean;
   isFavorite?: boolean;
   isBookmarked?: boolean;
+  // Multi-select support (used by project grids)
+  isSelected?: boolean;
+  onSelect?: () => void;
   handleCallback?: (isFavorite: boolean, isBookmarked: boolean) => void;
   handleDelCallback?: () => void;
   handleOnClick?: () => void;
@@ -60,6 +65,8 @@ const ImageCard: React.FC<{
   hasAction,
   isFavorite: isFavoriteProp,
   isBookmarked: isBookmarkedProp,
+  isSelected = false,
+  onSelect,
   handleCallback,
   handleDelCallback,
   handleOnClick,
@@ -384,6 +391,20 @@ const ImageCard: React.FC<{
         thumbnailUrl={img?.thumbnail}
         imageUrl={img?.path}
       />
+      {onSelect && (
+        <Box
+          className="absolute top-3 left-4"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          opacity={isSelected ? 1 : 0}
+          transition="opacity 0.3s"
+          zIndex={20}
+          _groupHover={{ opacity: 1 }}
+        >
+          <Checkbox isChecked={isSelected} onChange={() => onSelect()} size="lg" className="checkbox-project" />
+        </Box>
+      )}
       {hasPublish && (
         <Box
           className="absolute top-3 left-3 z-10"

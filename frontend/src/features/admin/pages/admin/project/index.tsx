@@ -25,7 +25,7 @@ import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import { useTranslation } from 'react-i18next';
 import { GetUnassignedUserImagesAction } from '@/features/admin/pages/admin/project/types/project';
 import FolderTree from '@/components/FolderTree';
-import { BreadcrumbItemType } from '@/types/breadcrumb';
+import { BreadcrumbItemType } from '@/features/admin/pages/admin/project/types/breadcrumb';
 import { PaginationType } from '@/types/pagination';
 import { getProjectLimit, getProjectLimitMessage, resolvePlan } from '@/utils/subscriptionRestrictions';
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +57,7 @@ const Projects: React.FC = () => {
     { displayName: 'Project', id: PROJECT_TREE_ITEM.ALL_PROJECT, type: 'project' },
   ]);
   const dispatch = useAppDispatch();
-  const { fetchProjectAndFolder, upsertProjects } = useProjectService();
+  const { upsertProjects } = useProjectService();
   const { user: currentUser } = useSelector((state: RootState) => state.currentUser);
   const userId = currentUser?.id;
   const toast = useToast();
@@ -310,17 +310,9 @@ const Projects: React.FC = () => {
     [projects, dispatch, fetchUnassignedData, fetchUploadsData]
   );
 
-  const handleFetchFolderTree = async () => {
-    await fetchProjectAndFolder();
-  };
-
   const reloadData = () => {
-    handleFetchFolderTree();
-    // Also refresh user projects to ensure consistency
     if (userId) {
-      if (userId) {
-        dispatch(getUserProjects({ userId: userId, orderBy: 'desc', inputType: [], creationType: '' }));
-      }
+      dispatch(getUserProjects({ userId: userId, orderBy: 'desc', inputType: [], creationType: '' }));
     }
   };
 

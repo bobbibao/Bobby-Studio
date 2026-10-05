@@ -10,7 +10,7 @@ import {
 import { useToast } from '@chakra-ui/react';
 import _ from 'lodash';
 import { updateLocalProjects } from '../reducers/project';
-import { Folder, ProjectAttributeEntity, ActionEntity } from '@/common/dtos/attribute/common.dto';
+import { Folder, ProjectAttributeEntity, ActionEntity, VImage } from '@/common/dtos/attribute/common.dto';
 import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import { AttributeTypeEnum } from '@/types/project';
 import { IProject, MoveImagesToFolderAction, MoveImageToFolderAction } from '../features/admin/pages/admin/project/types/project';
@@ -58,7 +58,7 @@ export const UserProjectManagement = () => {
 
       // Refresh data from server
       if (user?.id) {
-        dispatch(getUserProjects({ userId: userId, orderBy: 'desc', inputType: [], creationType: '' }));
+        dispatch(getUserProjects({ userId: user.id, orderBy: 'desc', inputType: [], creationType: '' }));
       }
     },
     [dispatch, projects, toast, user]
@@ -266,7 +266,10 @@ export const UserProjectManagement = () => {
   );
 
   const assignImageToFolder = useCallback(
-    async (attributeId: string, folderName: string, image: { id: string; path: string }) => {
+    async (attributeId: string, folderName: string, image: VImage) => {
+      if (!user?.id) {
+        return;
+      }
       const updateProjects = projects.map((project: IProject) => {
         if (project.attributeId === attributeId && project.value && project.value.folders) {
           const updatedFolders = project.value.folders.map((folder: Folder) => {
@@ -295,11 +298,11 @@ export const UserProjectManagement = () => {
       dispatch(updateLocalProjects(updateProjects));
       await dispatch(
         upsertUserProjects({
-          userId: user?.id,
+          userId: user.id,
           projects: updateProjects,
         })
       );
-      dispatch(getUserProjects({ userId: userId, orderBy: 'desc', inputType: [], creationType: '' }));
+      dispatch(getUserProjects({ userId: user.id, orderBy: 'desc', inputType: [], creationType: '' }));
     },
     [dispatch, projects, user]
   );
@@ -507,7 +510,9 @@ export const UserProjectManagement = () => {
 
       if (isUnassigned) {
         await deactiveImage(imageId, false);
-        await dispatch(getUnassignedAttributes({ page: 1, limit: 20, userId: user.id }));
+        if (user?.id) {
+          await dispatch(getUnassignedAttributes({ page: 1, limit: 20, userId: user.id }));
+        }
       }
 
       if (upsertUserProjects.fulfilled.match(action)) {
@@ -594,7 +599,9 @@ export const UserProjectManagement = () => {
         for (const imageId of imageIds) {
           await deactiveImage(imageId, false);
         }
-        await dispatch(getUnassignedAttributes({ page: 1, limit: 20, userId: user.id }));
+        if (user?.id) {
+          await dispatch(getUnassignedAttributes({ page: 1, limit: 20, userId: user.id }));
+        }
       }
 
       if (upsertUserProjects.fulfilled.match(action)) {
@@ -689,7 +696,7 @@ export const UserProjectManagement = () => {
       try {
         collectImageInfo(item);
       } catch (error) {
-        console.error('Lỗi khi xử lý item:', item.attributeId, error);
+        console.error('Failed to process item:', item.attributeId, error);
       }
     }
 
@@ -753,9 +760,9 @@ interface TransformedProject {
       folders: Folder[];
       description: string;
     };
-    actions: Record<string, unknown>;
-    createdAt: Date;
-    type: string;
+    actions: unknown;
+    createdAt: string | undefined;
+    type: string | undefined;
   }[];
 }
 

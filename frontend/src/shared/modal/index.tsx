@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/react';
+import { Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, ModalProps } from '@chakra-ui/react';
 import { classNames } from '@/utils';
 import Button from '@/shared/buttons/Button';
 import { useTranslation } from 'react-i18next';
@@ -16,11 +16,11 @@ interface ModalCommonProps {
   className?: string;
   classNameFooter?: string;
   closeOnOverlayClick?: boolean;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: ModalProps['size'];
   customOverlay?: any;
   showFooter?: boolean;
   disableSubmit?: boolean;
-  loadingSubmit?: boolean; // 👈 thêm dòng này
+  loadingSubmit?: boolean;
   showClose?: boolean;
   labelCancel?: string;
   labelSubmit?: string;

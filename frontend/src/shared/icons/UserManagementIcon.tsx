@@ -8,9 +8,9 @@ const UserManagementIcon = ({ active }: { active: boolean }) => {
   return !isToggleDarkMode || active ? (
     active ? (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-      stroke-linecap="round" stroke-linejoin="round" 
-      class="lucide lucide-user-cog-icon lucide-user-cog"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" 
+      strokeLinecap="round" strokeLinejoin="round" 
+      className="lucide lucide-user-cog-icon lucide-user-cog"
       >
         <path d="M10 15H6a4 4 0 0 0-4 4v2" />
         <path d="m14.305 16.53.923-.382" />
@@ -26,9 +26,9 @@ const UserManagementIcon = ({ active }: { active: boolean }) => {
       </svg>
     ) : (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-      stroke-linecap="round" stroke-linejoin="round" 
-      class="lucide lucide-user-cog-icon lucide-user-cog"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" 
+      strokeLinecap="round" strokeLinejoin="round" 
+      className="lucide lucide-user-cog-icon lucide-user-cog"
       >
         <path d="M10 15H6a4 4 0 0 0-4 4v2"/>
         <path d="m14.305 16.53.923-.382"/>
@@ -45,9 +45,9 @@ const UserManagementIcon = ({ active }: { active: boolean }) => {
     )
   ) : (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-      stroke-linecap="round" stroke-linejoin="round" 
-      class="lucide lucide-user-cog-icon lucide-user-cog"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" 
+      strokeLinecap="round" strokeLinejoin="round" 
+      className="lucide lucide-user-cog-icon lucide-user-cog"
       >
         <path d="M10 15H6a4 4 0 0 0-4 4v2"/>
         <path d="m14.305 16.53.923-.382"/>

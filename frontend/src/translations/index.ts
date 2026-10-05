@@ -16,6 +16,7 @@ const namespaces = [
   'history',
   'video',
   'usermanagement',
+  'studio',
 ];
 
 i18n

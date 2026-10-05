@@ -1,14 +1,11 @@
-import 'dotenv/config';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from '../../prisma/prisma.service';
 import { UserModule } from '../modules/user/user.module';
 import { NotificationModule } from '../modules/notification/notification.module';
 import { SubscriptionModule } from '../modules/subscription/subscription.module';
 import { AuthModule } from '../modules/auth/auth.module';
-import { JwtService } from '@nestjs/jwt';
 import { AttributeModule } from '../modules/attribute/attribute.module';
 import { ConfigurationService } from '../modules/profile-config/configuration.service';
 import { ConfigurationRepository } from '../modules/profile-config/configuration.repository';
@@ -21,7 +18,6 @@ import { UploadModule } from '../modules/upload/upload.module';
 import { TeamModule } from '../modules/team/team.module';
 import { PrivacyModule } from '../modules/privacy/privacy.module';
 import { VizpointModule } from '../modules/vizpoint/vizpoint.module';
-import { ImageGenerationModule } from '../modules/image-generation/image-generation.module';
 import { PromptEnhancementModule } from '../modules/prompt-enhancement/prompt-enhancement.module';
 import { ValidationMiddleware } from 'src/middleware';
 import { BullModule } from '@nestjs/bullmq';
@@ -33,56 +29,52 @@ import { EntitlementModule } from '../modules/entitlement/entitlement.module';
 import { ModelCatalogModule } from '../modules/model-catalog/model-catalog.module';
 import { AuthController } from '../modules/auth/auth.controller';
 import { AdminModule } from '../modules/admin/admin.module';
-import { isRedisConfigured } from 'src/shared/utils/env.utils';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { PrismaModule } from '../modules/prisma/prisma.module';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { RequestLoggingInterceptor } from '../modules/ops/request-logging.interceptor';
+import { AuthGuard } from '../modules/auth/auth.guard';
+import { GenerationModule } from '../modules/generation/generation.module';
+import { CreditsModule } from '../modules/credits/credits.module';
+import { AssetsModule } from '../modules/assets/assets.module';
+import { IdentityModule } from '../modules/identity/identity.module';
+import { RuntimeConfigModule } from '../config/runtime-config.module';
+import { HealthModule } from '../modules/health/health.module';
 
-const redisEnabled = isRedisConfigured();
-const cacheModule = redisEnabled
-  ? CacheModule.registerAsync({
-      isGlobal: true,
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('REDIS_HOST'),
-        port: configService.get('REDIS_PORT'),
-        password: configService.get('REDIS_PASSWORD'),
-        db: configService.get('REDIS_DB', 0),
-        ttl: 300, // 5 minutes default
-      }),
-      inject: [ConfigService],
-    })
-  : CacheModule.register({
-      isGlobal: true,
-      ttl: 300,
-    });
-
-const queueModules = redisEnabled
-  ? [ImageGenerationModule]
-  : [];
+const cacheModule = CacheModule.registerAsync({
+  isGlobal: true,
+  useFactory: async (configService: ConfigService) => ({
+    store: redisStore,
+    host: configService.get('REDIS_HOST'),
+    port: configService.get('REDIS_PORT'),
+    password: configService.get('REDIS_PASSWORD'),
+    db: configService.get('REDIS_DB', 0),
+    ttl: 300, // 5 minutes default
+  }),
+  inject: [ConfigService],
+});
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
-    }),
+    RuntimeConfigModule,
+    PrismaModule,
+    IdentityModule,
+    AssetsModule,
+    HealthModule,
     cacheModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ...(redisEnabled
-      ? [
-          BullModule.forRoot({
-            connection: {
-              host: process.env.REDIS_HOST,
-              port: parseInt(process.env.REDIS_PORT),
-              lazyConnect: true,
-            },
-          }),
-        ]
-      : []),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT, 10),
+        password: process.env.REDIS_PASSWORD || undefined,
+        db: parseInt(process.env.REDIS_DB || '0', 10),
+        lazyConnect: true,
+      },
+    }),
     UserModule,
     NotificationModule,
     SubscriptionModule,
@@ -99,11 +91,12 @@ const queueModules = redisEnabled
     ImageModule,
     EntitlementModule,
     ModelCatalogModule,
+    CreditsModule,
+    GenerationModule,
     AdminModule,
-    ...queueModules,
   ],
   controllers: [AppController, AuthController, UserController],
-  providers: [AppService, PrismaService, JwtService, ConfigurationService, ConfigurationRepository],
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }, { provide: APP_INTERCEPTOR, useClass: RequestLoggingInterceptor }, AppService, ConfigurationService, ConfigurationRepository],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

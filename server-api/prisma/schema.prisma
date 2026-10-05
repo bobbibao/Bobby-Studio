@@ -11,7 +11,8 @@ datasource db {
 model User {
   id                  String               @id @default(uuid())
   email               String
-  password            String
+  // Identity is owned by Firebase Authentication; legacy rows may still carry a hash.
+  password            String?
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   profileType         String?
@@ -28,6 +29,8 @@ model User {
   freeCreditRenewalAt DateTime?
   paidCredit          Int                  @default(0)
   usedPaidCredit      Int                  @default(0)
+  // Credits held for in-flight generation jobs; available = free + paid - used - reserved.
+  reservedCredit      Int                  @default(0)
   paidCreditRenewalAt DateTime?
   Bookmark            Bookmark[]
   Favorite            Favorite[]
@@ -323,14 +326,19 @@ model Bookmark {
 }
 
 model ImageRequest {
-  id         String     @id @default(uuid())
-  userId     String
-  method     String
-  parameters Json
-  status     String     @default("PENDING")
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  jobs       ImageJob[]
+  id             String     @id @default(uuid())
+  userId         String
+  method         String
+  parameters     Json
+  status         String     @default("PENDING")
+  // Idempotent admission: one logical request per user + client-supplied key.
+  idempotencyKey String?
+  inputHash      String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  jobs           ImageJob[]
+
+  @@unique([userId, idempotencyKey])
 
   @@index([userId])
   @@index([status])
@@ -352,9 +360,104 @@ model ImageJob {
   cancelledAt DateTime?
   request     ImageRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
+  // Owner, denormalized from the request so every read can be scoped by principal.
+  userId                  String?
+  studioSessionId         String?
+  clientRevision          Int?
+  // preview (automatic, supersedable) or final (explicit)
+  intent                  String       @default("final")
+  // Increments on every lifecycle change; consumers drop events with a lower version.
+  stateVersion            Int          @default(0)
+  stage                   String?
+  errorCode               String?
+  isSimulated             Boolean      @default(false)
+  creditCost              Int          @default(0)
+  // Worker attempt fencing: only the holder of the current run token may report progress or finish.
+  attemptId               String?
+  runTokenHash            String?
+  attemptCount            Int          @default(0)
+  lastEventSequence       Int          @default(0)
+  // Durable provider checkpoint (asset references and digests only; never image bytes).
+  checkpoint              Json?
+  // Output asset references once finalized.
+  result                  Json?
+  retryOfJobId            String?
+  deadlineAt              DateTime?
+  expiresAt               DateTime?
+  cancellationRequestedAt DateTime?
+  executionFinishedAt     DateTime?
+  // Set when the user keeps a result (Save version); kept results leave preview retention.
+  savedAt                 DateTime?
+
   @@index([requestId])
   @@index([status])
   @@index([createdAt])
+  @@index([userId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([studioSessionId, clientRevision])
+}
+
+// One editing session per browser tab; admission is serialized on this row.
+model StudioSession {
+  id             String   @id @default(uuid())
+  userId         String
+  latestRevision Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+// Transactional outbox: dispatch intent is committed together with the job.
+model GenerationOutbox {
+  id            String    @id @default(uuid())
+  jobId         String
+  eventType     String
+  schemaVersion Int       @default(1)
+  payload       Json
+  attempts      Int       @default(0)
+  nextAttemptAt DateTime  @default(now())
+  leaseUntil    DateTime?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@unique([jobId, eventType])
+  @@index([publishedAt, nextAttemptAt])
+}
+
+// Exactly one financial effect per job: RESERVED -> CAPTURED | RELEASED.
+model CreditReservation {
+  id        String   @id @default(uuid())
+  jobId     String   @unique
+  userId    String
+  amount    Int
+  status    String   @default("RESERVED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+}
+
+// Owned binary assets (inputs, outputs, thumbnails). Queue payloads and history carry only ids.
+model Asset {
+  id          String    @id @default(uuid())
+  ownerId     String
+  kind        String
+  storageKey  String    @unique
+  mimeType    String
+  byteSize    Int
+  sha256      String
+  width       Int?
+  height      Int?
+  // input | preview | saved
+  retention   String    @default("preview")
+  expiresAt   DateTime?
+  jobId       String?
+  outputIndex Int?
+  createdAt   DateTime  @default(now())
+
+  @@unique([jobId, outputIndex, kind])
+  @@index([ownerId, createdAt(sort: Desc)])
+  @@index([expiresAt])
 }
 
 model CreditSystem {

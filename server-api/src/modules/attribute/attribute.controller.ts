@@ -13,6 +13,7 @@ import {
   Put,
   Patch,
   UnauthorizedException,
+  NotFoundException,
   Logger,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -43,7 +44,6 @@ import { BaseResponse, BobbyResponse } from '../../common';
 import { randomUUID } from 'crypto';
 import { AuthGuard } from '../auth/auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { JwtService } from '@nestjs/jwt';
 import { VizpointService } from '../vizpoint/vizpoint.service';
 import {
   ToggleFavoriteDto,
@@ -57,9 +57,12 @@ import {
   InputTypeEnum,
 } from 'src/constant/attribute-type.enum';
 import { RedisService } from '../../shared/services/redis.service';
-import { Public } from '../auth/public.decorator';
+import { AuthenticatedRequest } from '../identity/principal';
+import { AdminGuard } from '../auth/admin.guard';
+import { OwnUserScopeGuard } from '../auth/own-user-scope.guard';
+import { imageUploadOptions } from '../../shared/upload/image-upload.options';
 // import { EntitlementService } from './entitlement.service';
-import { EntitlementService } from 'src/service/entitlement/entitlement.service';
+import { EntitlementService } from '../entitlement/entitlement.service';
 import { UserService } from '../user/user.service';
 
 @ApiTags('Attributes')
@@ -70,7 +73,6 @@ export class AttributeController {
 
   constructor(
     private readonly attributeService: AttributeService,
-    private readonly jwtService: JwtService,
     private readonly vizpointService: VizpointService,
     private readonly redisService: RedisService,
     private readonly entitlementService: EntitlementService,
@@ -78,7 +80,8 @@ export class AttributeController {
   ) {}
 
   @Post('upload-images/:userId')
-  @UseInterceptors(FilesInterceptor('file')) // Ensure 'images' matches the field name in the request
+  @UseGuards(OwnUserScopeGuard)
+  @UseInterceptors(FilesInterceptor('file', 10, imageUploadOptions))
   async uploadImages(
     @UploadedFiles() images: Express.Multer.File[],
     @Param('userId') userId: string,
@@ -119,6 +122,7 @@ export class AttributeController {
   }
 
   @Get('unassigned/:userId')
+  @UseGuards(OwnUserScopeGuard)
   async getUnassignedAttributes(
     @Param('userId') userId: string,
     @Query('page', ParseIntPipe) page = 1,
@@ -178,6 +182,7 @@ export class AttributeController {
   }
 
   @Get('uploads/:userId')
+  @UseGuards(OwnUserScopeGuard)
   @ApiOperation({ summary: 'Get user uploaded images (Original_Image type)' })
   async getUserUploads(
     @Param('userId') userId: string,
@@ -218,6 +223,7 @@ export class AttributeController {
   }
 
   @Get('videos/:userId')
+  @UseGuards(OwnUserScopeGuard)
   @ApiOperation({ summary: 'Get user generated videos (Generated_Video type)' })
   async getUserVideos(
     @Param('userId') userId: string,
@@ -252,6 +258,7 @@ export class AttributeController {
   }
 
   @Post('assigned/:userId')
+  @UseGuards(OwnUserScopeGuard)
   async getAssignedAttributes(
     @Param('userId') userId: string,
     @Body() body: { imageIds: string[] },
@@ -443,7 +450,7 @@ export class AttributeController {
     const offset = (currentPage - 1) * limit;
     const txt = type ? type.split(/[^a-zA-Z0-9]+/) : [];
     const getImagesDTO: GetImagesDTO = {
-      userId: '9FVUE9kkasPcgCzkTUbhNIzZmSD2',
+      userId: curUserId,
       offset,
       limit,
       type: txt.join(' ') as ActionMethodEnum,
@@ -665,6 +672,7 @@ export class AttributeController {
   }
 
   @Patch('versions/publish')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Update publish status of attribute versions' })
   @ApiResponse({
     status: 200,
@@ -694,6 +702,7 @@ export class AttributeController {
     return result;
   }
   @Patch('versions/publish-all')
+  @UseGuards(AdminGuard)
   @ApiOperation({ summary: 'Update publish status of all attribute versions' })
   @ApiResponse({
     status: 200,
@@ -720,7 +729,7 @@ export class AttributeController {
   }
 
   @Get('history/:userId')
-  @Public()
+  @UseGuards(OwnUserScopeGuard)
   @ApiOperation({ summary: 'Get image generation history for a user' })
   @ApiResponse({
     status: 200,
@@ -787,7 +796,7 @@ export class AttributeController {
   }
 
   @Get('edit-history/:userId')
-  @Public()
+  @UseGuards(OwnUserScopeGuard)
   @ApiOperation({ summary: 'Get image edit history for a user' })
   @ApiResponse({
     status: 200,
@@ -816,8 +825,13 @@ export class AttributeController {
   })
   async getAttributeActions(
     @Param('attributeId') attributeId: string,
+    @Request() req: AuthenticatedRequest,
     @Query('version') version?: string,
   ): Promise<ActionEntity | null> {
+    // Actions contain the generation prompt: only the owner, or anyone for a published image.
+    if (!(await this.attributeService.canReadAttribute(req.currentUser.id, attributeId))) {
+      throw new NotFoundException('Attribute not found');
+    }
     const actions = await this.attributeService.getAttributeActions(
       attributeId,
       version,

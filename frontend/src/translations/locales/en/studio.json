@@ -1,0 +1,221 @@
+{
+  "title": "Bobby Studio",
+  "header": {
+    "credits_one": "{{formatted}} credit",
+    "credits_other": "{{formatted}} credits"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "retry": "Try again"
+  },
+  "load": {
+    "loading": "Loading Bobby Studio",
+    "error_title": "Bobby Studio could not load",
+    "error_body": "We could not reach the service to start your session. Your draft is safe on this device. Check your connection and try again.",
+    "no_models_title": "No image models available",
+    "no_models_body": "Your plan does not include an image model right now. Contact support or check your plan."
+  },
+  "panel": {
+    "aria": "Prompt and settings"
+  },
+  "prompt": {
+    "label": "Prompt",
+    "placeholder": "Describe what you want to create",
+    "hint": "Press Ctrl+Enter (or Cmd+Enter) to generate.",
+    "counter": "{{current}} / {{max}}"
+  },
+  "settings": {
+    "title": "Settings",
+    "open": "Settings",
+    "model": "Model",
+    "model_locked": "{{name}} (not included in your plan)",
+    "no_models": "No models available",
+    "simulated": "Simulated inference",
+    "aspect": "Aspect ratio",
+    "size_option": "{{ratio}} · {{width}} × {{height}}",
+    "quality": "Quality",
+    "quality_preview": "Preview",
+    "quality_standard": "Standard",
+    "quality_option_one": "{{quality}} · {{count}} credit",
+    "quality_option_other": "{{quality}} · {{count}} credits",
+    "quality_hint": "Estimated credits per image."
+  },
+  "actions": {
+    "generate": "Generate",
+    "generating": "Generating…",
+    "stop": "Stop",
+    "retry": "Retry",
+    "save": "Save version",
+    "download": "Download",
+    "compare": "Compare with input",
+    "copy_prompt": "Copy prompt"
+  },
+  "realtime": {
+    "label": "Realtime",
+    "usage_one": "Previews as you edit · about {{count}} credit each",
+    "usage_other": "Previews as you edit · about {{count}} credits each",
+    "usage_unknown": "Previews as you edit",
+    "paused": "Realtime is paused.",
+    "paused_short": "Paused",
+    "paused_provider": "Realtime is paused because image generation is temporarily unavailable. Try again later or contact support if it continues.",
+    "paused_credits": "Realtime is paused because you do not have enough credits.",
+    "resume": "Resume Realtime"
+  },
+  "input": {
+    "modes": "Input mode",
+    "mode_prompt": "Prompt",
+    "mode_sketch": "Sketch",
+    "mode_reference": "Reference",
+    "prompt_only_title": "Prompt only",
+    "prompt_only_body": "Describe the scene in the prompt. Nothing else is required: no sketch or image is sent. Switch to Sketch or Reference to guide the result with an image.",
+    "examples": "Try an example prompt",
+    "example_timber": "A modern timber and glass home in soft morning light",
+    "example_library": "A minimalist concrete library at dusk with warm interior lighting",
+    "example_courtyard": "A quiet courtyard with climbing plants and a small water feature"
+  },
+  "sketch": {
+    "toolbar": "Sketch tools",
+    "brush": "Brush",
+    "eraser": "Eraser",
+    "pan": "Pan",
+    "brush_size": "Brush size",
+    "eraser_size": "Eraser size",
+    "undo": "Undo",
+    "redo": "Redo",
+    "clear": "Clear sketch",
+    "clear_title": "Clear the sketch?",
+    "clear_body": "This removes every stroke from the canvas. You can still describe your idea in the prompt.",
+    "clear_confirm": "Clear sketch",
+    "canvas_label": "Sketch canvas",
+    "canvas_image": "Drawing surface. Use a pointer or touch to draw.",
+    "help": "Draw with a mouse, pen or finger. With the canvas focused: Ctrl+Z undoes, Ctrl+Shift+Z redoes, +/- zooms. Prefer not to draw? Describe the scene in the prompt or add a reference image.",
+    "limit_reached": "The sketch reached its stroke limit. Undo or clear to keep drawing."
+  },
+  "reference": {
+    "dropzone": "Reference image drop area",
+    "title": "Add a reference image",
+    "body": "Drop an image here, paste one from the clipboard, or choose a file. It is used as-is, with its original colors.",
+    "choose": "Choose image",
+    "replace": "Replace",
+    "remove": "Remove",
+    "help": "PNG, JPEG or WebP, up to {{max}}.",
+    "uploading": "Uploading…",
+    "ready": "Ready",
+    "failed": "Upload failed",
+    "no_preview": "Reference attached (preview unavailable)",
+    "preview_alt": "Reference image {{name}}",
+    "issue_type": "This file type is not supported. Use a PNG, JPEG or WebP image.",
+    "issue_size": "This image is too large. The limit is {{max}}.",
+    "issue_empty": "This file is empty."
+  },
+  "result": {
+    "title": "Result",
+    "preview": "Preview",
+    "final": "Final",
+    "saved": "Saved",
+    "saving": "Saving…",
+    "unsaved": "Not saved",
+    "updating": "Updating…",
+    "input_changed": "Input changed since this version",
+    "working": "Working on it…",
+    "empty_title": "Your result appears here",
+    "empty_body": "Write a prompt, sketch or add a reference, then press Generate. Turn on Realtime for previews while you edit.",
+    "alt": "Generated image",
+    "alt_prompt": "Generated image for: {{prompt}}",
+    "compare_input": "Your input image",
+    "failed": "Generation failed",
+    "cancelled": "Cancelled",
+    "cancelled_keep": "The generation was stopped. Your previous result is still shown.",
+    "cancelled_body": "The generation was stopped before it finished.",
+    "expired_title": "Expired — regenerate",
+    "expired_body": "Unsaved previews are removed after a while. Regenerate to create this image again.",
+    "regenerate": "Regenerate",
+    "save_failed": "Could not save this version. Try again.",
+    "download_failed": "Could not download the image. Try again.",
+    "copied": "Prompt copied.",
+    "meta": "{{date}} · {{width}} × {{height}}",
+    "ready_one": "Result ready. {{count}} version in this session.",
+    "ready_other": "Result ready. {{count}} versions in this session."
+  },
+  "versions": {
+    "title": "Session versions",
+    "empty": "Versions you create in this session appear here. Save a version to keep it in your library.",
+    "preview_n": "Preview {{n}}",
+    "final_n": "Final {{n}}",
+    "item_label": "{{label}}, {{state}}"
+  },
+  "status": {
+    "pending": "Waiting to start…",
+    "queued": "Waiting for a free slot…",
+    "processing": "Working on your image…",
+    "stage_provider": "Generating the image…",
+    "stage_storing": "Saving the result…",
+    "stage_finalizing": "Finishing up…",
+    "cancelling": "Stopping…"
+  },
+  "connection": {
+    "reconnecting": "Reconnecting…",
+    "offline": "Offline — your draft is kept",
+    "unavailable": "Live updates unavailable — checking periodically"
+  },
+  "mobile": {
+    "input": "Input",
+    "result": "Result",
+    "new_badge": "New",
+    "updating_badge": "Updating"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Zoom in",
+    "out": "Zoom out",
+    "fit": "Fit to view"
+  },
+  "issues": {
+    "prompt_empty": "Describe what you want to create to generate.",
+    "prompt_too_long": "The prompt is too long. Shorten it to continue.",
+    "model_missing": "Choose a model to generate.",
+    "model_not_entitled": "This model is not included in your plan. Choose another model.",
+    "size_unsupported": "Choose an aspect ratio this model supports.",
+    "quality_unsupported": "Choose a quality this model supports.",
+    "mode_unsupported": "This model does not support the selected input mode.",
+    "reference_required": "Add a reference image to use Reference mode.",
+    "reference_uploading": "Waiting for the reference image to finish uploading.",
+    "reference_failed": "The reference image could not be uploaded. Replace it to continue."
+  },
+  "errors": {
+    "generic": "Something went wrong while generating. Your draft is kept. Try again.",
+    "network": "We could not reach Bobby Studio. Your draft is kept and the request will be retried when you are back online.",
+    "unauthorized": "Your session has expired. Sign in again to continue.",
+    "session": "The studio session could not be restored. Reload the page to continue; your draft is kept.",
+    "prepare": "The sketch or reference could not be prepared for upload. Try again.",
+    "invalid_input": "Some settings were not accepted. Review the highlighted fields.",
+    "rate_limited_one": "Too many requests. Trying again in {{count}} second.",
+    "rate_limited_other": "Too many requests. Trying again in {{count}} seconds.",
+    "rate_limited_short": "Too many requests. Waiting before the next attempt.",
+    "rate_limited_provider": "The image service is busy right now. Try again in a moment.",
+    "credits": "You do not have enough credits for this generation.",
+    "credits_with_balance": "You do not have enough credits for this generation. Available: {{balance}}.",
+    "provider_unavailable": "The image service is temporarily unavailable. Try again in a moment.",
+    "provider_unavailable_config": "Image generation is temporarily unavailable because of a service configuration issue. Try again later or contact support.",
+    "no_image": "No image was produced for this request. Adjust the prompt and try again.",
+    "storage": "The result could not be stored. Try again.",
+    "deadline": "The generation took too long and was stopped. Try again."
+  },
+  "history": {
+    "title": "Recent generations",
+    "empty": "No generations yet. Your recent results appear here.",
+    "open_studio": "Open Bobby Studio",
+    "load_error": "Recent generations could not be loaded.",
+    "mode_text_to_image": "From prompt",
+    "mode_sketch_to_image": "From sketch",
+    "mode_image_to_image": "From reference",
+    "status_PENDING": "Queued",
+    "status_RUNNING": "Generating",
+    "status_COMPLETED": "Ready",
+    "status_FAILED": "Failed",
+    "status_CANCELLED": "Cancelled",
+    "preview": "Preview",
+    "status_QUEUED": "Queued"
+  }
+}

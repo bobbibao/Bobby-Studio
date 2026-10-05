@@ -4,7 +4,7 @@ export interface PaymentPricingResponseDTO {
   id: string;
   unit_amount: number | null;
   currency: string;
-  product: string | Stripe.Product | Stripe.DeletedProduct; // Thêm DeletedProduct
+  product: string | Stripe.Product | Stripe.DeletedProduct; // Includes DeletedProduct
   productName: string;
   productDescription: string | null;
   currentPlan: boolean;

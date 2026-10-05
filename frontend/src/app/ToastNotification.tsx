@@ -21,7 +21,7 @@ const ToastNotification = () => {
         position: 'top-right',
       });
 
-      dispatch(clearToast()); // Xóa toast sau khi hiển thị
+      dispatch(clearToast()); // Clear the toast after it is shown
     }
   }, [toastState, dispatch, toast]);
 

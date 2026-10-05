@@ -19,7 +19,7 @@ import Button from '@/shared/buttons/Button';
 import CardFolder from '@/shared/card/CardFolder';
 import { ImageData, OptionType } from '@/types';
 import { ProjectFilters } from '@/types/project';
-import { MoveImageToFolderAction, SelectedMovingImageState } from '@/types/project';
+import { MoveImageToFolderAction, SelectedMovingImageState } from '@/features/admin/pages/admin/project/types/project';
 import ModalCreateFolder from './ModalCreateFolder';
 import ModalCreateProject from './ModalCreateProject';
 import ModalMoveImage from './ModalMoveImage';
@@ -517,7 +517,7 @@ const GridChildProject: React.FC<GridChildProjectProps> = ({
           py={3}
           zIndex={100}
           minW="600px"
-          justify="space-between"
+          justifyContent="space-between"
         >
           <HStack spacing={3}>
             <Box bg="brand.600" color="white" px={2} py={1} rounded="sm" fontWeight="medium" fontSize="sm" lineHeight="1">

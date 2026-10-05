@@ -9,6 +9,12 @@ import { changeLanguage } from 'i18next';
 import logoImage from '@/assets/img/logo/header_white.png';
 import { ChevronDown } from 'lucide-react';
 
+// CSS custom properties consumed by the `auth-scroll-animation` styles.
+type ScrollStyles = CSSProperties & {
+  '--scroll-distance': string;
+  '--scroll-duration': string;
+};
+
 export default function Auth() {
   const { t } = useTranslation();
   const { colorMode, toggleColorMode } = useColorMode();
@@ -58,7 +64,7 @@ export default function Auth() {
 
   const firstImageSetRef = useRef<HTMLDivElement | null>(null);
   const languageSelectWrapperRef = useRef<HTMLDivElement | null>(null);
-  const [scrollStyles, setScrollStyles] = useState<CSSProperties>({
+  const [scrollStyles, setScrollStyles] = useState<ScrollStyles>({
     '--scroll-distance': '0px',
     '--scroll-duration': '60s',
   });
@@ -75,7 +81,7 @@ export default function Auth() {
     setScrollStyles({
       '--scroll-distance': `${sectionHeight}px`,
       '--scroll-duration': `${duration}s`,
-    } as CSSProperties);
+    });
   }, []);
 
   useEffect(() => {

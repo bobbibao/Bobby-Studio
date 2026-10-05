@@ -1,9 +1,5 @@
 import { OptionType } from '../types';
-import { IArticle } from '@/types/cms';
-import { IBlog } from '@/features/admin/pages/admin/home/components/CardBlog';
-import { VITE_DOMAIN_BOBBY_CMS } from '@/config';
 import { ImageData } from '@/types';
-import moment from 'moment';
 import { ActionMethodEnum, InspirationMethodEnum } from '@/constants/attribute-enum';
 import { UserAttributeEntity } from '@/common/dtos/attribute/userAttribute.dto';
 import { ActionEntity, GeneratedImageAttributeEntity, OriginalImageAttributeEntity } from '@/common/dtos/attribute/common.dto';
@@ -166,23 +162,6 @@ export const removeEmpty = (obj: object) => {
     .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
 };
 
-export const mapArticlesToBlogs = (
-  articles: IArticle[],
-  type: 'models' | 'videos' | 'tutorials' | 'case-studies' = 'tutorials'
-): IBlog[] => {
-  return articles.map((article) => ({
-    imageSrc: article?.coverImage ? `${VITE_DOMAIN_BOBBY_CMS}${article?.coverImage?.formats?.thumbnail?.url}` : '',
-    largeImageSrc: article?.coverImage ? `${VITE_DOMAIN_BOBBY_CMS}${article?.coverImage?.formats?.large?.url}` : '',
-    title: article?.title,
-    description: article?.description,
-    published_at: moment(article?.publishedAt).format('MMM DD, YYYY'),
-    link: `/learning-center/${type}/${article?.id}`,
-    content: article?.content,
-    type: article?.description || undefined,
-    id: article?.id,
-    category: article?.category || '',
-  }));
-};
 
 export const handleUseTemplate = (
   matchedAttribute: UserAttributeEntity<OriginalImageAttributeEntity | GeneratedImageAttributeEntity, ActionEntity> | undefined,

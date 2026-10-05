@@ -41,7 +41,6 @@ import * as teamAPI from '@/features/team';
 
 import { MemberRole, TeamMember } from '@/types/team';
 import InviteTeamModal from '@/features/admin/pages/admin/profile/components/InviteTeamModal';
-import InviteCollaboratorsModal from '@/features/admin/pages/admin/profile/components/InviteCollaboratorsModal';
 import InviteQRCodeModal from '@/features/admin/pages/admin/profile/components/InviteQRCodeModal';
 import { FaPlus } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
@@ -243,7 +242,6 @@ export function TeamSection() {
   };
 
   const inviteModal = useInviteModal();
-  const inviteCollaboratorsModal = useInviteModal();
   const inviteQRCodeModal = useInviteModal();
 
   return (
@@ -284,7 +282,6 @@ export function TeamSection() {
             label="Create User"
             iconPosition="before"
           />*/}
-          <InviteCollaboratorsModal isOpen={inviteCollaboratorsModal.isOpen} onClose={inviteCollaboratorsModal.onClose} />
           <InviteTeamModal isOpen={inviteModal.isOpen} onClose={inviteModal.onClose} />
           <InviteQRCodeModal isOpen={inviteQRCodeModal.isOpen} onClose={inviteQRCodeModal.onClose} />
           <Menu>
@@ -310,7 +307,6 @@ export function TeamSection() {
             <MenuList>
               <MenuItem onClick={inviteQRCodeModal.onOpen}>{translatorProfileNS('create_qr_code')}</MenuItem>
               <MenuItem onClick={inviteModal.onOpen}>{translatorProfileNS('create_invite_link')}</MenuItem>
-              <MenuItem onClick={inviteCollaboratorsModal.onOpen}>{translatorProfileNS('send_email_invitation')}</MenuItem>
             </MenuList>
           </Menu>
         </Flex>

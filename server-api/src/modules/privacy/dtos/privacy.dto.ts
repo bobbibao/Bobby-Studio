@@ -27,7 +27,7 @@ export class PrivacySettingsDto {
     required: false,
   })
   @IsBoolean()
-  @IsOptional() // Cho phép nullable
+  @IsOptional() // Allow null
   termsAccepted?: boolean;
 
   @ApiProperty({

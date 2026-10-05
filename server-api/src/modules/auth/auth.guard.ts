@@ -1,156 +1,64 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   SetMetadata,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
-import { UserService } from '../user/user.service';
-import { CreateNewUserDTO } from '../user/dto';
-import {
-  BASIC_USER_ROLE,
-  PRO_USER_ROLE,
-  DEFAULT_USER_ROLE,
-  FREE_USER_ROLE,
-} from '../../config/roles.config';
-import * as admin from 'firebase-admin';
+import { BASIC_USER_ROLE, DEFAULT_USER_ROLE, FREE_USER_ROLE, PRO_USER_ROLE } from '../../config/roles.config';
+import { AuthenticatedRequest } from '../identity/principal';
+import { PrincipalService } from '../identity/principal.service';
 import { IS_PUBLIC_KEY } from './public.decorator';
 
 // Role metadata
 export const ROLE_KEY = 'role';
 export const Role = (role: string) => SetMetadata(ROLE_KEY, role);
 
-// Define CurrentUser interface
-interface CurrentUser {
-  id: string;
-  role: string;
-  email: string;
-  isAdmin: boolean;
-  hasCompletedSurvey: boolean;
-  userRoleName?: string;
-  firebaseUser?: admin.auth.DecodedIdToken;
-  language: string;
-  emailVerified?: boolean;
-}
-
-// Extend Request interface
-interface AuthenticatedRequest extends Request {
-  currentUser?: CurrentUser;
-}
-
+/**
+ * Registered globally (APP_GUARD): every route requires a verified Firebase identity unless it is
+ * explicitly marked @Public(). The principal is attached to the request once and reused by
+ * controller-level @UseGuards(AuthGuard) declarations.
+ */
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly userService: UserService,
+    private readonly principals: PrincipalService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    if (context.getType() !== 'http') return true;
 
-    // Bypass if route is public
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) {
-      return true;
+    if (isPublic) return true;
+
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    if (!request.currentUser) {
+      const token = this.extractBearerToken(request.headers.authorization);
+      if (!token) throw new UnauthorizedException('Missing bearer token');
+      request.currentUser = await this.principals.authenticateToken(token);
     }
 
-    try {
-      // Bypass logic
-      const bypass_api_token = this.checkByPassToken(request);
-      const bypass_user_id = this.getByPassUserId(request);
-      if (bypass_api_token && bypass_user_id) {
-        request.currentUser = {
-          id: bypass_user_id,
-          email: 'bypassed@gmail.com',
-          role: DEFAULT_USER_ROLE,
-          isAdmin: false,
-          hasCompletedSurvey: true,
-          userRoleName: PRO_USER_ROLE,
-          language: 'en',
-        };
-        return true;
-      }
-
-      const requiredRole =
-        this.reflector.getAllAndOverride<string>(ROLE_KEY, [
-          context.getHandler(),
-          context.getClass(),
-        ]) ?? DEFAULT_USER_ROLE;
-
-      const token = this.extractToken(request);
-      if (!token) return false;
-
-      const firebaseUser = await admin.auth().verifyIdToken(token);
-      if (!firebaseUser) return false;
-
-      const isGoogleSignup = firebaseUser.firebase?.sign_in_provider === 'google.com';
-      const checkUser = await this.userService.getById(firebaseUser.uid);
-      const email = firebaseUser.email;
-
-      if (!checkUser) {
-        const userDto = new CreateNewUserDTO();
-        userDto.id = firebaseUser.uid;
-        userDto.email = email;
-        userDto.role = DEFAULT_USER_ROLE;
-        userDto.password = 'securePassword123'; // TODO: no need it anymore
-        if (isGoogleSignup) {
-          userDto.emailVerified = firebaseUser.email_verified;
-        }
-        await this.userService.createUserFromFirebase(userDto);
-      }
-      
-      const userDb = await this.userService.getById(firebaseUser.uid);
-
-      // Update emailVerified for Google sign ups that still have it false in our DB
-      if (isGoogleSignup && firebaseUser.email_verified && !userDb.emailVerified) {
-        await this.userService.updateEmailVerified(firebaseUser.uid, true);
-      }
-      //TODO: remove after fixbug by LongHoang
-      // console.log(userDb)
-      request.currentUser = {
-        id: firebaseUser.uid,
-        email: email,
-        role: userDb.role ?? DEFAULT_USER_ROLE,
-        isAdmin: userDb.isAdmin ?? false,
-        hasCompletedSurvey: userDb.surveyCompletedAt != null,
-        userRoleName: userDb.role ?? DEFAULT_USER_ROLE,
-        firebaseUser: firebaseUser,
-        language: userDb.language ?? 'en',
-        emailVerified: firebaseUser.email_verified,
-      };
-
-      if (requiredRole === BASIC_USER_ROLE && userDb.role === PRO_USER_ROLE) {
-        return true;
-      }
-
-      if (requiredRole == FREE_USER_ROLE) {
-        return true;
-      }
-
-      return requiredRole === userDb.role;
-    } catch (error) {
-      console.error('Authorization failed:', error.message);
-      return false;
-    }
+    const requiredRole =
+      this.reflector.getAllAndOverride<string>(ROLE_KEY, [context.getHandler(), context.getClass()]) ??
+      DEFAULT_USER_ROLE;
+    const userRole = request.currentUser.role;
+    const allowed =
+      requiredRole === FREE_USER_ROLE ||
+      requiredRole === userRole ||
+      (requiredRole === BASIC_USER_ROLE && userRole === PRO_USER_ROLE);
+    if (!allowed) throw new ForbiddenException('Your plan does not include this feature');
+    return true;
   }
 
-  private extractToken(request: Request): string | null {
-    const authorization = request.headers.authorization;
-    if (!authorization) return null;
-    return authorization.replace(/bearer\s+/i, '').trim();
-  }
-
-  private checkByPassToken(request: Request): boolean {
-    const token = request.headers['bypass_api_token'];
-    return typeof token === 'string' && token === process.env.BYPASS_API_TOKEN;
-  }
-
-  private getByPassUserId(request: Request): string | null {
-    const userId = request.headers['bypass_api_user_id'];
-    return typeof userId === 'string' ? userId : null;
+  private extractBearerToken(header: string | undefined): string | null {
+    if (!header) return null;
+    const match = /^Bearer\s+(.+)$/i.exec(header.trim());
+    return match ? match[1].trim() : null;
   }
 }

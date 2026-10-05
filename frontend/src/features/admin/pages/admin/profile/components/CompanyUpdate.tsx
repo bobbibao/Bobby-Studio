@@ -76,7 +76,7 @@ const validationSchema: yup.ObjectSchema<FormInputs> = yup.object().shape({
 });
 
 interface CompanyUpdateProps {
-  company?: any; // Nếu company không có, nghĩa là đang tạo mới
+  company?: any; // Absent when a company is being created
   refreshData?: () => void;
 }
 
@@ -301,15 +301,15 @@ export const CompanyUpdate: React.FC<CompanyUpdateProps> = ({ company, refreshDa
     }
     const response: {
       message: string;
-      s3Url: string;
+      imgUrl: string;
     } | null = await uploadImage(file);
-    if (response?.s3Url) {
-      setValue('pictureProfile', response.s3Url, { shouldDirty: true });
+    if (response?.imgUrl) {
+      setValue('pictureProfile', response.imgUrl, { shouldDirty: true });
       if (temporaryLogoUrl.current) {
         URL.revokeObjectURL(temporaryLogoUrl.current);
         temporaryLogoUrl.current = null;
       }
-      setLogoPreview(response.s3Url);
+      setLogoPreview(response.imgUrl);
     }
   };
 
@@ -405,8 +405,8 @@ export const CompanyUpdate: React.FC<CompanyUpdateProps> = ({ company, refreshDa
                 position="absolute"
                 inset={0}
                 display="flex"
-                align="center"
-                justify="center"
+                alignItems="center"
+                justifyContent="center"
                 bg={logoUploadOverlay}
                 opacity={0}
                 transition="opacity 0.2s"
@@ -832,7 +832,7 @@ export const CompanyUpdate: React.FC<CompanyUpdateProps> = ({ company, refreshDa
         mb={-4}
         mt="auto"
         display="flex"
-        justify="center"
+        justifyContent="center"
         borderTopWidth="1px"
         borderColor={useColorModeValue('border.default', 'whiteAlpha.200')}
         bg={useColorModeValue('whiteAlpha.800', 'blackAlpha.700')}

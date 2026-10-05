@@ -10,7 +10,7 @@ export class VizpointRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Lấy ra tổng số freeVizPoints và subscriptionVizPoints hiện có của người dùng
+   * Returns the user's current freeVizPoints and subscriptionVizPoints totals
    */
   async getUserVizPoints(userId: string): Promise<VizPointsDto> {
     const user = await this.prisma.user.findUnique({
@@ -35,24 +35,6 @@ export class VizpointRepository {
     );
   }
 
-  /**
-   * Kiểm tra user có đủ credit để generate ảnh không
-   */
-  async hasEnoughVizPoints(userId: string, cost: number): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const freeVizPointsRemaining = user.freeCredit - user.usedFreeCredit;
-    const subscriptionVizPointsRemaining =
-      user.paidCredit - user.usedPaidCredit;
-
-    return freeVizPointsRemaining + subscriptionVizPointsRemaining >= cost;
-  }
 
   async resetFreeCredits(userId: string): Promise<void> {
     const user = await this.prisma.user.findUnique({
@@ -67,7 +49,7 @@ export class VizpointRepository {
       where: { id: userId },
       data: {
         usedFreeCredit: 0,
-        freeCreditRenewalAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Đặt thời gian reset sau 30 ngày
+        freeCreditRenewalAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Reset after 30 days
       },
     });
   }
@@ -89,11 +71,11 @@ export class VizpointRepository {
   }
 
   /**
-   * Xử lý logic reset free credits hàng tháng
-   * Có thể gọi từ một cronjob
+   * Monthly reset of free credits
+   * Can be called from a cron job
    */
   async getMonthlyFreeCreditsReset(): Promise<User[]> {
-    // Lấy danh sách user cần reset free credits
+    // Load the users whose free credits need a reset
     const usersToReset = await this.prisma.user.findMany({
       where: {
         OR: [
@@ -105,73 +87,4 @@ export class VizpointRepository {
     return usersToReset;
   }
 
-  /**
-   * Trừ credit của user, ưu tiên free trước, paid sau
-   * Trả về true nếu trừ thành công, false nếu không đủ credit
-   * @param userId ID của người dùng
-   * @param amount Số credit cần trừ
-   * @returns Boolean cho biết trừ thành công hay không
-   */
-  async consumeVizPoints(userId: string, amount: number): Promise<boolean> {
-    // Sử dụng transaction để đảm bảo tính nhất quán của dữ liệu
-
-    return this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        throw new Error('User not found');
-      }
-      // Tính số credit còn lại của mỗi loại
-      const freeVizPointsRemaining = Math.max(
-        0,
-        user.freeCredit - user.usedFreeCredit,
-      );
-      const paidVizPointsRemaining = Math.max(
-        0,
-        user.paidCredit - user.usedPaidCredit,
-      );
-
-      // Tổng số credit còn lại
-      const totalVizPointsRemaining =
-        freeVizPointsRemaining + paidVizPointsRemaining;
-      // Kiểm tra xem có đủ credit không
-      if (totalVizPointsRemaining < amount) {
-        return false; // Không đủ credit để trừ
-      }
-
-      // Ưu tiên trừ free credit trước
-      const freeToConsume = Math.min(freeVizPointsRemaining, amount);
-      const paidToConsume = Math.min(
-        paidVizPointsRemaining,
-        amount - freeToConsume,
-      );
-
-      const freeCreditAfterConsumption = user.usedFreeCredit + freeToConsume;
-      const paidCreditAfterConsumption = user.usedPaidCredit + paidToConsume;
-      // Cập nhật dữ liệu
-      await tx.user.update({
-        where: { id: userId },
-        data: {
-          usedFreeCredit: freeCreditAfterConsumption,
-          usedPaidCredit: paidCreditAfterConsumption,
-        },
-      });
-
-      // Tạo lịch sử sử dụng credit
-      await tx.usage.create({
-        data: {
-          userId: userId,
-          type: 'VIZ_POINTS',
-          amount: amount,
-          freeAmount: freeToConsume,
-          paidAmount: paidToConsume,
-          description: 'Generate image',
-        },
-      });
-
-      return true; // Trừ credit thành công
-    });
-  }
 }

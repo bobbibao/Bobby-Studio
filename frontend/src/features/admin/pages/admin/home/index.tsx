@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { FilterButton } from '@/components/FilterButton';
 import { GridSwitcher } from '@/components/GridSwitcher';
-import { Box, Flex, Heading, Button, SimpleGrid, useBreakpointValue, Tab, TabList, Tabs, Skeleton, keyframes, useBoolean } from '@chakra-ui/react';
+import { Box, Flex, Heading, Button, SimpleGrid, useBreakpointValue, Tab, TabList, Tabs, Skeleton, useBoolean } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import QuickActionCard from '../ai-design/components/QuickActionCard';
@@ -71,7 +71,13 @@ const Home: React.FC = () => {
   const { columns, setColumns } = useLayoutStore();
   
   // Quick Actions Logic
-  const quickActions = [
+  const quickActions: Array<{
+    title: string;
+    icon: React.ReactElement;
+    linkTo: string;
+    isNew?: boolean;
+    badgeLabel?: string;
+  }> = [
     {
       title: 'bobby_ai_studio',
       icon: <PhotoIcon />,

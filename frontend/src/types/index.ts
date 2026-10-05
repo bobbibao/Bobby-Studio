@@ -1,5 +1,3 @@
-import { SUBSCRIPTION_TYPE_BASIC, SUBSCRIPTION_TYPE_PRO, TAB_TYPE_EDIT, TAB_TYPE_GENERATE } from '../constants';
-
 export interface RouteConfig {
   name: string;
   layout: string;
@@ -21,10 +19,10 @@ export interface RouteConfig {
 }
 
 export enum SUBSCRIPTION_TYPE_ENUM {
-  BASIC = SUBSCRIPTION_TYPE_BASIC,
-  PRO = SUBSCRIPTION_TYPE_PRO,
-  GENERATE = TAB_TYPE_GENERATE,
-  EDIT = TAB_TYPE_EDIT,
+  BASIC = 'Basic',
+  PRO = 'Pro',
+  GENERATE = 'Generate',
+  EDIT = 'Edit',
 }
 
 export enum PRICING_PLAN_ENUM {
