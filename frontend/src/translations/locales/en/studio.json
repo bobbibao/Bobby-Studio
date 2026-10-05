@@ -201,5 +201,21 @@
     "no_image": "No image was produced for this request. Adjust the prompt and try again.",
     "storage": "The result could not be stored. Try again.",
     "deadline": "The generation took too long and was stopped. Try again."
+  },
+  "history": {
+    "title": "Recent generations",
+    "empty": "No generations yet. Your recent results appear here.",
+    "open_studio": "Open Bobby Studio",
+    "load_error": "Recent generations could not be loaded.",
+    "mode_text_to_image": "From prompt",
+    "mode_sketch_to_image": "From sketch",
+    "mode_image_to_image": "From reference",
+    "status_PENDING": "Queued",
+    "status_RUNNING": "Generating",
+    "status_COMPLETED": "Ready",
+    "status_FAILED": "Failed",
+    "status_CANCELLED": "Cancelled",
+    "preview": "Preview",
+    "status_QUEUED": "Queued"
   }
 }

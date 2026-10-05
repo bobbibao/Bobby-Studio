@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { setNavbarAllowBack, setNavbarHeading } from '@/slices/navbar';
-import { useApi } from '@/services';
+import { useConfigurationApi } from '@/services';
 import { useAuthentication } from '@/hooks/useAuthentication';
 import ImageCard from '@/shared/card/ImageCard';
 import useLayoutStore from '@/store/layoutStore';
@@ -32,7 +32,7 @@ const FILTER_MODAL_FIELDS: FilterField[] = ['models', 'time'];
 
 const Inspiration: React.FC = () => {
   const { t } = useTranslation();
-  const { fetchUserConfiguration } = useApi();
+  const { fetchUserConfiguration } = useConfigurationApi();
   const location = useLocation();
   const dispatch = useDispatch();
   const { columns, setColumns } = useLayoutStore();

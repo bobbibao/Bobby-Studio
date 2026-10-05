@@ -1,107 +1,61 @@
-import { Box, Button, Flex, Icon, List, ListItem, Menu, MenuButton, MenuGroup, MenuList, Portal, Text, useColorMode, useColorModeValue } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, List, ListItem, Menu, MenuButton, MenuList, Portal, Text, useColorModeValue } from '@chakra-ui/react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import ClockIcon from '../icons/ClockIcon';
-import ImagePlaceholderIcon from '../icons/ImagePlacholderIcon';
 import { useSelector } from 'react-redux';
-import { selectHistoryJobs } from '@/reducers/inspiration';
-import AddIcon from '../icons/AddIcon';
-import { InputTypeEnum, InputTypeToTextMap } from '@/constants/attribute-enum';
-import { t } from 'i18next';
 import { useNavigate } from 'react-router-dom';
-import { colors } from '@/theme/components/colors';
+import ClockIcon from '../icons/ClockIcon';
+import AddIcon from '../icons/AddIcon';
+import ImagePlaceholderIcon from '../icons/ImagePlacholderIcon';
+import { generationApiClient, generationKeys } from '@/features/generation/api';
+import { TERMINAL_JOB_STATUSES, type GenerationSnapshot, type JobStatus } from '@/features/generation/contracts';
+import { formatDateTime } from '@/features/generation/components/format';
+import { selectCurrentUser } from '@/selectors/user';
 
-interface HistoryJobItem {
-  jobId: string;
-  type: string;
-  progress: string;
-  status: string;
-}
+const RECENT_LIMIT = 5;
+const ACTIVE_REFRESH_MS = 4000;
 
-const HistoryJobItem = ({ item }: { item: HistoryJobItem }) => {
-  const iconBg = useColorModeValue('brand.600', 'brand.600');
-  const iconColor = useColorModeValue('white', 'white');
-  const progressBg = useColorModeValue('zinc.200', 'zinc.700');
-  const progressBarBg = useColorModeValue('brand.600', 'brand.500');
-  const itemHoverBg = useColorModeValue('zinc.50', 'zinc.900');
-
-  return (
-    <ListItem 
-      display="flex" 
-      justifyContent="space-between" 
-      alignItems="center" 
-      px={4} 
-      py={3} 
-      gap={4}
-      _hover={{ bg: itemHoverBg }}
-      transition="background 0.2s"
-      cursor="default"
-    >
-      <Flex gap={3}>
-        <Box
-          width="28px"
-          height="28px"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          borderRadius="md"
-          p={2}
-          bg={iconBg}
-        >
-          <ImagePlaceholderIcon width={'12px'} height={'12px'} color={iconColor} />
-        </Box>
-        <Flex direction="column" gap={1}>
-          <Text color="text.primary" fontSize="sm" fontWeight="normal">
-            {t(`generate:${InputTypeToTextMap.get(item.type as InputTypeEnum)}`)}
-          </Text>
-          <Flex alignItems="center" gap={2}>
-            <Box w="48" h="2" bg={progressBg} borderRadius="full" overflow="hidden">
-              <Box h="full" bg={progressBarBg} borderRadius="full" transition="width 0.3s" style={{ width: `${item.progress}%` }} />
-            </Box>
-            <Text color="text.muted" fontSize="xs" fontWeight="normal">
-              {item.progress}%
-            </Text>
-          </Flex>
-        </Flex>
-      </Flex>
-    </ListItem>
-  );
+const STATUS_COLOR: Record<JobStatus, string> = {
+  PENDING: 'gray',
+  QUEUED: 'gray',
+  PROCESSING: 'blue',
+  COMPLETED: 'green',
+  FAILED: 'red',
+  CANCELLED: 'orange',
 };
 
+const hasActiveJob = (items: GenerationSnapshot[] | undefined): boolean =>
+  Boolean(items?.some((job) => !TERMINAL_JOB_STATUSES.includes(job.status)));
+
+/** Recent generations from the server, the same source as the studio's own history. */
 const HistoryJobMenu: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation(['studio', 'common']);
   const navigate = useNavigate();
+  const { user } = useSelector(selectCurrentUser);
+  const userId = user?.id;
 
-  const handleNavigateToGenerate = (tab: string) => {
-    navigate(`/generate?tab=${tab}`);
-  };
+  const recent = useQuery({
+    queryKey: [...generationKeys.history(userId ?? ''), 'recent'],
+    queryFn: () => generationApiClient.listGenerations({ limit: RECENT_LIMIT }),
+    enabled: Boolean(userId),
+    staleTime: 10_000,
+    refetchInterval: (query) => (hasActiveJob(query.state.data?.items) ? ACTIVE_REFRESH_MS : false),
+  });
+  const items = recent.data?.items ?? [];
 
-  // Get history jobs from Redux store
-  const historyJobs = useSelector(selectHistoryJobs);
-
-  const historyJobItems = historyJobs
-    .filter((job) => job.progress !== undefined && job.status !== 'completed')
-    .map((job) => ({
-      jobId: job.jobId,
-      type: job.inputType,
-      progress: job?.progress !== undefined ? job.progress.toString() : '0',
-      status: job.status,
-    }));
-  const translatorCommonNS = (key: string) => t(`common:${key}`);
-
-  // Chakra color values
   const menuBg = useColorModeValue('white', 'zinc.950');
   const menuBorderColor = useColorModeValue('zinc.200', 'zinc.700');
-  const viewMoreButtonBg = useColorModeValue('zinc.100', 'zinc.800');
-  const viewMoreButtonHoverBg = useColorModeValue('zinc.200', 'zinc.700');
-  const emptyStateButtonBg = useColorModeValue('zinc.100', 'zinc.800');
-  const emptyStateButtonHoverBg = useColorModeValue('zinc.200', 'zinc.700');
-  const emptyStateIconColor = useColorModeValue(colors.zinc['900'], 'white');
+  const buttonBg = useColorModeValue('zinc.100', 'zinc.800');
+  const buttonHoverBg = useColorModeValue('zinc.200', 'zinc.700');
+  const itemHoverBg = useColorModeValue('zinc.50', 'zinc.900');
   const listBorderColor = useColorModeValue('zinc.200', 'zinc.700');
 
+  const openStudio = () => navigate('/generate');
+
   return (
-    <Menu>
+    <Menu isLazy onOpen={() => void recent.refetch()}>
       <MenuButton
         as={Button}
+        aria-label={t('common:history')}
         variant="unstyled"
         px={0}
         py={0}
@@ -122,79 +76,69 @@ const HistoryJobMenu: React.FC = () => {
       </MenuButton>
 
       <Portal>
-        <MenuList
-          maxW="300px"
-          minW="300px"
-          borderRadius="lg"
-          bg={menuBg}
-          borderColor={menuBorderColor}
-          borderWidth="1px"
-          boxShadow="xl"
-          zIndex={99999}
-          p={0}
-        >
-        <Box mb={2}>
+        <MenuList maxW="300px" minW="300px" borderRadius="lg" bg={menuBg} borderColor={menuBorderColor} borderWidth="1px" boxShadow="xl" zIndex={99999} p={0}>
           <Flex justify="space-between" align="center" px={4} py={3}>
             <Text fontSize="lg" fontWeight="semibold" color="text.primary">
-              {translatorCommonNS('history')}
+              {t('studio:history.title')}
             </Text>
-            <Button
-              onClick={() => handleNavigateToGenerate('history')}
-              variant="ghost"
-              size="sm"
-              fontWeight="medium"
-              color="text.muted"
-              bg={viewMoreButtonBg}
-              px={2}
-              py={1}
-              borderRadius="md"
-              _hover={{ 
-                bg: viewMoreButtonHoverBg,
-                color: 'text.primary'
-              }}
-            >
-                {t('common:view_more')}
+            <Button onClick={openStudio} variant="ghost" size="sm" fontWeight="medium" color="text.muted" bg={buttonBg} px={2} py={1} borderRadius="md" _hover={{ bg: buttonHoverBg, color: 'text.primary' }}>
+              {t('studio:history.open_studio')}
             </Button>
           </Flex>
 
-          <MenuGroup title="" m={0} p={0}>
-            <List spacing={0} borderTopWidth="1px" borderTopColor={listBorderColor}>
-              <Flex direction="column">
-                {historyJobItems.length > 0 ? (
-                  historyJobItems.map((item) => <HistoryJobItem key={item.jobId} item={item} />)
-                ) : (
-                  <Flex direction="column" justify="center" align="center" p={6} gap={3}>
-                    <Button
-                      w="68px"
-                      h="68px"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      borderRadius="full"
-                      bg={emptyStateButtonBg}
-                      _hover={{ bg: emptyStateButtonHoverBg }}
-                      onClick={() => handleNavigateToGenerate('workspace')}
-                    >
-                      <AddIcon
-                        width="36px"
-                        height="36px"
-                        color={emptyStateIconColor}
-                      />
-                    </Button>
-                    <Text color="text.muted" fontSize="sm" fontWeight="medium" textAlign="center">
-                      {t('common:history_no_images_are_being_generated')}
-                    </Text>
+          <List spacing={0} borderTopWidth="1px" borderTopColor={listBorderColor} role="status" aria-live="polite">
+            {recent.isError ? (
+              <Text color="text.muted" fontSize="sm" p={4}>
+                {t('studio:history.load_error')}
+              </Text>
+            ) : items.length > 0 ? (
+              items.map((job) => (
+                <ListItem
+                  key={job.id}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  px={4}
+                  py={3}
+                  gap={3}
+                  cursor="pointer"
+                  onClick={openStudio}
+                  _hover={{ bg: itemHoverBg }}
+                >
+                  <Flex gap={3} align="center" minW={0}>
+                    <Box w="28px" h="28px" display="flex" alignItems="center" justifyContent="center" borderRadius="md" bg="brand.600" flexShrink={0}>
+                      <ImagePlaceholderIcon width="12px" height="12px" color="white" />
+                    </Box>
+                    <Flex direction="column" minW={0}>
+                      <Text color="text.primary" fontSize="sm" noOfLines={1}>
+                        {t(`studio:history.mode_${job.mode}`)}
+                        {job.intent === 'preview' ? ` · ${t('studio:history.preview')}` : ''}
+                      </Text>
+                      <Text color="text.muted" fontSize="xs">
+                        {formatDateTime(job.completedAt ?? job.createdAt, i18n.language)}
+                      </Text>
+                    </Flex>
                   </Flex>
-                )}
+                  <Badge colorScheme={STATUS_COLOR[job.status]} flexShrink={0}>
+                    {t(`studio:history.status_${job.status}`)}
+                  </Badge>
+                </ListItem>
+              ))
+            ) : (
+              <Flex direction="column" justify="center" align="center" p={6} gap={3}>
+                <Button w="68px" h="68px" borderRadius="full" bg={buttonBg} _hover={{ bg: buttonHoverBg }} onClick={openStudio} aria-label={t('studio:history.open_studio')}>
+                  <AddIcon width="36px" height="36px" />
+                </Button>
+                <Text color="text.muted" fontSize="sm" fontWeight="medium" textAlign="center">
+                  {t('studio:history.empty')}
+                </Text>
               </Flex>
-            </List>
-          </MenuGroup>
-        </Box>
-      </MenuList>
+            )}
+          </List>
+        </MenuList>
       </Portal>
     </Menu>
   );
 };
 
 export default HistoryJobMenu;
-
