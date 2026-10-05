@@ -1,4 +1,6 @@
-# Frontend Conventions & Rules
+> Historical template: the ERP examples below are not the current Bobby specification. Use [AGENTS.md](../AGENTS.md), [Bobby architecture and conventions](../docs/architecture/overview.md) and [studio design](../docs/product/studio-design.md). Do not infer dependencies or mandatory folder layers from this template.
+
+# Frontend Conventions & Rules (historical)
 
 ## 1. Import Direction Rules
 

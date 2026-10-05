@@ -1,4 +1,6 @@
-# React ERP Frontend - Target Folder Structure
+> Historical ERP/Vue migration template. Bobby's current source map and incremental target are in [architecture](../docs/architecture/overview.md) and [studio design](../docs/product/studio-design.md). Do not perform the migration described below as part of an unrelated task.
+
+# React ERP Frontend - Target Folder Structure (historical)
 
 ## Root Architecture
 

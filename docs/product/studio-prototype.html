@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Bobby Studio — Creative workspace</title>
+  <style>
+    :root { color-scheme: light; --bg:#f5f6f8; --surface:#fff; --ink:#252631; --muted:#646875; --line:#e5e7ec; --accent:#7044c8; --soft:#f2edfb; --green:#23764b; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); }
+    button,input,textarea,select { font:inherit; }
+    button,a,input,textarea,select,summary { -webkit-tap-highlight-color:transparent; }
+    button { cursor:pointer; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible,canvas:focus-visible { outline:3px solid #ac8be7; outline-offset:3px; }
+    a { color:inherit; text-decoration:none; }
+    h1,h2,h3,p { margin:0; }
+    .icon { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+    .rail { position:fixed; inset:0 auto 0 0; width:76px; background:var(--surface); border-right:1px solid var(--line); display:flex; align-items:center; flex-direction:column; padding:24px 8px; gap:24px; z-index:2; }
+    .logo { width:39px; height:39px; display:grid; place-items:center; background:#272631; border-radius:13px; color:white; font-size:30px; font-weight:800; line-height:1; }
+    .rail nav { display:flex; flex-direction:column; gap:12px; width:100%; }
+    .nav-item { display:flex; align-items:center; flex-direction:column; gap:5px; width:100%; padding:13px 2px; border-radius:10px; color:var(--muted); font-size:10px; border:0; background:transparent; }
+    .nav-item.active { background:var(--soft); color:var(--accent); }
+    .nav-item:hover:not(:disabled) { background:var(--bg); }
+    .avatar { margin-top:auto; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:#f0e8dc; color:#745b40; font-weight:600; }
+    .app { margin-left:76px; }
+    .topbar { height:80px; padding:0 32px; display:flex; align-items:center; justify-content:space-between; gap:20px; border-bottom:1px solid var(--line); background:#ffffffeb; }
+    .breadcrumbs { display:flex; align-items:center; gap:14px; }
+    .brand { font-weight:750; font-size:17px; letter-spacing:-.5px; }
+    .divider,.muted { color:var(--muted); }
+    .project-name { font-size:13px; }
+    .pill { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:600; border-radius:20px; padding:5px 10px; background:#edf5ef; color:#286544; white-space:nowrap; }
+    .dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .top-actions { display:flex; align-items:center; gap:20px; }
+    .text-button { background:none; border:0; color:var(--muted); display:flex; gap:7px; align-items:center; padding:9px 0; }
+    .layout { display:grid; grid-template-columns:284px minmax(0,1fr); min-height:calc(100vh - 80px); }
+    .controls { background:white; border-right:1px solid var(--line); padding:29px 24px 24px; display:flex; flex-direction:column; gap:25px; align-self:start; }
+    .eyebrow { font-size:10px; font-weight:750; letter-spacing:1.6px; color:var(--muted); text-transform:uppercase; }
+    .controls h2 { font-size:19px; font-weight:650; letter-spacing:-.5px; margin:5px 0 7px; }
+    .description { color:var(--muted); font-size:12px; }
+    label,.label { display:block; font-size:12px; font-weight:600; margin-bottom:9px; }
+    textarea { width:100%; min-height:165px; resize:vertical; padding:13px; border:1px solid var(--line); border-radius:10px; line-height:1.7; color:var(--ink); background:#fcfcfd; font-size:13px; }
+    .counter { color:var(--muted); text-align:right; font-size:10px; margin-top:4px; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:11px; }
+    .chip { border:1px solid var(--line); background:white; padding:5px 8px; border-radius:6px; font-size:10px; color:#5e6070; }
+    .chip:hover { border-color:#b69ddf; background:var(--soft); }
+    .model { border:1px solid var(--line); border-radius:10px; display:flex; gap:11px; align-items:center; padding:11px; }
+    .model-icon { width:34px; height:34px; border-radius:8px; background:var(--soft); color:var(--accent); display:grid; place-items:center; }
+    .model strong { font-size:12px; font-weight:600; }
+    .model small { display:block; color:var(--muted); font-size:10px; }
+    .ratios { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .ratio { border:1px solid var(--line); background:white; border-radius:8px; padding:10px; display:flex; flex-direction:column; align-items:center; gap:7px; font-size:10px; }
+    .ratio[aria-pressed=true] { background:var(--soft); border-color:#b5a0db; color:var(--accent); }
+    .shape { width:17px; height:17px; border:1.5px solid currentColor; border-radius:2px; }
+    .shape.wide { width:24px; height:16px; }
+    .shape.tall { width:13px; height:20px; }
+    details { font-size:12px; }
+    summary { cursor:pointer; font-weight:600; padding:8px 0; }
+    details p { margin:8px 0; color:var(--muted); }
+    details select { border:1px solid var(--line); border-radius:6px; padding:7px; width:100%; background:white; }
+    .create-area { margin-top:auto; padding-top:16px; border-top:1px solid var(--line); }
+    .primary { width:100%; display:flex; justify-content:center; align-items:center; gap:9px; padding:13px 16px; background:var(--accent); color:white; border:0; border-radius:10px; font-weight:600; font-size:13px; box-shadow:0 3px 8px #7044c824; }
+    .primary:hover:not(:disabled) { background:#6036b6; }
+    .hint { color:var(--muted); font-size:10px; text-align:center; margin-top:10px; }
+    kbd { font:inherit; padding:1px 4px; border:1px solid var(--line); border-radius:4px; background:#fafafa; }
+    main { min-width:0; padding:30px 30px 20px; }
+    .workspace-heading { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:25px; }
+    h1 { font-size:25px; font-weight:650; letter-spacing:-.9px; margin-bottom:4px; }
+    .subtitle { color:var(--muted); font-size:12px; }
+    .live-control { display:flex; align-items:center; gap:10px; background:white; padding:8px 12px; border:1px solid var(--line); border-radius:9px; white-space:nowrap; }
+    .live-control label { margin:0; font-size:12px; cursor:pointer; }
+    .switch { appearance:none; position:relative; width:33px; height:20px; background:#c8cbd2; border-radius:20px; margin:0; cursor:pointer; transition:background .15s; }
+    .switch::after { content:""; position:absolute; left:3px; top:3px; width:14px; height:14px; border-radius:50%; background:white; transition:transform .15s; }
+    .switch:checked { background:var(--accent); }
+    .switch:checked::after { transform:translateX(13px); }
+    .workspace-toolbar { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-bottom:15px; }
+    .segmented { display:flex; background:#e9ebef; border-radius:8px; padding:3px; gap:2px; }
+    .segment { border:0; color:var(--muted); background:transparent; padding:7px 13px; border-radius:6px; font-size:11px; display:flex; align-items:center; gap:7px; }
+    .segment[aria-pressed=true] { background:white; color:var(--ink); box-shadow:0 1px 3px #0000000d; }
+    .workspace-note { font-size:10px; color:var(--muted); }
+    .boards { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+    .board { background:white; border:1px solid var(--line); border-radius:14px; min-width:0; overflow:hidden; box-shadow:0 3px 12px #27304303; }
+    .board-header { height:56px; display:flex; justify-content:space-between; align-items:center; padding:0 17px; gap:8px; }
+    .board-header h2 { font-size:12px; font-weight:650; display:flex; align-items:center; gap:8px; }
+    .tag { font-size:9px; color:var(--muted); background:#f1f2f5; padding:3px 7px; border-radius:5px; }
+    .icon-button { border:0; background:none; width:34px; height:34px; border-radius:7px; color:var(--muted); display:inline-grid; place-items:center; flex:none; }
+    .icon-button:hover { background:var(--bg); color:var(--ink); }
+    .icon-button[aria-pressed=true] { background:var(--soft); color:var(--accent); }
+    .media { position:relative; margin:0 11px; border:1px solid var(--line); border-radius:8px; background:#fff; overflow:hidden; aspect-ratio:1; }
+    #sketch { display:block; width:100%; height:100%; cursor:crosshair; touch-action:none; }
+    #result { display:block; width:100%; height:100%; object-fit:contain; background:#edf0ed; }
+    .sample-label { position:absolute; bottom:11px; left:11px; background:#fffef6e8; border-radius:5px; padding:4px 8px; font-size:9px; color:#444d43; pointer-events:none; }
+    .canvas-label { position:absolute; bottom:10px; left:10px; font-size:9px; color:#8c8d97; pointer-events:none; }
+    .board-footer { padding:10px 13px; display:flex; align-items:center; justify-content:space-between; gap:6px; min-height:57px; }
+    .tools { display:flex; gap:2px; }
+    .tools + .tools { border-left:1px solid var(--line); padding-left:6px; }
+    .footer-label { color:var(--muted); font-size:10px; }
+    .outline-button { border:1px solid var(--line); border-radius:7px; background:white; padding:7px 10px; display:inline-flex; align-items:center; justify-content:center; gap:6px; color:var(--ink); font-size:10px; min-height:34px; }
+    .outline-button:hover:not(:disabled) { border-color:#bea7e3; background:#faf8fd; }
+    .busy-overlay { position:absolute; inset:0; background:#ffffffbd; backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:13px; font-size:12px; }
+    [hidden] { display:none !important; }
+    .spinner { width:28px; height:28px; border:2px solid #dfd4ef; border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .status-bar { display:flex; align-items:center; gap:9px; color:var(--muted); min-height:48px; font-size:11px; }
+    .status-dot { width:6px; height:6px; background:#9b9ea9; border-radius:50%; flex:none; }
+    .status-bar[data-state=success] { color:var(--green); }
+    .status-bar[data-state=success] .status-dot { background:var(--green); }
+    .status-bar[data-state=error] { color:#a3383f; }
+    .status-bar[data-state=error] .status-dot { background:#a3383f; }
+    .versions { border-top:1px solid var(--line); padding-top:20px; margin-top:5px; }
+    .section-heading { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .section-heading h2 { font-size:12px; font-weight:650; }
+    .version-count { font-size:10px; color:var(--muted); }
+    .version-list { display:flex; gap:11px; overflow:auto; padding:3px; min-height:116px; }
+    .empty-history { border:1px dashed #d4d6dd; border-radius:9px; min-height:106px; width:100%; display:flex; align-items:center; justify-content:center; gap:12px; color:var(--muted); font-size:11px; text-align:left; padding:18px; }
+    .empty-history .icon { color:#a59aac; width:28px; height:28px; }
+    .empty-history strong { display:block; font-size:12px; color:#686876; font-weight:500; margin-bottom:2px; }
+    .version-card { flex:0 0 115px; text-align:left; padding:5px; border:1px solid var(--line); border-radius:9px; background:white; }
+    .version-card img { width:100%; height:72px; object-fit:cover; border-radius:5px; display:block; }
+    .version-card span { display:block; padding:5px 3px 1px; font-size:10px; color:var(--muted); }
+    .version-card[aria-pressed=true] { border-color:var(--accent); }
+    .prototype-note { display:flex; justify-content:space-between; gap:12px; border-top:1px solid var(--line); margin-top:24px; padding-top:15px; font-size:10px; color:var(--muted); }
+    .prototype-note a { text-decoration:underline; text-underline-offset:3px; }
+    dialog { border:1px solid var(--line); border-radius:16px; padding:26px; width:min(560px,90vw); box-shadow:0 20px 80px #0002; }
+    dialog::backdrop { background:#24233166; }
+    dialog h2 { font-size:20px; margin-bottom:14px; }
+    dialog p { margin:10px 0; color:var(--muted); font-size:13px; }
+    dialog button { margin-top:18px; }
+    @media (min-width:1700px) { main { padding:36px 50px; } .layout { grid-template-columns:310px minmax(0,1fr); } .boards { max-width:1240px; } }
+    @media (max-width:1190px) { .rail { width:64px; } .app { margin-left:64px; } .topbar { padding:0 22px; } .layout { grid-template-columns:240px minmax(0,1fr); } .controls { padding:25px 18px; } main { padding:25px 20px; } .boards { gap:12px; } h1 { font-size:22px; } .workspace-note { display:none; } .footer-label { font-size:9px; } .board-footer { flex-wrap:wrap; } }
+    @media (max-width:980px) { .layout { grid-template-columns:1fr; } .controls { border-right:0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:1.3fr 1fr; gap:18px 24px; } .intro { grid-column:1/-1; } .prompt-field { grid-row:2/5; } .controls .create-area { margin:0; padding:0; border:0; } .controls details { display:none; } .controls .intro h2 { display:none; } .description { margin-top:6px; } textarea { min-height:170px; } main { padding:24px; } }
+    @media (max-width:600px) { .rail { width:54px; padding:17px 5px; } .logo { width:32px; height:32px; font-size:25px; border-radius:10px; } .app { margin-left:54px; } .topbar { height:64px; padding:0 15px; } .breadcrumbs { gap:10px; } .project-name,.top-actions .text-button,.topbar .divider { display:none; } .pill { font-size:9px; padding:4px 7px; } .layout { min-height:calc(100vh - 64px); } .controls { display:flex; padding:21px 18px; gap:18px; } .controls .intro h2 { display:block; } textarea { min-height:125px; } .model-field { display:none; } .controls .create-area { margin-top:0; } main { padding:23px 15px 18px; } .workspace-heading { align-items:flex-start; flex-direction:column; gap:14px; } h1 { font-size:23px; } .workspace-heading .subtitle { font-size:11px; } .live-control { padding:7px 11px; } .boards { grid-template-columns:1fr; gap:16px; } .workspace-toolbar { flex-wrap:wrap; } .segment { padding:8px 10px; font-size:10px; } .icon-button { min-width:38px; min-height:38px; } .prototype-note { flex-direction:column; } .empty-history { padding:14px; } }
+    @media (prefers-reduced-motion:reduce) { * { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute"><defs>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 15l-1 6Z"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1.5"/><path d="m4 18 5-5 4 3 4-6 4 6"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="5" width="12" height="14" rx="3"/><path d="m15 9 6-3v12l-6-3"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="m8 4-5 5 5 5M3 9h11a7 7 0 0 1 0 14" transform="translate(0 -2)"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="m16 2 5 5-5 5M21 7H10a7 7 0 0 0 0 14"/></symbol>
+    <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m14 3 7 7-10 11H6l-4-4L14 3Zm-7 9 7 7M11 21h10"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4V3Z"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1.5 1-1.5 1-1.5 2m0 3h.01"/></symbol>
+  </defs></svg>
+  <aside class="rail" aria-label="Main navigation">
+    <a class="logo" href="#workspace" aria-label="Bobby Studio">b</a>
+    <nav>
+      <a class="nav-item active" href="#workspace" aria-current="page"><svg class="icon"><use href="#i-spark"/></svg>Studio</a>
+      <a class="nav-item" href="#history"><svg class="icon"><use href="#i-grid"/></svg>Versions</a>
+      <button class="nav-item" disabled aria-label="Video — coming later"><svg class="icon"><use href="#i-video"/></svg>Later</button>
+    </nav>
+    <div class="avatar" aria-label="Example account">B</div>
+  </aside>
+  <div class="app">
+    <header class="topbar">
+      <div class="breadcrumbs"><span class="brand">Bobby Studio</span><span class="divider">/</span><span class="project-name">Forest retreat</span></div>
+      <div class="top-actions"><span class="pill"><span class="dot"></span>Simulated · no charge</span><button id="help" class="text-button"><svg class="icon"><use href="#i-help"/></svg>Help</button></div>
+    </header>
+    <div class="layout">
+      <aside class="controls" aria-label="Creative controls">
+        <div class="intro"><div class="eyebrow">From thought to image</div><h2>Make room for an idea.</h2><p class="description">A few lines. A little imagination.</p></div>
+        <div class="prompt-field"><label for="prompt">What would you like to create?</label><textarea id="prompt" maxlength="4000" spellcheck="false">A modern timber and glass retreat in a quiet forest. Clean architectural lines, a natural garden, and soft morning light.</textarea><div class="counter" id="counter"></div><div class="chips"><button class="chip" data-prompt="Warm golden-hour light.">+ Warm light</button><button class="chip" data-prompt="A lush, natural garden.">+ More greenery</button></div></div>
+        <div class="model-field"><span class="label">Image model</span><div class="model"><div class="model-icon"><svg class="icon"><use href="#i-spark"/></svg></div><div><strong>Studio Preview</strong><small>Illustrated preview · no usage charge</small></div></div></div>
+        <div><span class="label">Aspect ratio</span><div class="ratios" role="group" aria-label="Image aspect ratio"><button class="ratio" data-ratio="1:1" aria-pressed="true"><span class="shape"></span>1:1</button><button class="ratio" data-ratio="3:2" aria-pressed="false"><span class="shape wide"></span>3:2</button><button class="ratio" data-ratio="2:3" aria-pressed="false"><span class="shape tall"></span>2:3</button></div></div>
+        <details><summary>Prototype controls</summary><p>Explore waiting and failure states. This design prototype does not connect to an AI service.</p><label for="latency">Simulated delay</label><select id="latency"><option value="800">Fast · 0.8 seconds</option><option value="2400">Slow · 2.4 seconds</option></select><button id="fail-next" class="outline-button" style="margin-top:10px">Simulate the next failure</button></details>
+        <div class="create-area"><button class="primary" id="generate"><svg class="icon"><use href="#i-spark"/></svg><span>Generate</span></button><p class="hint"><kbd>⌘ / Ctrl</kbd> + <kbd>Enter</kbd> to generate</p></div>
+      </aside>
+      <main id="workspace">
+        <div class="workspace-heading"><div><h1>Your creative workspace</h1><p class="subtitle">Start with a sketch. See where it takes you.</p></div><div class="live-control"><input class="switch" type="checkbox" id="realtime" role="switch" aria-describedby="auto-help"><label for="realtime">Realtime</label></div></div>
+        <div class="workspace-toolbar"><div class="segmented" role="group" aria-label="Input mode"><button class="segment" data-mode="sketch" aria-pressed="true"><svg class="icon" style="width:14px;height:14px"><use href="#i-pen"/></svg>Sketch + prompt</button><button class="segment" data-mode="text" aria-pressed="false">Prompt only</button></div><span class="workspace-note" id="auto-help">Updates after you pause typing or drawing.</span></div>
+        <div class="boards">
+          <section class="board" id="input-board" aria-label="Sketch"><header class="board-header"><h2><svg class="icon" style="width:15px;height:15px"><use href="#i-pen"/></svg>Sketch</h2><span class="tag">Input</span></header><div class="media"><canvas id="sketch" width="640" height="640" tabindex="0" aria-label="Sketch canvas. Draw with a pointer or touch; use Undo to revise."></canvas><span class="canvas-label">Draw to shape your idea</span></div><footer class="board-footer"><div class="tools"><button class="icon-button" id="pen" aria-label="Draw" aria-pressed="true" title="Draw"><svg class="icon"><use href="#i-pen"/></svg></button><button class="icon-button" id="eraser" aria-label="Erase" aria-pressed="false" title="Erase"><svg class="icon"><use href="#i-eraser"/></svg></button></div><div class="tools"><button class="icon-button" id="undo" aria-label="Undo" title="Undo"><svg class="icon"><use href="#i-undo"/></svg></button><button class="icon-button" id="redo" aria-label="Redo" title="Redo"><svg class="icon"><use href="#i-redo"/></svg></button></div><button class="icon-button" id="clear" aria-label="Clear sketch" title="Clear sketch"><svg class="icon"><use href="#i-trash"/></svg></button></footer></section>
+          <section class="board" aria-label="Generated result"><header class="board-header"><h2><svg class="icon" style="width:15px;height:15px"><use href="#i-image"/></svg>Result</h2><span class="tag" id="result-tag">Reference sample</span></header><div class="media"><img id="result" src="../../frontend/src/assets/img/generate-styles/ModernStyle.jpg" alt="Existing reference sample: a modern home with glass balconies and a garden"><span class="sample-label" id="image-label">Reference sample · not generated from this sketch</span><div class="busy-overlay" id="busy" hidden><div class="spinner" aria-hidden="true"></div><span>Creating a simulated preview…</span><button id="stop" class="outline-button">Stop</button></div></div><footer class="board-footer"><span class="footer-label" id="result-info">Ready for your idea</span><div class="tools"><button class="outline-button" id="save" disabled><svg class="icon" style="width:13px;height:13px"><use href="#i-save"/></svg>Save version</button><button class="icon-button" id="download" disabled aria-label="Download image" title="Download image"><svg class="icon"><use href="#i-download"/></svg></button></div></footer></section>
+        </div>
+        <div class="status-bar" id="status-bar" data-state="idle"><span class="status-dot"></span><p id="status" role="status" aria-live="polite">Ready when you are. Generate an image or turn on Realtime.</p></div>
+        <section class="versions" id="history"><header class="section-heading"><h2>Ideas worth keeping</h2><span class="version-count" id="version-count">0 versions</span></header><div class="version-list" id="version-list"><div class="empty-history" id="empty-history"><svg class="icon"><use href="#i-save"/></svg><div><strong>Keep the ideas you want to come back to.</strong>Select “Save version” when something catches your eye.</div></div></div></section>
+        <footer class="prototype-note"><span>Interactive design prototype · new previews are canvas illustrations.</span><a href="studio-design.md">View design specification ↗</a></footer>
+      </main>
+    </div>
+  </div>
+  <dialog id="help-dialog"><h2>Try the creative flow</h2><p>Write a prompt, draw on the canvas, then select Generate. Realtime updates after about 700 ms of quiet input. While a preview is running, only the latest pending draft is kept.</p><p>New images are procedural illustrations, not AI inference. This prototype makes no API calls and does not persist after closing the page. Save a version and download it to keep a local copy.</p><p>Ctrl/Cmd + Enter generates. With the canvas focused, Ctrl/Cmd + Z undoes; add Shift to redo. Choose Prompt only to create without drawing.</p><button class="primary" id="close-help">Start exploring</button></dialog>
+  <script>
+    'use strict';
+    const $ = (id) => document.getElementById(id);
+    const canvas = $('sketch');
+    const ctx = canvas.getContext('2d');
+    const initialPaths = [
+      [[102,290],[335,207],[539,258],[302,346],[102,290]],
+      [[102,290],[102,392],[302,461],[539,367],[539,258]],
+      [[302,346],[302,461]], [[126,307],[126,386],[277,437],[277,357],[126,307]],
+      [[151,317],[151,394]], [[215,338],[215,416]],
+      [[326,350],[510,280],[510,356],[326,430],[326,350]],
+      [[385,328],[385,407]], [[449,304],[449,381]],
+      [[82,403],[303,484],[558,382]], [[78,420],[303,503],[567,397]],
+      [[89,383],[72,320],[61,349],[51,308],[48,379]],
+      [[548,365],[569,313],[583,337],[598,291],[610,371]]
+    ];
+    const state = { revision:1, mode:'sketch', ratio:'1:1', auto:false, tool:'pen', strokes:initialPaths.map(points => ({points,erase:false})), undo:[], redo:[], drawing:null, debounce:null, dispatchTimer:null, active:null, pending:null, nextId:0, lastStart:0, result:null, versions:[], failNext:false };
+    function status(message, kind='idle') { $('status').textContent=message; $('status-bar').dataset.state=kind; }
+    function updateControls() {
+      $('undo').disabled=!state.undo.length; $('redo').disabled=!state.redo.length;
+      $('generate').disabled=!!state.active; $('busy').hidden=!state.active;
+      $('save').disabled=!state.result; $('download').disabled=!state.result;
+      $('counter').textContent=`${$('prompt').value.length} / 4,000`;
+    }
+    function redraw() {
+      ctx.fillStyle='#fff'; ctx.fillRect(0,0,640,640);
+      ctx.lineCap='round'; ctx.lineJoin='round';
+      for(const stroke of [...state.strokes,...(state.drawing?[state.drawing]:[])]) {
+        ctx.beginPath(); ctx.strokeStyle=stroke.erase?'#fff':'#484a53'; ctx.lineWidth=stroke.erase?24:2.4;
+        stroke.points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+        if(stroke.points.length===1) ctx.lineTo(stroke.points[0][0]+.1,stroke.points[0][1]+.1);
+        ctx.stroke();
+      }
+    }
+    function remember() { state.undo.push(structuredClone(state.strokes)); if(state.undo.length>40) state.undo.shift(); state.redo=[]; }
+    function changed() {
+      state.revision++; clearTimeout(state.debounce); clearTimeout(state.dispatchTimer); state.pending=null;
+      if(state.result) $('result-tag').textContent='Input changed';
+      updateControls();
+      if(state.auto) schedule(); else if(!state.active) status('Draft updated. Select Generate to see your changes.');
+    }
+    function valid() { return $('prompt').value.trim().length>0 && (state.mode==='text'||state.strokes.some(s=>!s.erase)); }
+    function snapshot(intent) { return {revision:state.revision,prompt:$('prompt').value.trim(),strokes:structuredClone(state.mode==='text'?[]:state.strokes),ratio:state.ratio,intent}; }
+    function schedule() {
+      clearTimeout(state.debounce);
+      if(!state.auto || state.drawing || composing || document.hidden || !navigator.onLine) return;
+      if(!valid()) { status('Add a prompt and sketch, or choose Prompt only.'); return; }
+      if(!state.active) status('Waiting for your next idea…');
+      state.debounce=setTimeout(()=>enqueue(snapshot('preview')),700);
+    }
+    function enqueue(input) {
+      if(!state.auto||!valid()||input.revision!==state.revision||state.drawing) return;
+      state.pending=input;
+      if(state.active) { status('Creating a preview. Your latest draft will follow.'); return; }
+      clearTimeout(state.dispatchTimer);
+      const wait=Math.max(0,2000-(performance.now()-state.lastStart));
+      state.dispatchTimer=setTimeout(()=>{ const next=state.pending; state.pending=null; if(next&&state.auto&&next.revision===state.revision) start(next); },wait);
+    }
+    function hash(value) { let n=2166136261; for(let i=0;i<value.length;i++) n=Math.imul(n^value.charCodeAt(i),16777619); return n>>>0; }
+    function renderFixture(input) {
+      const out=document.createElement('canvas');
+      [out.width,out.height]=input.ratio==='3:2'?[960,640]:input.ratio==='2:3'?[640,960]:[800,800];
+      const c=out.getContext('2d'); const h=hash(JSON.stringify([input.prompt,input.ratio,input.strokes]));
+      const hue=185+h%55; const w=out.width,H=out.height;
+      const sky=c.createLinearGradient(0,0,0,H); sky.addColorStop(0,`hsl(${hue} 25% 85%)`); sky.addColorStop(.63,'#f3efe5'); sky.addColorStop(1,'#a5b498'); c.fillStyle=sky;c.fillRect(0,0,w,H);
+      c.fillStyle='#fff9de';c.beginPath();c.arc(w*(.17+(h%35)/100),H*.21,w*.058,0,Math.PI*2);c.fill();
+      for(let i=0;i<18;i++) { const x=(i/17)*w,top=H*(.31+((h+i*71)%15)/100); c.fillStyle=i%2?'#879987':'#a6b49a';c.beginPath();c.moveTo(x-50,H*.78);c.lineTo(x,top);c.lineTo(x+55,H*.78);c.fill(); }
+      c.save();c.translate(w*.13,H*.43);c.scale(w*.00116,H*.00105);
+      function polygon(points,fill) { c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fillStyle=fill;c.fill(); }
+      const offset=(h%41)-20;
+      polygon([[0,210],[280,340],[660,210],[340,100]],'#778471');
+      polygon([[35,85],[315,175],[315,310],[35,220]],'#b6a081');
+      polygon([[315,175],[628,58],[628,186],[315,310]],'#655f52');
+      polygon([[20,68],[310,153],[644,35],[355,-42+offset]],'#e9e7db');
+      polygon([[20,68],[310,153],[310,170],[20,86]],'#5d6060');
+      polygon([[310,153],[644,35],[644,53],[310,170]],'#3d4648');
+      polygon([[72,115],[276,181],[276,268],[72,202]],'#879d9e');
+      polygon([[344,182],[597,87],[597,171],[344,273]],'#95a9a6');
+      c.strokeStyle='#3c4848';c.lineWidth=4;
+      for(let i=0;i<5;i++){c.beginPath();c.moveTo(80+i*48,117+i*15.5);c.lineTo(80+i*48,205+i*15.5);c.stroke();}
+      for(let i=0;i<5;i++){c.beginPath();c.moveTo(354+i*56,178-i*21);c.lineTo(354+i*56,268-i*22.5);c.stroke();}
+      polygon([[20,225],[316,324],[641,195],[641,207],[316,340],[20,240]],'#e5dfce');
+      c.restore();
+      for(let i=0;i<17;i++){const x=(i/16)*w; c.fillStyle=i%2?'#697f5f':'#78906d';c.beginPath();c.ellipse(x,H*.85+(i%3)*9,w*.06,H*.04,0,0,Math.PI*2);c.fill();}
+      if(input.strokes.length) { c.save(); c.globalAlpha=.1;c.scale(w/640,H/640);c.strokeStyle='#212830';c.lineWidth=2;for(const stroke of input.strokes.filter(s=>!s.erase)){c.beginPath();stroke.points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();}c.restore(); }
+      c.fillStyle='#ffffffdd';c.fillRect(18,H-45,275,27);c.fillStyle='#475448';c.font='11px sans-serif';c.fillText('BOBBY STUDIO · SIMULATED PREVIEW',28,H-27);
+      return {url:out.toDataURL('image/png'),width:w,height:H};
+    }
+    function display(result) {
+      state.result=result; $('result').src=result.url; $('result').alt=`Simulated preview for: ${result.prompt}`;
+      document.querySelectorAll('.version-card').forEach(button=>button.setAttribute('aria-pressed','false'));
+      $('result').dataset.revision=String(result.revision); $('result-tag').textContent='Simulated preview';
+      $('image-label').textContent='Canvas illustration · not AI inference';
+      $('result-info').textContent=`${result.width} × ${result.height} · ${result.elapsed}s`;
+      updateControls();
+    }
+    function start(input) {
+      if(!valid()||state.drawing) return;
+      const id=++state.nextId, started=performance.now(), shouldFail=state.failNext;
+      state.failNext=false; $('fail-next').textContent='Simulate the next failure';
+      state.lastStart=started; status('Creating a preview from your draft…');
+      const timer=setTimeout(()=>{
+        if(state.active?.id!==id) return;
+        state.active=null;
+        if(shouldFail) { state.auto=false;$('realtime').checked=false;state.pending=null;clearTimeout(state.debounce);clearTimeout(state.dispatchTimer);status('Simulated failure: the service is busy. Your draft is safe; select Generate to retry.','error'); }
+        else if(input.revision===state.revision) { display({...input,...renderFixture(input),elapsed:((performance.now()-started)/1000).toFixed(1),id});status('Your preview is ready. Save this version if you like it.','success'); }
+        else status('Input changed. The outdated result was ignored.');
+        updateControls();
+        if(state.pending&&state.auto){const next=state.pending;state.pending=null;enqueue(next);}
+      },Number($('latency').value));
+      state.active={id,input,timer};updateControls();
+    }
+    function cancel(previewsOnly=false) {
+      clearTimeout(state.debounce);clearTimeout(state.dispatchTimer);state.pending=null;
+      if(state.active&&(!previewsOnly||state.active.input.intent==='preview')){clearTimeout(state.active.timer);state.active=null;}
+      updateControls();
+    }
+    function manual() {
+      if(composing || state.drawing) return;
+      if(!valid()){status('Add a prompt and sketch, or switch to Prompt only.','error');$('prompt').focus();return;}
+      cancel();start(snapshot('final'));
+    }
+    function point(event){const rect=canvas.getBoundingClientRect();return [(event.clientX-rect.left)/rect.width*640,(event.clientY-rect.top)/rect.height*640];}
+    canvas.addEventListener('pointerdown',event=>{if(state.mode==='text'||state.drawing||event.button!==0)return;canvas.focus();clearTimeout(state.debounce);clearTimeout(state.dispatchTimer);state.pending=null;state.revision++;remember();state.drawing={points:[point(event)],erase:state.tool==='eraser'};canvas.setPointerCapture(event.pointerId);redraw();});
+    canvas.addEventListener('pointermove',event=>{if(!state.drawing)return;state.drawing.points.push(point(event));redraw();});
+    function endStroke(event){if(!state.drawing)return;state.strokes.push(state.drawing);state.drawing=null;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);redraw();changed();}
+    canvas.addEventListener('pointerup',endStroke);canvas.addEventListener('pointercancel',endStroke);canvas.addEventListener('lostpointercapture',endStroke);
+    function undo(){if(!state.undo.length)return;state.redo.push(structuredClone(state.strokes));state.strokes=state.undo.pop();redraw();changed();}
+    function redo(){if(!state.redo.length)return;state.undo.push(structuredClone(state.strokes));state.strokes=state.redo.pop();redraw();changed();}
+    $('undo').onclick=undo;$('redo').onclick=redo;
+    $('clear').onclick=()=>{remember();state.strokes=[];redraw();changed();};
+    for(const tool of ['pen','eraser']) $(tool).onclick=()=>{state.tool=tool;$('pen').setAttribute('aria-pressed',String(tool==='pen'));$('eraser').setAttribute('aria-pressed',String(tool==='eraser'));};
+    let composing=false;
+    $('prompt').addEventListener('compositionstart',()=>{composing=true;clearTimeout(state.debounce);clearTimeout(state.dispatchTimer);state.pending=null;});
+    $('prompt').addEventListener('input',()=>{if(composing){state.revision++;updateControls();return;}changed();});
+    $('prompt').addEventListener('compositionend',()=>{composing=false;changed();});
+    document.querySelectorAll('[data-prompt]').forEach(button=>button.onclick=()=>{$('prompt').value=($('prompt').value+' '+button.dataset.prompt).slice(0,4000);changed();});
+    document.querySelectorAll('[data-ratio]').forEach(button=>button.onclick=()=>{if(state.ratio===button.dataset.ratio)return;state.ratio=button.dataset.ratio;document.querySelectorAll('[data-ratio]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));changed();});
+    document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>{if(state.mode===button.dataset.mode)return;state.mode=button.dataset.mode;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));$('input-board').style.opacity=state.mode==='text'?'.55':'1';canvas.tabIndex=state.mode==='text'?-1:0;canvas.setAttribute('aria-disabled',String(state.mode==='text'));changed();});
+    $('realtime').onchange=()=>{state.auto=$('realtime').checked;if(state.auto)schedule();else{cancel(true);status('Realtime is off. Generate when you are ready.');}};
+    $('generate').onclick=manual;$('stop').onclick=()=>{cancel();status('Generation stopped. Your draft and previous image are still here.');};
+    $('fail-next').onclick=()=>{state.failNext=true;$('fail-next').textContent='Next generation will simulate a failure';};
+    $('save').onclick=()=>{
+      if(!state.result)return;
+      if(state.versions.some(v=>v.id===state.result.id)){status('This version is already saved.','success');return;}
+      const saved={...state.result};state.versions.push(saved);$('empty-history').hidden=true;
+      const button=document.createElement('button');button.className='version-card';button.setAttribute('aria-pressed','false');button.setAttribute('aria-label',`View version ${state.versions.length}`);
+      const img=document.createElement('img');img.src=saved.url;img.alt='';const label=document.createElement('span');label.textContent=`Version ${state.versions.length}`;button.append(img,label);
+      button.onclick=()=>{cancel();state.auto=false;$('realtime').checked=false;display(saved);document.querySelectorAll('.version-card').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));status('Viewing a saved version. Your current draft is unchanged.');};
+      $('version-list').append(button);$('version-count').textContent=`${state.versions.length} versions`;status('Version saved in this prototype. Download it to keep a local copy.','success');
+    };
+    $('download').onclick=()=>{if(!state.result)return;const link=document.createElement('a');link.href=state.result.url;link.download=`bobby-studio-preview-${state.result.id}.png`;link.click();};
+    $('help').onclick=()=>$('help-dialog').showModal();$('close-help').onclick=()=>$('help-dialog').close();
+    document.addEventListener('keydown',event=>{if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();if(!$('help-dialog').open&&!state.drawing)manual();}if(document.activeElement===canvas&&(event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='z'){event.preventDefault();event.shiftKey?redo():undo();}});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTimeout(state.debounce);clearTimeout(state.dispatchTimer);state.pending=null;}else if(state.auto)schedule();});
+    window.addEventListener('offline',()=>{cancel(true);status('You are offline. Your draft remains in this page.');});
+    window.addEventListener('online',()=>{if(state.auto)schedule();});
+    window.addEventListener('pagehide',()=>cancel());
+    redraw();updateControls();
+  </script>
+</body>
+</html>
