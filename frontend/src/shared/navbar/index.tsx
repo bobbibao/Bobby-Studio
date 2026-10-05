@@ -236,14 +236,10 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
         </Box> */}
         <Divider orientation="vertical" h={6} borderColor={dividerColor} />
         {/* History */}
-        <IconButton
-          aria-label="History"
-          icon={<HistoryMenu />}
-          variant="outline"
-          size="md"
+        {/* The menu renders its own button; wrapping it in another button is invalid HTML. */}
+        <Box
           h="10"
           w="10"
-          minW="10"
           rounded="lg"
           bg={iconButtonBg}
           border="1px solid"
@@ -258,7 +254,9 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
           _active={{
             bg: iconButtonActiveBg,
           }}
-        />
+        >
+          <HistoryMenu />
+        </Box>
         {/* Notifications */}
         <IconButton
           aria-label="Notifications"

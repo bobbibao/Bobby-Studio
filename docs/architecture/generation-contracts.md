@@ -1,6 +1,8 @@
 # Generation contracts v1
 
-**Target contracts, not implemented endpoints.** A1 owns schema changes; API, worker and client move together. The current routes are in the [generation controller](../../server-api/src/modules/image-generation/image-generation.controller.ts).
+**v1 is frozen in code**: typed contracts in [`server-api/src/application/generation/contracts`](../../server-api/src/application/generation/contracts) (mirrored byte-for-byte into the worker and frontend, checked by a test) with shared fixtures in [`contracts/v1`](../../contracts/v1). The HTTP endpoints below are implemented in A3; the schema migration and identity/ownership layer exist already. The legacy SDXL routes are interim-locked and removed in A3.
+
+Authentication summary: browser routes require a Firebase ID token (`Authorization: Bearer`); `/api/internal/*` routes require the worker service credential (`Authorization: Bearer <WORKER_SERVICE_SECRET>`, constant-time check); asset delivery to `<img>` uses short-lived signed `access` tokens minted inside authorized responses. Socket.IO handshakes carry the ID token in `auth.token`; each socket joins `user:<uid>` automatically and may join a job room only for its own jobs.
 
 ## 1. Separate three boundaries
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { auth } from '@/configs/firebase';
-import { clearToken, getToken } from './tokenStorage';
+import { getToken } from './tokenStorage';
 import { authService } from './auth.service';
 
 interface AuthStore {
@@ -36,7 +36,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const user = await authService.getCurrentUser();
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
-      clearToken();
       set({
         user: null,
         isAuthenticated: false,
@@ -50,7 +49,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       await auth.signOut();
     } finally {
-      clearToken();
       set({ user: null, isAuthenticated: false });
     }
   },

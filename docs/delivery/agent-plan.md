@@ -8,21 +8,25 @@ Read [AGENTS](../../AGENTS.md), [architecture](../architecture/overview.md), [co
 
 *Update at every milestone boundary. After a restart re-read AGENTS.md and this block, then continue.*
 
-- **Milestone:** A0 closing → A1 next. Branch `claude/epic-clarke-f0he4y`.
-- **Verified (A0):** see evidence table below.
-- **In progress:** none uncommitted beyond the A0 commit.
-- **Next concrete step:** A1. Replace `AuthGuard` (bypass headers, fake password, no global guard) with Firebase-verified principal + fail-closed global guard; owner checks on `image-generation` routes; authenticated Socket.IO; service-authenticated worker claim/callback; remove CMS token from `frontend/src/config.ts`; additive Prisma migration (sessions, idempotency, outbox, reservations, results).
+- **Milestone:** A0 verified, A1 verified (carry-overs below), A2 verified. Next: **A3 + A4** (A4 can be delegated; A3 owns API/worker lifecycle). Branch `claude/epic-clarke-f0he4y`.
+- **Verified so far:** evidence tables below. Integration tests: `yarn --cwd server-api test:integration` (25 tests, real PostgreSQL/Redis/Auth Emulator, disposable DB per run). Browser: `tools/node_modules/.bin/playwright test` (identity spec passes).
+- **Next concrete step (A3, in order):**
+  1. Delete the legacy generation backend (`modules/image-generation/*` service/repository/DTOs/CQRS handlers, `infrastructure/{queue,redis,gemini}`) and the legacy worker pipeline (Python connector/processors, webhook service, Redis metadata, GCS connector), replacing them with the new use cases behind `/api/generations`, `/api/studio-sessions`, `/api/uploads`, `/api/assets`, `/api/internal/generations/*` exactly as typed in `server-api/src/application/generation/contracts` (fixtures `contracts/v1/*.json`).
+  2. In the same step consolidate catalog/entitlements onto Prisma only (delete `src/service/*`, `src/database/**`, Sequelize deps): fail-closed entitlements (no default-enabled fallback, no `DEFAULT_MODEL_CATALOG` runtime fallback), catalog filtered by the active provider profile, prices per quality, upsert-only seed (the current seed deletes the catalog).
+  3. Outbox poller, worker claim/events with attempt fencing, checkpointed delivery, reconciler, credit reservation capture/release, socket `generation.updated` to `user:<id>` room.
+- **Carry-overs:** catalog/entitlement consolidation (C13) and Sequelize removal moved into A3 step 2 (the legacy generation service consumes the fail-open entitlement methods). Legacy generation routes are only interim-locked (owner checks, worker credential on webhooks) and are removed in A3.
 - **Blockers / human steps:**
-  - The credential-like CMS token in `frontend/src/config.ts` (and git history) is **exposed and must be revoked/rotated by its owner**; its value also appeared once in this session's tool output when the file was printed. Removal from source (A1) does not revoke it.
-  - No Firebase cloud project, GCS bucket, OpenAI or Gemini credentials were provided; staging deployment and live-provider verification are outside what can be evidenced (recorded as gaps, not claimed).
+  - The credential-like CMS token that was in `frontend/src/config.ts` is **exposed and must be revoked/rotated by its owner**: it remains in git history (earlier commits) and appeared once in this session's tool output. The browser CMS client and token were removed from source (the CMS data was fetched but never rendered); a production bundle scan found no long hex strings or hardcoded service IPs. Removal does not revoke it.
+  - No Firebase cloud project, GCS bucket, OpenAI or Gemini credentials were provided; staging deployment and live-provider verification are outside what can be evidenced (recorded as gaps, not claimed). Vendor documentation sites were unreachable from the sandbox, so adapters were built from official SDK type definitions (see `docs/architecture/provider-simulator.md`).
 - **Non-obvious decisions:**
-  - No Docker daemon in the cloud sandbox: local PostgreSQL 16 / Redis 7 run natively, `docker-compose.dev.yml` is provided for Docker hosts but is **unverified** here. Firebase Auth Emulator runs from `tools/` (`firebase-tools`, own lockfile) and is verified.
-  - `tools/` holds dev/CI tooling (emulator now, Playwright later) with its own lockfile; root `package.json` has scripts only (no dependencies, no lockfile).
-  - Compiled API entrypoint is `dist/src/main` (Prisma service lives outside `src/`); `start:prod` and `main` were corrected.
-  - Frontend env with the emulator URL lives in `.env.development.local`; `vite build` (production mode) fails if `VITE_FIREBASE_AUTH_EMULATOR_URL` is set.
-  - Existing seed (`prisma/tools/seed.ts`) deletes and recreates the model catalog: not safe to re-run on real data; replaced during catalog consolidation (A1).
-  - Dead frontend code that did not compile (learning-center*, style-guide, ProfileFormOld, several unused components) was deleted after confirming zero importers by `tsc` reachability from `main.tsx`; the remaining dead files are inventoried for A6.
-  - Worker legacy pipeline (Python connector, GCS connector, webhook service, Redis metadata) is intentionally untouched in A0 and replaced in A2/A3.
+  - No Docker daemon in the cloud sandbox: PostgreSQL 16 / Redis 7 run natively; `docker-compose.dev.yml` is provided for Docker hosts but is **unverified** here. The Firebase Auth Emulator runs from `tools/` (`firebase-tools`, own lockfile) and is verified. `tools/` also holds Playwright.
+  - Root `package.json` has scripts only (no dependencies, no lockfile). Always run yarn with `--mutex file:/tmp/.yarn-mutex` when more than one install may run.
+  - Compiled API entrypoint is `dist/src/main`. Frontend emulator URL lives in `.env.development.local`; `vite build` (production mode) refuses it and the web bundle throws if it is set outside `import.meta.env.DEV`.
+  - Identity is only a verified Firebase ID token. First request provisions the account (no password column value). Global `APP_GUARD`; `@Public()` is the opt-out (health, Stripe webhook, signed-URL image route, worker-credential webhooks). `User.password` is now nullable (additive migration).
+  - Asset access for `<img>` uses short-lived HMAC URLs minted only inside authorized responses (`ASSET_URL_SECRET`), never the user token in a URL.
+  - The Prisma terminal-state triggers (`ImageJob`, `CreditReservation`) are defense in depth; application code still uses conditional updates.
+  - Existing seed deletes and recreates the model catalog: do not run it against real data; replaced in A3.
+  - Remaining dead frontend files are inventoried by `tsc` reachability from `main.tsx` and removed in A6; only non-compiling or security-relevant dead code was removed so far.
 
 ## Baseline (2026-10-05, commit 82958dc) and A0 evidence
 
@@ -49,8 +53,8 @@ Commands: `node scripts/setup.mjs` (idempotent; `--rotate-secrets`, `--skip-db`,
 | Task | Status | Evidence / remaining |
 | --- | --- | --- |
 | A0 | **verified except**: V01 gate for the image simulator (A2) and Docker-compose path (no daemon available) | table above |
-| A1 | planned | |
-| A2 | planned | |
+| A1 | **verified** (carry-over: catalog consolidation in A3) | Firebase Auth Emulator end to end: anonymous/forged/bypass-header requests 401, valid token provisions account without password (`test:integration` 25/25); two-user isolation for jobs, history, projects, library prompts, notifications, publishing, sockets; worker credential guard (constant-time); additive migration applies on fresh DB and upgraded dev DB; contract fixtures validated in API (11 tests), worker (6) and frontend (3); Playwright `identity.spec.ts` passes (bearer on every API call, zero third-party requests, zero console errors); prod bundle scan clean |
+| A2 | **verified** (adapter wiring into worker lifecycle is A3) | `image-simulator` 61 tests; worker provider suite 48 tests against the real simulator over HTTP; simulator healthy under `dev.mjs`, returns decodable 1024x1024 PNG, wrong key 401; live vendors not contacted |
 | A3 | planned | |
 | A4 | planned | |
 | A5 | planned | |
