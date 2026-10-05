@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const DATA_DIR = path.join(ROOT, '.data');
-export const APPS = ['server-api', 'worker', 'frontend', 'tools'];
+export const APPS = ['server-api', 'worker', 'image-simulator', 'frontend', 'tools'];
 
 export const PORTS = {
   api: 3000,
