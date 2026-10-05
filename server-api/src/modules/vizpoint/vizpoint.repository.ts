@@ -35,24 +35,6 @@ export class VizpointRepository {
     );
   }
 
-  /**
-   * Checks whether the user has enough credit to generate an image
-   */
-  async hasEnoughVizPoints(userId: string, cost: number): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const freeVizPointsRemaining = user.freeCredit - user.usedFreeCredit;
-    const subscriptionVizPointsRemaining =
-      user.paidCredit - user.usedPaidCredit;
-
-    return freeVizPointsRemaining + subscriptionVizPointsRemaining >= cost;
-  }
 
   async resetFreeCredits(userId: string): Promise<void> {
     const user = await this.prisma.user.findUnique({
@@ -105,73 +87,4 @@ export class VizpointRepository {
     return usersToReset;
   }
 
-  /**
-   * Deducts the user's credit, free credit first and paid credit after
-   * Returns true when the deduction succeeds and false when credit is insufficient
-   * @param userId The user id
-   * @param amount The credit amount to deduct
-   * @returns Whether the deduction succeeded
-   */
-  async consumeVizPoints(userId: string, amount: number): Promise<boolean> {
-    // Use a transaction to keep the data consistent
-
-    return this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!user) {
-        throw new Error('User not found');
-      }
-      // Compute the remaining credit of each kind
-      const freeVizPointsRemaining = Math.max(
-        0,
-        user.freeCredit - user.usedFreeCredit,
-      );
-      const paidVizPointsRemaining = Math.max(
-        0,
-        user.paidCredit - user.usedPaidCredit,
-      );
-
-      // Total remaining credit
-      const totalVizPointsRemaining =
-        freeVizPointsRemaining + paidVizPointsRemaining;
-      // Check whether the credit is sufficient
-      if (totalVizPointsRemaining < amount) {
-        return false; // Not enough credit to deduct
-      }
-
-      // Deduct free credit first
-      const freeToConsume = Math.min(freeVizPointsRemaining, amount);
-      const paidToConsume = Math.min(
-        paidVizPointsRemaining,
-        amount - freeToConsume,
-      );
-
-      const freeCreditAfterConsumption = user.usedFreeCredit + freeToConsume;
-      const paidCreditAfterConsumption = user.usedPaidCredit + paidToConsume;
-      // Update the data
-      await tx.user.update({
-        where: { id: userId },
-        data: {
-          usedFreeCredit: freeCreditAfterConsumption,
-          usedPaidCredit: paidCreditAfterConsumption,
-        },
-      });
-
-      // Record the credit usage history
-      await tx.usage.create({
-        data: {
-          userId: userId,
-          type: 'VIZ_POINTS',
-          amount: amount,
-          freeAmount: freeToConsume,
-          paidAmount: paidToConsume,
-          description: 'Generate image',
-        },
-      });
-
-      return true; // Deduction succeeded
-    });
-  }
 }
