@@ -193,6 +193,7 @@ async function start() {
 
 async function stop() {
   for (const app of [...apps].reverse()) {
+    if (!selected(app.name)) continue;
     const pid = readPid(app.name);
     if (!pid) continue;
     if (alive(pid)) {
@@ -213,7 +214,7 @@ async function stop() {
     rmSync(pidFile(app.name), { force: true });
   }
   for (const [name, service] of Object.entries(infra)) {
-    if (!existsSync(managedFile(name))) continue;
+    if (!selected(name) || !existsSync(managedFile(name))) continue;
     service.stop(readFileSync(managedFile(name), 'utf8'));
     rmSync(managedFile(name), { force: true });
     log(`${name}: stopped`);

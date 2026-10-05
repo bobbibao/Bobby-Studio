@@ -1,0 +1,1 @@
+ALTER TABLE "ImageJob" ADD COLUMN "savedAt" TIMESTAMP(3);

@@ -386,6 +386,8 @@ model ImageJob {
   expiresAt               DateTime?
   cancellationRequestedAt DateTime?
   executionFinishedAt     DateTime?
+  // Set when the user keeps a result (Save version); kept results leave preview retention.
+  savedAt                 DateTime?
 
   @@index([requestId])
   @@index([status])
@@ -399,8 +401,6 @@ model StudioSession {
   id             String   @id @default(uuid())
   userId         String
   latestRevision Int      @default(0)
-  activeJobId    String?
-  pendingJobId   String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

@@ -22,7 +22,15 @@ describe('identity and ownership', () => {
       data: { userId: alice.uid, method: 'text_to_image', parameters: {}, status: 'QUEUED' },
     });
     const job = await prisma.imageJob.create({
-      data: { requestId: request.id, userId: alice.uid, modelName: 'm', provider: 'p', status: 'QUEUED' },
+      data: {
+        requestId: request.id,
+        userId: alice.uid,
+        modelName: 'simulated-openai-image',
+        provider: 'openai',
+        status: 'FAILED',
+        errorCode: 'INTERNAL',
+        payload: { modelId: 'simulated-openai-image', mode: 'text_to_image', prompt: 'p', size: { width: 1024, height: 1024 }, quality: 'preview', inputAssetId: null, inputHash: 'h' },
+      },
     });
     aliceJobId = job.id;
   });
@@ -32,7 +40,7 @@ describe('identity and ownership', () => {
   });
 
   describe('authentication', () => {
-    it.each(['/api/models', '/api/projects/user/anyone', '/api/image-generation/queue/stats', '/api/users/profile'])(
+    it.each(['/api/models', '/api/projects/user/anyone', '/api/generations', '/api/credits/balance', '/api/users/profile'])(
       'rejects anonymous access to %s',
       async (url) => {
         await anonymous(app).get(url).expect(401);
@@ -69,18 +77,21 @@ describe('identity and ownership', () => {
 
   describe("another user's job", () => {
     it.each([
-      ['status', 'get', (id: string) => `/api/image-generation/job/${id}/status`],
-      ['result', 'get', (id: string) => `/api/image-generation/job/${id}/result`],
-      ['cancel', 'post', (id: string) => `/api/image-generation/job/${id}/cancel`],
-      ['retry', 'post', (id: string) => `/api/image-generation/job/${id}/retry`],
+      ['read', 'get', (id: string) => `/api/generations/${id}`],
+      ['cancel', 'post', (id: string) => `/api/generations/${id}/cancel`],
+      ['retry', 'post', (id: string) => `/api/generations/${id}/retry`],
+      ['save', 'post', (id: string) => `/api/generations/${id}/save`],
     ] as const)('does not disclose or mutate it through %s', async (_name, method, url) => {
-      await as(app, bob)[method](url(aliceJobId)).expect(404);
+      await as(app, bob)[method](url(aliceJobId)).set('Idempotency-Key', randomUUID()).expect(404);
       const job = await prismaOf(app).imageJob.findUnique({ where: { id: aliceJobId } });
-      expect(job?.status).toBe('QUEUED');
+      expect(job?.status).toBe('FAILED');
     });
 
-    it("hides another user's history", async () => {
-      await as(app, bob).get(`/api/image-generation/user/${alice.uid}/jobs`).expect(404);
+    it("never lists another user's generations", async () => {
+      const page = await as(app, bob).get('/api/generations').expect(200);
+      expect(page.body.items.map((item: { id: string }) => item.id)).not.toContain(aliceJobId);
+      const own = await as(app, alice).get('/api/generations?studioSessionId=00000000-0000-4000-8000-000000000000').expect(200);
+      expect(own.body.items).toEqual([]);
     });
   });
 
@@ -146,18 +157,20 @@ describe('identity and ownership', () => {
       ['no credential', undefined],
       ['a wrong credential', 'Bearer not-the-worker-secret'],
       ['a user ID token', 'Bearer USER_TOKEN'],
-    ])('rejects callbacks with %s', async (_name, header) => {
-      const req = anonymous(app).post('/api/image-generation/generate-webhook').send({ event: 'job.completed' });
-      if (header) req.set('Authorization', header.replace('USER_TOKEN', alice.token));
-      await req.expect(401);
+    ])('rejects claim and event calls with %s', async (_name, header) => {
+      for (const route of ['claim', 'events']) {
+        const req = anonymous(app).post(`/api/internal/generations/${aliceJobId}/${route}`).send({});
+        if (header) req.set('Authorization', header.replace('USER_TOKEN', alice.token));
+        await req.expect(401);
+      }
     });
 
-    it('accepts the service credential at the guard (payload errors are the handler’s concern)', async () => {
+    it('accepts the service credential at the guard and validates the payload before any effect', async () => {
       const response = await anonymous(app)
-        .post('/api/image-generation/generate-webhook')
+        .post(`/api/internal/generations/${aliceJobId}/events`)
         .set('Authorization', `Bearer ${process.env.WORKER_SERVICE_SECRET}`)
-        .send({ event: 'job.unknown' });
-      expect(response.status).not.toBe(401);
+        .send({ schemaVersion: 2 });
+      expect(response.status).toBe(400);
     });
   });
 
