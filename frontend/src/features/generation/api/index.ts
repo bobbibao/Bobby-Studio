@@ -1,4 +1,4 @@
 export * from './client';
 export * from './endpoints';
-export * from './hooks';
-
+export * from './errors';
+export * from './keys';
