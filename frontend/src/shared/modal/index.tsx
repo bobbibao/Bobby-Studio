@@ -20,7 +20,7 @@ interface ModalCommonProps {
   customOverlay?: any;
   showFooter?: boolean;
   disableSubmit?: boolean;
-  loadingSubmit?: boolean; // 👈 thêm dòng này
+  loadingSubmit?: boolean;
   showClose?: boolean;
   labelCancel?: string;
   labelSubmit?: string;

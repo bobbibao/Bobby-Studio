@@ -47,7 +47,7 @@ const ChangePasswordModal: React.FC<{
     }
   }, []);
 
-  // ✅ Schema validation (bỏ currentPassword nếu user login bằng Google)
+  // Schema validation (currentPassword is skipped for users who signed in with Google)
   const schema = yup.object().shape({
     currentPassword: isGoogleUser
       ? yup.string()

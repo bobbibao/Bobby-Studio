@@ -1,4 +1,4 @@
-// DTO StripeSubscription với cancelDate
+// StripeSubscription DTO including cancelDate
 export interface StripeSubscriptionDTO {
   id: string;
   userId: string;

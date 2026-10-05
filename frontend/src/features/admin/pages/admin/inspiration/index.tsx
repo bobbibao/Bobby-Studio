@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { setNavbarAllowBack, setNavbarHeading } from '@/slices/navbar';
-import { useConfigurationApi } from '@/services';
 import { useAuthentication } from '@/hooks/useAuthentication';
 import ImageCard from '@/shared/card/ImageCard';
 import useLayoutStore from '@/store/layoutStore';
@@ -32,7 +31,6 @@ const FILTER_MODAL_FIELDS: FilterField[] = ['models', 'time'];
 
 const Inspiration: React.FC = () => {
   const { t } = useTranslation();
-  const { fetchUserConfiguration } = useConfigurationApi();
   const location = useLocation();
   const dispatch = useDispatch();
   const { columns, setColumns } = useLayoutStore();
@@ -41,8 +39,6 @@ const Inspiration: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTabIndex, setSelectedTabIndex] = useState<number>(-1);
-  const [isPublishMethod, setIsPublishMethod] = useState<boolean>(false);
-  const [isDeleteMethod, setIsDeleteMethod] = useState<boolean>(false);
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const [showPagination, setShowPagination] = useState(false);
@@ -197,13 +193,6 @@ const Inspiration: React.FC = () => {
   );
 
   // Track which user we've fetched configuration for to prevent duplicate calls
-  const configuredUserRef = useRef<string | null>(null);
-  const isLoadingConfigRef = useRef<boolean>(false);
-
-  // Create a stable reference to the fetch function
-  const fetchUserConfigRef = useRef(fetchUserConfiguration);
-  fetchUserConfigRef.current = fetchUserConfiguration;
-
   // Initial setup effect - runs once on mount
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -216,33 +205,6 @@ const Inspiration: React.FC = () => {
       dispatch(setNavbarAllowBack(false));
     };
   }, [dispatch, location.search]);
-
-  // User configuration effect - only call once per user
-  useEffect(() => {
-    const fetchUserConfig = async (userId: string) => {
-      if (isLoadingConfigRef.current) return; // Prevent concurrent calls
-
-      isLoadingConfigRef.current = true;
-      try {
-        const response = await fetchUserConfigRef.current(userId);
-        const { isPublishMethod, isDeleteMethod } = response;
-        setIsPublishMethod(isPublishMethod);
-        setIsDeleteMethod(isDeleteMethod);
-        configuredUserRef.current = userId;
-      } catch (error) {
-        console.error('Error fetching user configuration:', error);
-        // Set default values on error
-        setIsPublishMethod(false);
-        setIsDeleteMethod(false);
-      } finally {
-        isLoadingConfigRef.current = false;
-      }
-    };
-
-    if (user?.id && user.id !== configuredUserRef.current && !isLoadingConfigRef.current) {
-      fetchUserConfig(user.id);
-    }
-  }, [user?.id]);
 
   // Initial data fetch effect - runs once after component mounts and when location changes
   useEffect(() => {
@@ -435,8 +397,8 @@ const Inspiration: React.FC = () => {
                       id={img.attributeId}
                       img={img.value}
                       matchedAttribute={img}
-                      hasPublish={isPublishMethod}
-                      hasAction={isDeleteMethod}
+                      hasPublish={false}
+                      hasAction={false}
                       handleDelCallback={() => {
                         const orderBy = savedFilters?.time === 'oldest' ? 'asc' : 'desc';
                         const inputType =

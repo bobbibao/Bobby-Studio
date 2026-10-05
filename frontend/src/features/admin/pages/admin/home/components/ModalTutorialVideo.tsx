@@ -39,7 +39,7 @@ export const ModalTutorialVideo: FC<ModalTutorialVideoProps> = ({
     } catch (err: any) {
     } finally {
       setLoading(false);
-      onClose(); // Đóng modal xác nhận
+      onClose(); // Close the confirmation modal
     }
   };
 

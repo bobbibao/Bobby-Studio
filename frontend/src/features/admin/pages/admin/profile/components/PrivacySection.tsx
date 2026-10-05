@@ -85,7 +85,7 @@ export function PrivacySection() {
     const fetchSettings = async () => {
       try {
         const response = await getPrivacySettings();
-        setInitialValues(response); // Lưu giá trị ban đầu
+        setInitialValues(response); // Keep the initial values
         reset(response);
       } catch (error) {
         toast({

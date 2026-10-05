@@ -1,6 +1,6 @@
 # Legacy cleanup and replacement plan
 
-**Status: planned.** This is an implementation inventory, not a claim that source has been cleaned. See [baseline findings](../architecture/source-audit.md). Product target: Bobby Studio, production behavior, English-first development, and one isolated image simulator.
+**Status: in progress; see [Closure status](#closure-status-2026-10-05).** The inventory below is the original plan; the closure table records what was actually verified. See [baseline findings](../architecture/source-audit.md). Product target: Bobby Studio, production behavior, English-first development, and one isolated image simulator.
 
 ## Rules for removal
 
@@ -50,3 +50,27 @@ Do not print, test against a third party, or copy the embedded CMS credential. I
 ## Closure
 
 Each cleanup item is closed by a task/PR reference and verification result, not by deleting a keyword. A8 requires no unexplained synthetic business behavior, embedded secrets, bypass auth, external defaults or unimplemented exposed action in the release path. Known optional/deferred features are explicit and inaccessible as active functionality.
+
+
+## Closure status (2026-10-05)
+
+Evidence column names what was run. "Verified" means an automated check or browser run passed; nothing here is claimed from reading code alone.
+
+| ID | Status | Evidence / remaining |
+| --- | --- | --- |
+| C01 | **code done; credential revocation is a human step** | Browser CMS client and token removed; production bundle scan found no long hex strings or service IPs. The token remains in git history and was printed once in a tool session, so it must be treated as exposed until its owner revokes it |
+| C02, C03 | verified | Auth Emulator integration suite; forged/bypass requests rejected; no password backdoor on provisioning |
+| C04, C05, C06, C07 | **verified** | Fake `services/project.ts` functions, `configs/mock.ts`, project/inspiration fixtures and the hardcoded-user design service removed; projects without images render the card's honest placeholder (`selectors/project.test.ts`); Playwright `routes.spec.ts` shows an empty projects page for a new account. Project create/rename/delete continue to use the existing `UserProjectManagement` hook and attribute API; that CRUD was **not** browser-exercised in this pass |
+| C08 | verified | Local and CI run only against the simulator; live profile needs explicit configuration and `--confirm-spend` |
+| C09 | verified | Legacy studio, thesis UI and Python processor removed; `/generate` renders the new studio |
+| C10 | **mostly verified** | Studio uses the server catalog and entitlements only. Dead client-side catalog slice, fallback catalog and unused model-catalog client removed. `constants/models.ts` keeps `Bobby AI` labels for legacy persisted records and the plan-limit defaults used by the projects page; it grants no model access |
+| C11, C12 | verified | A3 lifecycle suites (admission failure cannot enqueue, rejected callbacks cannot mutate state) |
+| C13 | verified | Prisma-only catalog; Sequelize removed; fresh and upgrade migrations applied |
+| C14, C15 | verified | Bounded decode/download in worker; one retry owner; graceful shutdown covered by recovery E2E |
+| C16 | **verified** | `useSdxlGeneration`, `useJobSocket`, `JobSocketProvider`, the Redux job projection and its history reducers deleted. The navbar History menu now reads the real server history (status chips; no progress percentages). Logout/navigation isolation covered by `studio.spec.ts` two-account test |
+| C17 | verified | Empty `store/user.ts`, the dead `inspiration` and `models` slices and 174+ unreachable files removed by import-graph reachability from `main.tsx` (tsc, 101 unit tests, build and 22 browser tests pass afterwards) |
+| C18 | verified | Title and identity are Bobby Studio; `index.html` loads no third-party scripts; browser runs assert zero third-party hosts |
+| C19 | **done** | The three ERP/Vue templates deleted; `frontend/AI_CONTEXT.yaml` updated to current facts |
+| C20 | verified | Single Vitest runner; no Jest scaffold or template test |
+| C21 | **done for code, comments, logs and server messages** | All Vietnamese source comments, logs and the one user-visible server message translated; remaining non-English text is the `vi` language label and intentional Unicode in tests. `vi`/`de` locale files untouched. Hardcoded UI copy outside the studio namespace was not re-audited screen by screen |
+| C22 | **partly done** | The email-invitation modal, which showed success without sending anything, was removed (no backend endpoint exists; invite link and QR flows remain). Unreachable pricing/payment pages removed. The profile billing/subscription section is still reachable and its Stripe flows were **not** verified here (no Stripe account); decide exposure before release |

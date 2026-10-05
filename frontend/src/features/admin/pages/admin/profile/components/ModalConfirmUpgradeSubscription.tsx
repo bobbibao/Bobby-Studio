@@ -68,7 +68,7 @@ export const ModalConfirmUpgradeSubscription: FC<ModalCancelSubscriptionProps> =
     } finally {
       setLoading(false);
       await dispatch(fetchCurrentUser());
-      onClose(); // Đóng modal xác nhận
+      onClose(); // Close the confirmation modal
     }
   };
 

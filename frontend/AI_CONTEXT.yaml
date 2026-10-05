@@ -2,7 +2,7 @@ project_name: Bobby Studio
 description: Image studio using prompt, sketch and reference images; video is deferred.
 baseline_commit: 82958dc
 documented_at: '2026-10-05'
-documentation_status: architecture_planned_not_implemented
+documentation_status: implemented_see_agent_plan_for_verified_status
 instructions: ../AGENTS.md
 documents:
   architecture: ../docs/architecture/overview.md
@@ -18,18 +18,18 @@ current_stack:
   routing: React Router 6
   server_state: TanStack Query 5 plus legacy Redux flows
   editor_state: React hooks; existing Redux and Zustand stores
-  auth: Firebase; legacy custom bypass is scheduled for replacement with official emulator support
+  auth: Firebase ID tokens; official Auth Emulator in development and test, rejected in staging and production
   api: NestJS 10 with some integration package majors requiring compatibility checks
   jobs: BullMQ 5 + Redis + separate NestJS worker
-  database: PostgreSQL + Prisma, with duplicate Sequelize model catalog paths
-  rendering: External Python adapter currently wired; Sharp for post-processing
+  database: PostgreSQL + Prisma (single catalog; Sequelize removed)
+  rendering: OpenAI and Gemini adapters behind a provider port; simulated through the HTTP image simulator by default; Sharp for post-processing
 current_entrypoints:
   studio: src/features/generation/components/StudioEditor.tsx
   generation_feature: src/features/generation
   realtime_scheduler: src/features/generation/scheduler/scheduler.ts
   generation_hook: src/features/generation/hooks/useRealtimeGeneration.ts
-  socket_hook: src/hooks/useJobSocket.ts
-  api_client: src/services/api/client.ts
+  socket_hook: src/features/generation/hooks/useGenerationEvents.ts
+  api_client: src/features/generation/api/client.ts
   theme: src/theme/index.ts
 target_invariants:
   - New code comments, documentation and UI source copy use English.
@@ -45,6 +45,5 @@ target_invariants:
   - Preserve the existing stack and migrate one use case at a time.
   - Tests cover critical behavior, not one file for every class.
 status:
-  dependencies_installed_at_audit: false
-  application_build_or_e2e_verified_at_audit: false
+  verification: see docs/delivery/agent-plan.md (Current state and Status table)
   ui_prototype: standalone_browser_design_only
