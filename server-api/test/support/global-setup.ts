@@ -34,7 +34,7 @@ export default async function globalSetup(): Promise<void> {
   const testUrl = new URL(devUrl.toString());
   testUrl.pathname = `/${dbName}`;
 
-  execFileSync('npx', ['prisma', 'migrate', 'deploy'], {
+  execFileSync(process.execPath, [require.resolve('prisma/build/index.js'), 'migrate', 'deploy'], {
     cwd: root,
     env: { ...process.env, DATABASE_URL: testUrl.toString() },
     stdio: 'pipe',

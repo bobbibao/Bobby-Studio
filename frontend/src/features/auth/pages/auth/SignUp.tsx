@@ -45,6 +45,7 @@ export default function SignUp() {
     formState: { errors, isValid },
     setValue,
   } = useForm<ISignupRequest>({
+    defaultValues: { email: '', password: '' },
     resolver: yupResolver(validationSchema),
     mode: 'onChange',
   });

@@ -2,6 +2,8 @@
  * Validated runtime configuration for the Bobby Studio worker.
  * Problems are reported as field names and reasons, never as values.
  */
+import { isAbsolute } from 'node:path';
+
 export const APP_ENVS = ['development', 'test', 'staging', 'production'] as const;
 export type AppEnv = (typeof APP_ENVS)[number];
 export type ImageProviderId = 'openai' | 'gemini';
@@ -85,7 +87,7 @@ export function loadWorkerConfig(env: Env = process.env): WorkerRuntimeConfig {
   const storageDriver = oneOf<'local' | 'gcs'>('STORAGE_DRIVER', env.STORAGE_DRIVER, ['local', 'gcs'], problems);
   if (storageDriver === 'local') {
     if (isDeployed) problems.push('STORAGE_DRIVER=local is only allowed in development and test');
-    if (!isSet(env.LOCAL_STORAGE_ROOT) || !env.LOCAL_STORAGE_ROOT.startsWith('/')) {
+    if (!isSet(env.LOCAL_STORAGE_ROOT) || !isAbsolute(env.LOCAL_STORAGE_ROOT)) {
       problems.push('LOCAL_STORAGE_ROOT must be an absolute path when STORAGE_DRIVER=local');
     }
   } else if (!isSet(env.BOBBY_GCS_BUCKET_NAME)) {

@@ -64,6 +64,7 @@ import { imageUploadOptions } from '../../shared/upload/image-upload.options';
 // import { EntitlementService } from './entitlement.service';
 import { EntitlementService } from '../entitlement/entitlement.service';
 import { UserService } from '../user/user.service';
+import { AssetService } from '../assets/asset.service';
 
 @ApiTags('Attributes')
 @Controller('attributes')
@@ -77,6 +78,7 @@ export class AttributeController {
     private readonly redisService: RedisService,
     private readonly entitlementService: EntitlementService,
     private readonly userService: UserService,
+    private readonly assets: AssetService,
   ) {}
 
   @Post('upload-images/:userId')
@@ -173,7 +175,7 @@ export class AttributeController {
         ActionEntity
       >[]
     > = {
-      data: newData,
+      data: await this.assets.withOwnedAssetUrls(newData, userId),
       total,
       page,
       limit,
@@ -214,7 +216,7 @@ export class AttributeController {
     const result: BobbyResponse<
       UserAttributeEntity<OriginalImageAttributeEntity, ActionEntity>[]
     > = {
-      data: newData,
+      data: await this.assets.withOwnedAssetUrls(newData, userId),
       total,
       page,
       limit,
@@ -298,7 +300,7 @@ export class AttributeController {
           ActionEntity
         >[]
       > = {
-        data: newData,
+        data: await this.assets.withOwnedAssetUrls(newData, userId),
         total,
         page,
         limit,

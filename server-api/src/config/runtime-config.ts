@@ -6,6 +6,8 @@
  * so a misconfigured environment fails closed without leaking secrets.
  */
 
+import { isAbsolute } from 'node:path';
+
 export const APP_ENVS = ['development', 'test', 'staging', 'production'] as const;
 export type AppEnv = (typeof APP_ENVS)[number];
 
@@ -164,7 +166,7 @@ export function loadRuntimeConfig(env: Env = process.env): RuntimeConfig {
     if (isDeployed) problems.push('STORAGE_DRIVER=local is only allowed in development and test');
     if (!isSet(env.LOCAL_STORAGE_ROOT)) {
       problems.push('LOCAL_STORAGE_ROOT is required when STORAGE_DRIVER=local');
-    } else if (!env.LOCAL_STORAGE_ROOT!.startsWith('/')) {
+    } else if (!isAbsolute(env.LOCAL_STORAGE_ROOT!)) {
       problems.push('LOCAL_STORAGE_ROOT must be an absolute path');
     }
   } else if (!isSet(env.BOBBY_GCS_BUCKET_NAME)) {

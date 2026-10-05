@@ -31,10 +31,15 @@ export function log(message = '') {
 }
 
 export function run(command, args, options = {}) {
+  // Windows package-manager shims must be invoked through the command interpreter.
+  if (process.platform === 'win32' && ['yarn', 'npm', 'pnpm'].includes(command)) {
+    return spawnSync(`${command}.cmd`, args, { encoding: 'utf8', shell: true, windowsHide: true, ...options });
+  }
   return spawnSync(command, args, { encoding: 'utf8', ...options });
 }
 
 export function commandExists(command) {
+  if (process.platform === 'win32') return run('where.exe', [command]).status === 0;
   return run('sh', ['-c', `command -v ${command}`]).status === 0;
 }
 

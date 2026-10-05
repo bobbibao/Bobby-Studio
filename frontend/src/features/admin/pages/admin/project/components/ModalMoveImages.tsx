@@ -23,7 +23,7 @@ interface ModalMoveImagesProps {
   selectedImages: SelectedMovingImageState[]; // Array of images to move
   projects: UserAttributeEntity<ProjectAttributeEntity, ActionEntity>[];
   onClose: () => void;
-  onMove?: (payloads: MoveImagesToFolderAction) => void;
+  onMove?: (payloads: MoveImagesToFolderAction) => void | Promise<void>;
 }
 
 const ModalMoveImages: React.FC<ModalMoveImagesProps> = ({ isOpen, selectedImages, projects, onClose, onMove }) => {
@@ -42,7 +42,7 @@ const ModalMoveImages: React.FC<ModalMoveImagesProps> = ({ isOpen, selectedImage
     if (isOpen) {
       setSelectedProject(null);
       setSelectedFolder(null);
-      // setMoveImagesPayload(null);
+      setMoveImagesToFolderAction(null);
     }
   }, [isOpen]);
 
@@ -89,11 +89,11 @@ const ModalMoveImages: React.FC<ModalMoveImagesProps> = ({ isOpen, selectedImage
 
   const onPrev = () => {
     setSelectedProject(null);
-    // setSelectedFolder(null);
+    setSelectedFolder(null);
     // setMoveImagesPayload(null);
   };
 
-  const handleMoveImages = () => {
+  const handleMoveImages = async () => {
     if (!moveImagesToFolderAction || moveImagesToFolderAction.selectedImages.length === 0) {
       toast({
         title: 'Error',
@@ -108,8 +108,7 @@ const ModalMoveImages: React.FC<ModalMoveImagesProps> = ({ isOpen, selectedImage
 
     // Check if trying to move to the same location
     if (
-      moveImagesToFolderAction.from.projectId === moveImagesToFolderAction.to.projectId &&
-      moveImagesToFolderAction.from.folderIndex === moveImagesToFolderAction.to.folderIndex
+      selectedImages.every((image) => image.projectId === selectedFolder?.projectId && image.folderName === selectedFolder?.folderName)
     ) {
       toast({
         title: 'Warning',
@@ -123,7 +122,11 @@ const ModalMoveImages: React.FC<ModalMoveImagesProps> = ({ isOpen, selectedImage
     }
 
     if (moveImagesToFolderAction) {
-      onMove?.(moveImagesToFolderAction);
+      try {
+        await onMove?.(moveImagesToFolderAction);
+      } catch {
+        return;
+      }
     }
     onClose();
   };
@@ -201,8 +204,7 @@ const ModalMoveImages: React.FC<ModalMoveImagesProps> = ({ isOpen, selectedImage
             isDisabled={
               !moveImagesToFolderAction ||
               moveImagesToFolderAction.selectedImages.length === 0 ||
-              (moveImagesToFolderAction.from.projectId === moveImagesToFolderAction.to.projectId &&
-                moveImagesToFolderAction.from.folderIndex === moveImagesToFolderAction.to.folderIndex)
+              selectedImages.every((image) => image.projectId === selectedFolder?.projectId && image.folderName === selectedFolder?.folderName)
             }
             onClick={handleMoveImages}
           />

@@ -80,7 +80,7 @@ Restart the API and worker after changing the profile. Details, the deployed-env
 - Any live OpenAI or Gemini call (adapters were built from official SDK type definitions and tested against the simulator).
 - A real Firebase project, a real GCS bucket (adapters are checked against a local fake of the JSON API), Stripe flows, and any cloud or staging deployment.
 - Docker image builds and the CI workflow (no Docker daemon was available where this was built).
-- Project and library create/rename/delete through the browser, and real-device, screen-reader and long-soak behavior.
+- Real-device, screen-reader and long-soak behavior. Project/folder CRUD and saved-image delivery now have browser coverage; see [Windows Chrome QA](docs/delivery/browser-qa.md).
 
 ## Human steps outstanding
 

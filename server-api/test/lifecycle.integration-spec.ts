@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { AddressInfo } from 'net';
 import { io } from 'socket.io-client';
+import { ASSET_STORAGE, AssetStorage } from '../src/infrastructure/storage/asset-storage';
 import {
   as,
   baseRequest,
@@ -348,8 +349,10 @@ describe('generation lifecycle', () => {
       const before = await balance();
       const { id, worker } = await startRunning();
       await worker.event(id, 'started', {}).expect(200);
-      await prismaOf(app).imageJob.update({ where: { id }, data: { deadlineAt: new Date(Date.now() - 120_000) } });
-      await prismaOf(app).$executeRaw`UPDATE "ImageJob" SET "updatedAt" = now() - interval '5 minutes' WHERE id = ${id}`;
+      await prismaOf(app).imageJob.update({ where: { id }, data: {
+        deadlineAt: new Date(Date.now() - 120_000),
+        updatedAt: new Date(Date.now() - 5 * 60_000),
+      } });
 
       const result = await reconcilerOf(app).run();
       expect(result.failed).toBeGreaterThanOrEqual(1);
@@ -385,7 +388,9 @@ describe('generation lifecycle', () => {
     it('saves a completed preview without inference, idempotently, into the library', async () => {
       const { id, worker } = await startRunning();
       await expect(as(app, user).post(`/api/generations/${id}/save`)).resolves.toMatchObject({ status: 409 });
-      await worker.event(id, 'completed', { outputs: await worker.outputs(id), durationMs: 1 }).expect(200);
+      const outputs = await worker.outputs(id);
+      await app.get<AssetStorage>(ASSET_STORAGE).put(outputs[0].storageKey, await makePng({ r: 10, g: 120, b: 200 }, 32), 'image/png');
+      await worker.event(id, 'completed', { outputs, durationMs: 1 }).expect(200);
 
       const first = await as(app, user).post(`/api/generations/${id}/save`).expect(200);
       const second = await as(app, user).post(`/api/generations/${id}/save`).expect(200);
@@ -394,6 +399,16 @@ describe('generation lifecycle', () => {
       const asset = await prismaOf(app).asset.findFirstOrThrow({ where: { jobId: id } });
       expect(asset).toMatchObject({ retention: 'saved', expiresAt: null });
       expect(await prismaOf(app).userAttribute.count({ where: { userId: user.uid, attributeId: first.body.libraryItemId } })).toBe(1);
+      const library = await as(app, user).get(`/api/attributes/unassigned/${user.uid}?page=1&limit=20`).expect(200);
+      const item = library.body.data.find((entry: { attributeId: string }) => entry.attributeId === first.body.libraryItemId);
+      expect(item.value.path).toContain('access=');
+      expect(item.value.thumbnail).toContain('thumbnail=true');
+      expect(item.value.thumbnail).toContain('access=');
+      const thumbnail = new URL(item.value.thumbnail);
+      await as(app, user).get(thumbnail.pathname + thumbnail.search).expect(200).expect('Content-Type', /image\/webp/);
+      const other = await createUser('foreign-library');
+      await signIn(app, other);
+      await as(app, other).get(`/api/attributes/unassigned/${user.uid}?page=1&limit=20`).expect(404);
     });
 
     it('lists finals and kept previews with a stable cursor', async () => {
