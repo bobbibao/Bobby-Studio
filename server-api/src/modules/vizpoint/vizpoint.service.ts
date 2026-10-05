@@ -26,19 +26,7 @@ export class VizpointService {
     return await this.vizPointsRepository.getUserVizPoints(userId);
   }
 
-  /**
-   * Checks whether the user has enough credits
-   */
-  async hasEnoughVizPoints(userId: string, cost = 1): Promise<boolean> {
-    return this.vizPointsRepository.hasEnoughVizPoints(userId, cost);
-  }
 
-  /**
-   * Deducts credits when the user generates an image
-   */
-  async consumeVizPoints(userId: string, amount = 1): Promise<boolean> {
-    return this.vizPointsRepository.consumeVizPoints(userId, amount);
-  }
 
   /**
    * Monthly reset of free credits
