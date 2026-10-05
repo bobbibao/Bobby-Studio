@@ -58,4 +58,4 @@ Preview outputs expire after 24 hours and uploaded inputs after 7 days; saved re
 
 ## Known gaps
 
-Docker image builds, CI execution, GCS private-bucket behavior, a staging deployment and any live provider call have not been run. Each is recorded in the [agent plan](agent-plan.md) as a human or access prerequisite rather than claimed.
+Docker image builds, CI execution, GCS private-bucket behavior against Google's real service, a staging deployment and any live provider call have not been run. The GCS adapters (API and worker) are verified only against `tools/support/fake-gcs.cjs`, a local fake of the JSON API used through the real `@google-cloud/storage` client (`server-api/test/gcs-storage.integration-spec.ts`, `worker/src/storage/gcs-asset-storage.spec.ts`): put/read/exists/delete/list, integrity checks and key validation. IAM, signed URLs, retries and quota are not modeled. Each is recorded in the [agent plan](agent-plan.md) as a human or access prerequisite rather than claimed.
