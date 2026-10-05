@@ -24,7 +24,18 @@ Create small, idempotent setup/doctor commands, not a provisioning framework. A0
 - Support a disposable E2E environment and cleanup of resources created by that run. Do not reset a developer's persistent database for convenience.
 - Generate a sanitized environment summary and test result, including process/port health and external-call policy, rather than dumping all environment variables.
 
-These commands/files do not exist merely because they are described here. A0 updates this runbook with their actual names and verified usage.
+**Implemented (A0):**
+
+~~~sh
+node scripts/setup.mjs [--install] [--rotate-secrets] [--skip-db] [--skip-install]   # idempotent; env files 0600, values never printed
+node scripts/dev.mjs start [--build] [--only=api,worker]                             # PostgreSQL, Redis, Auth Emulator, simulator, API, worker, frontend
+node scripts/dev.mjs status | stop
+node scripts/doctor.mjs [--json]                                                     # tools, env (names only), profile validation, external-call policy, health
+yarn --cwd server-api test:integration                                               # real services, disposable database per run
+(cd tools && node_modules/.bin/playwright test)                                      # browser checks against the running stack
+~~~
+
+Without a Docker daemon (the cloud sandbox) `dev.mjs` uses native PostgreSQL (`pg_ctlcluster`) and `redis-server`; with Docker it uses `docker-compose.dev.yml` (unverified in the sandbox).
 
 ## 3. Firebase through supported mechanisms
 

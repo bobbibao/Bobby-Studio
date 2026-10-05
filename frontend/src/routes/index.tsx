@@ -1,7 +1,6 @@
 import { Route, Routes as ReactRoutes } from 'react-router-dom';
 import AuthLayout from '../layouts/auth';
 import ProtectedRoutes from './ProtectedRoutes';
-import ProtectedRoutesByPassed from './ProtectedRoutesByPassed';
 import React, { useEffect } from 'react';
 import OnboardingLayout from '../layouts/auth/OnboardingLayout';
 import VerifyEmail from '@/features/auth/pages/auth/VerifyEmail';
@@ -23,7 +22,6 @@ const initAudioContext = () => {
 document.addEventListener('click', initAudioContext, { once: true });
 
 export default function AppRoutes() {
-  const shouldBypassAuth = !import.meta.env.VITE_FIREBASE_API_KEY;
   // const [user, loading] = useAuthState(auth);
 
   // const getIdToken = async () => {
@@ -41,7 +39,7 @@ export default function AppRoutes() {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/auth/*" element={<AuthLayout />} />
       <Route path="/onboarding/*" element={<OnboardingLayout />} />
-      <Route path="/*" element={shouldBypassAuth ? <ProtectedRoutesByPassed /> : <ProtectedRoutes />} />
+      <Route path="/*" element={<ProtectedRoutes />} />
     </ReactRoutes>
   );
 }

@@ -4,11 +4,14 @@
   "private": true,
   "description": "Development and CI tooling for Bobby Studio: Firebase emulators and browser end-to-end tests.",
   "license": "UNLICENSED",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "emulators": "firebase emulators:start --only auth --project demo-bobby-studio --config firebase.json"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49",
     "firebase-tools": "^14.0.0"
   }
 }

@@ -11,7 +11,6 @@ import { navbarReducer } from '../slices/navbar';
 import { projectManagement } from '../reducers/project';
 import { currentUserReducer } from '../slices/currentUserSlice';
 import surveyFormReducer from '../slices/formSlice';
-import { cmsReducer } from '../slices/cms';
 import inspiration from '../reducers/inspiration';
 import { canvasReducer } from '../slices/canvasSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
@@ -57,7 +56,6 @@ const store = configureStore({
     projectManagement,
     currentUser: currentUserReducer,
     survey: surveyFormReducer,
-    cms: cmsReducer,
     inspiration,
     canvas: persistedCanvasReducer,
     toast: toastReducer,
