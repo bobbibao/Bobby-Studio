@@ -366,6 +366,7 @@ export function StudioEditor({ userId, api, connect, fetchImage, session, catalo
     const hasNew = rt.displayed !== null && rt.displayed.job.jobId !== seenJobId && mobileTab === 0;
     body = (
       <Box>
+        <Box mb={2}>{realtime}</Box>
         <Tabs
           index={mobileTab}
           onChange={(index) => {
@@ -415,9 +416,6 @@ export function StudioEditor({ userId, api, connect, fetchImage, session, catalo
           </TabPanels>
         </Tabs>
         <Stack position="sticky" bottom={0} zIndex={5} bg="bg.surface" borderTopWidth="1px" borderColor="border.default" mx={-3} px={3} py={2} spacing={1} mt={3}>
-          <Flex align="center" justify="space-between" gap={2} wrap="wrap">
-            {realtime}
-          </Flex>
           {actions(true)}
           {issueHint}
         </Stack>

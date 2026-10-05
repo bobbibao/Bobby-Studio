@@ -181,3 +181,19 @@ export function touchSignal(jobs: JobEntry[], jobId: string, now: number): JobEn
 export function patchEntry(jobs: JobEntry[], jobId: string, patch: Partial<JobEntry>): JobEntry[] {
   return jobs.map((job) => (job.jobId === jobId ? { ...job, ...patch } : job));
 }
+
+/** Upper bound on the session's job projection; the oldest finished entries are dropped first. */
+export const MAX_TRACKED_JOBS = 80;
+
+export function pruneJobs(jobs: JobEntry[], keepJobId: string | null, max: number = MAX_TRACKED_JOBS): JobEntry[] {
+  if (jobs.length <= max) {
+    return jobs;
+  }
+  const removable = jobs
+    .filter((job) => isTerminalStatus(job.status) && job.jobId !== keepJobId)
+    .sort((a, b) => a.order - b.order)
+    .slice(0, jobs.length - max)
+    .map((job) => job.jobId);
+  const doomed = new Set(removable);
+  return jobs.filter((job) => !doomed.has(job.jobId));
+}

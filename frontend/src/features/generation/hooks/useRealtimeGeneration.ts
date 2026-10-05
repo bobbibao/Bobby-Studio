@@ -68,6 +68,8 @@ export function useRealtimeGeneration({ userId, api, session, store, model, conn
   modelRef.current = model;
   const apiRef = useRef(api);
   apiRef.current = api;
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
   const [scheduler, setScheduler] = useState<RealtimeScheduler | null>(null);
 
   useEffect(() => {
@@ -126,9 +128,10 @@ export function useRealtimeGeneration({ userId, api, session, store, model, conn
       },
     };
     const initial = store.getState();
+    const { sessionId, latestRevision, jobs: restoredJobs } = sessionRef.current;
     const created = createRealtimeScheduler({
-      sessionId: session.sessionId,
-      initialRevision: session.latestRevision,
+      sessionId,
+      initialRevision: latestRevision,
       initialInput: toStudioInput(initial),
       initialAuto: initial.auto,
       initialVisible: document.visibilityState !== 'hidden',
@@ -143,7 +146,7 @@ export function useRealtimeGeneration({ userId, api, session, store, model, conn
     document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('online', onOnline);
     window.addEventListener('offline', onOffline);
-    created.adoptJobs(session.jobs.map((job) => ({ jobId: job.id, prompt: job.prompt })));
+    created.adoptJobs(restoredJobs.map((job) => ({ jobId: job.id, prompt: job.prompt })));
     setScheduler(created);
     return () => {
       unsubscribeStore();
@@ -153,7 +156,7 @@ export function useRealtimeGeneration({ userId, api, session, store, model, conn
       created.dispose();
       setScheduler(null);
     };
-  }, [userId, session.sessionId, session.latestRevision, session.jobs, store, queryClient, previewUrls]);
+  }, [userId, session.sessionId, store, queryClient, previewUrls]);
 
   useGenerationEvents(scheduler, connect);
 

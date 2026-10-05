@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, screen } from '@testing-library/react';
+import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installCanvasStub, installDomStubs } from '../test/dom';
 import { renderStudio } from '../test/render';
@@ -102,6 +103,44 @@ describe('SketchCanvas stroke commit', () => {
     cleanup();
     expect(props.onDrawingChange).toHaveBeenLastCalledWith(false);
     expect(props.onStroke).not.toHaveBeenCalled();
+  });
+});
+
+describe('SketchCanvas with a re-rendering parent', () => {
+  it('does not lose the stroke when the parent re-renders mid-stroke with new callback identities', () => {
+    const onStroke = vi.fn();
+    const seen: boolean[] = [];
+    function Parent() {
+      const [drawing, setDrawing] = useState(false);
+      return (
+        <div data-drawing={drawing}>
+          <SketchCanvas
+            strokes={[]}
+            aspect={1}
+            canUndo={false}
+            canRedo={false}
+            limitReached={false}
+            onStroke={(stroke) => onStroke(stroke)}
+            onUndo={() => undefined}
+            onRedo={() => undefined}
+            onClear={() => undefined}
+            onDrawingChange={(active) => {
+              seen.push(active);
+              setDrawing(active); // changes the parent's state, so it re-renders with fresh callbacks
+            }}
+          />
+        </div>
+      );
+    }
+    renderStudio(<Parent />);
+    const canvas = screen.getByTestId('sketch-canvas');
+    down(canvas, 100, 100);
+    move(canvas, 140, 140);
+    move(canvas, 180, 150);
+    fireEvent.pointerUp(canvas, { pointerId: 1 });
+    expect(onStroke).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(onStroke).mock.calls[0][0].points.length).toBeGreaterThanOrEqual(6);
+    expect(seen).toEqual([true, false]);
   });
 });
 

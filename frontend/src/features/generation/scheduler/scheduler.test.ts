@@ -524,6 +524,24 @@ describe('connection loss is not a failed job', () => {
   });
 });
 
+describe('bounded tracking', () => {
+  it('drops the oldest finished jobs beyond the cap', async () => {
+    const h = createHarness();
+    for (let i = 0; i < 90; i += 1) {
+      h.scheduler.updateInput({ prompt: `prompt ${i}` });
+      h.scheduler.generate();
+      await flush();
+      h.scheduler.handleHint(hintFor(h.server.complete(`job-${i + 1}`)));
+      await flush();
+    }
+    const state = h.scheduler.getState();
+    expect(state.jobs.length).toBeLessThanOrEqual(80);
+    expect(state.jobs.some((job) => job.jobId === 'job-90')).toBe(true);
+    expect(state.jobs.some((job) => job.jobId === 'job-1')).toBe(false);
+    h.scheduler.dispose();
+  });
+});
+
 describe('error policy', () => {
   it('shows rate limiting once, coalesces, and resubmits the latest input after Retry-After', async () => {
     const h = createHarness({ initialAuto: true });

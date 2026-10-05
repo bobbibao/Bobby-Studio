@@ -1,6 +1,6 @@
 # Bobby Studio product and interface specification
 
-**Target UX; the standalone [prototype](studio-prototype.html) is a review artifact, not the production React implementation.** Current implementation: [SDXL studio](../../frontend/src/features/admin/pages/admin/generate/components/SdxlStudio/SdxlStudio.tsx).
+**Target UX; the standalone [prototype](studio-prototype.html) is a review artifact, not the production React implementation.** Current implementation: [studio editor](../../frontend/src/features/generation/components/StudioEditor.tsx) and its [realtime scheduler](../../frontend/src/features/generation/scheduler/scheduler.ts).
 
 ## 1. Product direction
 
