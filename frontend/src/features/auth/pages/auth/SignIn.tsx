@@ -192,8 +192,8 @@ export default function SignIn() {
         bg={useColorModeValue('white', 'zinc.900')}
       >
         <Box
-          w="360px"
-          maxW="md"
+          w="full"
+          maxW="360px"
           rounded="lg"
           p={6}
           borderWidth={formBorderWidth}

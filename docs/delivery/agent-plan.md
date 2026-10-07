@@ -8,7 +8,7 @@ Read [AGENTS](../../AGENTS.md), [architecture](../architecture/overview.md), [co
 
 *Update at every milestone boundary. After a restart re-read AGENTS.md and this block, then continue.*
 
-- **Milestone:** A0 to A8 complete for the simulated-inference production candidate (A0 minus the Docker compose path; A7 minus Docker/CI/staging; A6 with open items listed in its row). Live-provider, real-Firebase, real-GCS and deployment verification are **not** done. Branch `claude/epic-clarke-f0he4y`.
+- **Milestone:** A0 to A8 complete for the simulated-inference production candidate (A7 minus application Docker builds/CI/staging; A6 with open items listed in its row). The development Docker Compose path has now been exercised on Windows (see below). Live-provider, real-Firebase, real-GCS and deployment verification are **not** done. Branch `claude/epic-clarke-f0he4y`.
 - **Operations work done alongside A3 (verified, see `docs/delivery/performance.md`):** Redis Socket.IO adapter (cross-replica fanout), bearer-protected `/api/ops/metrics`, structured request logging, `scripts/backup.mjs` (backup + restore verification into a throwaway DB), `tools/load/generation-load.mjs` (0 failures up to 100 concurrent sessions), and `scripts/configure-provider.mjs` / `scripts/provider-smoke.mjs` (configuration-only provider switch validated by the app's own config validators, masked secret input, `*.bak-*` env backups, key rotation that changes only the secret, no request ever made without `--confirm-spend`). Live provider calls remain **unverified** (no credentials).
 - **Verified so far:** evidence tables below. API integration suite `yarn --cwd server-api test:integration` (59 tests, real PostgreSQL/Redis/Auth Emulator, disposable DB per run). Stack E2E `cd tools && node_modules/.bin/playwright test` (22 tests: identity, generation API, recovery, studio UI, responsive, route sweep; needs `node scripts/dev.mjs start`).
 - **Remaining follow-ups (none blocks the simulated candidate):** decide billing/subscription exposure and verify Stripe (C22); browser-exercise project/library create/rename/delete and have the library mint signed asset URLs; audit remaining legacy API modules (vizpoint, payment, team) and `GCSConnector` upload paths; the monthly free-credit reset (`processMonthlyFreeCreditsReset`) has no caller, so free credits are never renewed; build Docker images and run CI on a Docker host; then the human-gated live checks below.
@@ -17,7 +17,7 @@ Read [AGENTS](../../AGENTS.md), [architecture](../architecture/overview.md), [co
   - The credential-like CMS token that was in `frontend/src/config.ts` is **exposed and must be revoked/rotated by its owner**: it remains in git history (earlier commits) and appeared once in this session's tool output. The browser CMS client and token were removed from source (the CMS data was fetched but never rendered); a production bundle scan found no long hex strings or hardcoded service IPs. Removal does not revoke it.
   - No Firebase cloud project, GCS bucket, OpenAI or Gemini credentials were provided; staging deployment and live-provider verification are outside what can be evidenced (recorded as gaps, not claimed). Vendor documentation sites were unreachable from the sandbox, so adapters were built from official SDK type definitions (see `docs/architecture/provider-simulator.md`).
 - **Non-obvious decisions:**
-  - No Docker daemon in the cloud sandbox: PostgreSQL 16 / Redis 7 run natively; `docker-compose.dev.yml` is provided for Docker hosts but is **unverified** here. The Firebase Auth Emulator runs from `tools/` (`firebase-tools`, own lockfile) and is verified. `tools/` also holds Playwright.
+  - The original cloud sandbox had no Docker daemon and used native PostgreSQL 16 / Redis 7. Development Compose startup and migrations were subsequently verified on Windows on 2026-10-06. Application container builds remain unverified. The Firebase Auth Emulator runs from `tools/` (`firebase-tools`, own lockfile). `tools/` also holds Playwright.
   - Root `package.json` has scripts only (no dependencies, no lockfile). Always run yarn with `--mutex file:/tmp/.yarn-mutex` when more than one install may run.
   - Compiled API entrypoint is `dist/src/main`. Frontend emulator URL lives in `.env.development.local`; `vite build` (production mode) refuses it and the web bundle throws if it is set outside `import.meta.env.DEV`.
   - Identity is only a verified Firebase ID token. First request provisions the account (no password column value). Global `APP_GUARD`; `@Public()` is the opt-out (health, Stripe webhook, signed-URL image route, worker-credential webhooks). `User.password` is now nullable (additive migration).
@@ -25,6 +25,29 @@ Read [AGENTS](../../AGENTS.md), [architecture](../architecture/overview.md), [co
   - The Prisma terminal-state triggers (`ImageJob`, `CreditReservation`) are defense in depth; application code still uses conditional updates.
   - Existing seed deletes and recreates the model catalog: do not run it against real data; replaced in A3.
   - Remaining dead frontend files are inventoried by `tsc` reachability from `main.tsx` and removed in A6; only non-compiling or security-relevant dead code was removed so far.
+
+## Windows local setup (2026-10-06)
+
+The local assignment was environment creation and source startup. Node 22.23.3, repository-local Yarn 1.22.22 and Docker Desktop were used. The existing PostgreSQL 18 Windows service on 5432 was preserved; isolated Compose PostgreSQL 16 runs on 55432 and Redis 7 on 6379. Redis reports AOF enabled and `noeviction`. Four ignored environment files were generated with random shared secrets, checked for consistency, and restricted through NTFS ACLs to the current user and SYSTEM.
+
+Windows fixes cover executable discovery, Yarn/CLI JavaScript entrypoints, hidden detached services, matching Compose database admin access, host-platform absolute storage paths, installed Chrome selection, and cold-start deadlines. Doctor now requires application HTTP readiness and checks the simulator dependencies; it does not interpret POSIX permission bits as NTFS ACLs.
+
+| Command/check | Evidence |
+| --- | --- |
+| `npm install --prefix .data/toolchain yarn@1.22.22 --no-audit --no-fund` | Preserved system Yarn 4; local Yarn 1.22.22 used by scripts |
+| `node scripts/dev.mjs start --only=postgres,redis` | Both Compose services healthy |
+| `node scripts/setup.mjs --install` | Exit 0; frozen-lockfile installs; all five migrations applied to a fresh `bobby_dev`; catalog sync created four supported model entries |
+| `node scripts/dev.mjs start --build` | Simulator/API/worker builds passed; all five application processes ready |
+| `node scripts/doctor.mjs` / `node scripts/dev.mjs status` | Every tool/config/policy/service check passed; all services healthy |
+| API `yarn test runtime-config.spec.ts --runInBand` | 9 tests passed |
+| Worker `yarn test worker-config.spec.ts --runInBand` | 3 tests passed |
+| `cd tools; node node_modules/@playwright/test/cli.js test` (second full run) | 22/22 passed in 3.1 minutes using installed Chrome: identity, generation, retries/quota/idempotency/ownership, API outage recovery, routes, responsive layouts, prompt/sketch/reference, realtime, save/download/reload, cancel and reconnect |
+| Non-mutating ESLint on both changed config files and their tests | API: 0 errors/warnings; worker: 0 errors, 5 existing non-null-assertion warnings |
+| `node --check` on changed scripts; `git diff --check`; ignored env checks | Passed |
+
+The first Chrome run passed 21/22 tests; initial navigation exceeded 60 seconds during cold Vite dependency optimization. Trace inspection showed pending dependency requests, and subsequent route/UI checks passed. Windows now allows 180 seconds per browser test while retaining the generation/recovery assertion deadlines. Desktop/mobile generated-result screenshots were visually inspected.
+
+Cloud access remains unavailable: Firebase CLI lists zero authenticated accounts, no ADC/project/provider credentials were available in the configured environment, and the browser tool exposed no authenticated Chrome session. The terminal attempt to open the normal Chrome window was rejected by automatic approval policy. Playwright uses isolated contexts in the installed Chrome. No live inference, cloud project/bucket provisioning, production application container builds or broad unit/integration suites were performed for this assignment.
 
 ## Baseline (2026-10-05, commit 82958dc) and A0 evidence
 
@@ -50,7 +73,7 @@ Commands: `node scripts/setup.mjs` (idempotent; `--rotate-secrets`, `--skip-db`,
 
 | Task | Status | Evidence / remaining |
 | --- | --- | --- |
-| A0 | **verified except**: V01 gate for the image simulator (A2) and Docker-compose path (no daemon available) | table above |
+| A0 | **verified for the local development foundation** | Native baseline evidence above; Windows Docker Compose setup, fresh database migration, compiled startup and configuration checks recorded in the Windows section. Application container builds are still an A7 gap |
 | A1 | **verified** (carry-over: catalog consolidation in A3) | Firebase Auth Emulator end to end: anonymous/forged/bypass-header requests 401, valid token provisions account without password (`test:integration` 25/25); two-user isolation for jobs, history, projects, library prompts, notifications, publishing, sockets; worker credential guard (constant-time); additive migration applies on fresh DB and upgraded dev DB; contract fixtures validated in API (11 tests), worker (6) and frontend (3); Playwright `identity.spec.ts` passes (bearer on every API call, zero third-party requests, zero console errors); prod bundle scan clean |
 | A2 | **verified** (adapter wiring into worker lifecycle is A3) | `image-simulator` 61 tests; worker provider suite 48 tests against the real simulator over HTTP; simulator healthy under `dev.mjs`, returns decodable 1024x1024 PNG, wrong key 401; live vendors not contacted |
 | A3 | **verified** | Prisma-only catalog (fail-closed; sequelize/cqrs/passport/bcrypt removed), atomic credit ledger, transactional admission (idempotency, revision, supersede, bounded backlog), outbox dispatcher, claim/event fencing, conditional finalize + capture, cancel, retry, save, reconciler, signed asset delivery, `generation.updated` socket hints. Worker rewritten (claim → provider → store → checkpoint → completed; one retry owner; no blind paid retries). API integration 59/59 (concurrent idempotency, cancel/complete race x12, overspend, outbox crash recovery, unknown-outcome, terminal-state trigger, sockets); worker 67 tests (processor against the real simulator); stack E2E: success, transient retry, quota failure, explicit retry, idempotent replay, cancel + isolation, validation, and API SIGKILL during completion with short and long outage (exactly one provider call, one charge) |

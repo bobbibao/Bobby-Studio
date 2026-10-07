@@ -12,14 +12,25 @@ Requirements: Node.js 20+, Yarn 1.x, and PostgreSQL 16 and Redis 7 either runnin
 
 ```bash
 node scripts/setup.mjs            # install from lockfiles, generate ignored env files (0600), create DB, migrate, seed
-node scripts/doctor.mjs           # validate tools, env names, provider profile and (if running) service health
 node scripts/dev.mjs start --build  # Auth Emulator, simulator, API, worker, frontend (reuses infrastructure already listening)
+node scripts/doctor.mjs           # validate tools, env names, provider profile and all service health
 # open http://127.0.0.1:4200 and create an account; local sign-in uses the Firebase Auth Emulator
 node scripts/dev.mjs status
 node scripts/dev.mjs stop
 ```
 
 Ports: web 4200, API 3000, worker health 3100, simulator 4010, Auth Emulator 9099. Secrets are generated locally, never printed, and never committed.
+
+On Windows, start Docker Desktop before setup. The scripts use port **55432** for the isolated Compose PostgreSQL database, preserving an existing host PostgreSQL installation on 5432. Set `BOBBY_POSTGRES_PORT` before setup/start to choose a different port. Compose commands run directly in the terminal must use the same variable. Start infrastructure before the database setup step:
+
+```powershell
+npm install --prefix .data/toolchain yarn@1.22.22 --no-audit --no-fund
+node scripts/dev.mjs start --only=postgres,redis
+node scripts/setup.mjs
+node scripts/dev.mjs start --build
+```
+
+The local Yarn installation preserves the system's Yarn version and each application's lockfile. Windows browser checks use installed Google Chrome; `CHROMIUM_PATH` can select another Chromium executable. Fresh dependency loading and Vite optimization can take a few minutes on Windows. `doctor.mjs` fails until every application service is ready; its POSIX permission checks apply only on Unix hosts (Windows environment files use NTFS ACLs).
 
 ## Checks
 

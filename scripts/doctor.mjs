@@ -7,7 +7,7 @@
 import { existsSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { PORTS, appDir, checkPort, commandExists, httpOk, log, nodeMajor, readEnvFile, run } from './lib/common.mjs';
+import { APPS, PORTS, appDir, checkPort, commandExists, httpOk, log, nodeMajor, readEnvFile, run } from './lib/common.mjs';
 
 const asJson = process.argv.includes('--json');
 const results = [];
@@ -15,8 +15,9 @@ const record = (area, name, ok, detail = '', required = true) => results.push({ 
 
 // Toolchain
 record('tools', 'node >= 20', nodeMajor() >= 20, process.versions.node);
-record('tools', 'yarn', commandExists('yarn'), commandExists('yarn') ? run('yarn', ['--version']).stdout.trim() : 'missing');
-for (const app of ['server-api', 'worker', 'frontend', 'tools']) {
+const yarnVersion = commandExists('yarn') ? run('yarn', ['--version']).stdout?.trim() : undefined;
+record('tools', 'yarn 1.x', yarnVersion?.startsWith('1.') ?? false, yarnVersion || 'missing');
+for (const app of APPS) {
   record('tools', `${app} dependencies`, existsSync(path.join(appDir(app), 'node_modules')), 'node_modules');
 }
 
@@ -36,9 +37,12 @@ for (const [file, keys] of envChecks) {
     continue;
   }
   const missing = keys.filter((key) => !values.get(key));
-  const mode = statSync(full).mode & 0o777;
   record('config', file, missing.length === 0, missing.length ? `missing: ${missing.join(', ')}` : 'required keys present');
-  record('config', `${file} permissions`, (mode & 0o077) === 0, `mode ${mode.toString(8)}`, false);
+  // Windows uses NTFS ACLs; a POSIX mode of 666 does not describe who can read the file.
+  if (process.platform !== 'win32') {
+    const mode = statSync(full).mode & 0o777;
+    record('config', `${file} permissions`, (mode & 0o077) === 0, `mode ${mode.toString(8)}`, false);
+  }
 }
 
 // Profile validation using the API's own compiled validator, so the doctor cannot drift from it.
@@ -80,7 +84,7 @@ for (const [name, url, present] of http) {
     continue;
   }
   const result = await httpOk(url);
-  record('services', name, result.ok, result.ok ? `HTTP ${result.status}` : result.status ? `HTTP ${result.status}` : `unreachable (${result.error ?? 'no response'})`, false);
+  record('services', name, result.ok, result.ok ? `HTTP ${result.status}` : result.status ? `HTTP ${result.status}` : `unreachable (${result.error ?? 'no response'})`);
 }
 
 const failed = results.filter((r) => !r.ok && r.required);

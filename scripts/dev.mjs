@@ -57,7 +57,8 @@ const infra = {
     port: PORTS.postgres,
     async start() {
       if (dockerAvailable()) {
-        run('docker', ['compose', '-f', path.join(ROOT, 'docker-compose.dev.yml'), 'up', '-d', 'postgres'], { stdio: 'inherit' });
+        const result = run('docker', ['compose', '-f', path.join(ROOT, 'docker-compose.dev.yml'), 'up', '-d', 'postgres'], { stdio: 'inherit', env: { ...process.env, BOBBY_POSTGRES_PORT: String(PORTS.postgres) } });
+        if (result.status !== 0) throw new Error('PostgreSQL Compose startup failed');
         return 'docker';
       }
       const version = pgClusterVersion();
@@ -177,17 +178,22 @@ async function startApp(app) {
     log(`${app.name}: already healthy (reused)`);
     return;
   }
-  if (app.build && (flags.has('--build') || !existsSync(path.join(dir, app.cmd[1])))) {
+  const entrypoint = path.join(dir, app.cmd[1]);
+  if (app.build && (flags.has('--build') || (!existsSync(entrypoint) && !existsSync(`${entrypoint}.js`)))) {
     log(`${app.name}: building (${app.build.join(' ')})`);
     const built = run(app.build[0], app.build.slice(1), { cwd: dir, stdio: 'inherit' });
     if (built.status !== 0) throw new Error(`${app.name}: build failed`);
   }
   const out = openSync(path.join(LOG_DIR, `${app.name}.log`), 'a');
   const child = spawn(app.cmd[0], app.cmd.slice(1), { cwd: dir, detached: true, windowsHide: true, stdio: ['ignore', out, out], env: process.env });
+  await new Promise((resolve, reject) => {
+    child.once('spawn', resolve);
+    child.once('error', (error) => reject(new Error(`${app.name}: could not start (${error.code ?? 'spawn error'})`)));
+  }).finally(() => closeSync(out));
   child.unref();
-  closeSync(out);
   writeFileSync(pidFile(app.name), String(child.pid));
-  await waitFor(`${app.name} readiness`, async () => (await app.ready()).ok && alive(child.pid), { timeoutMs: 120000, intervalMs: 700 }).catch((error) => {
+  // Cold CLI/module loading on Windows can exceed two minutes after a fresh install.
+  await waitFor(`${app.name} readiness`, async () => (await app.ready()).ok && alive(child.pid), { timeoutMs: process.platform === 'win32' ? 300000 : 120000, intervalMs: 700 }).catch((error) => {
     throw new Error(`${error.message}. See .data/logs/${app.name}.log`);
   });
   log(`${app.name}: healthy (pid ${child.pid}, log .data/logs/${app.name}.log)`);

@@ -6,7 +6,7 @@ name: bobby-dev
 services:
   postgres:
     image: postgres:16-alpine
-    ports: ["127.0.0.1:5432:5432"]
+    ports: ["127.0.0.1:${BOBBY_POSTGRES_PORT:-5432}:5432"]
     environment:
       POSTGRES_USER: postgres
       # Loopback-only development database; scripts/setup.mjs creates the application role.

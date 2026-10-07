@@ -2,9 +2,9 @@ import React from 'react';
 import routes from '@/routes';
 import SidebarLinks from '@/shared/sidebar/components/Links';
 import { motion } from 'framer-motion';
-import { Box, Flex, IconButton, Image, useColorModeValue } from '@chakra-ui/react';
-import logoImage from '@/assets/img/logo/header_white.png';
-import iconImage from '@/assets/img/logo/icon_white_x.png';
+import { Box, Flex, IconButton, useColorModeValue } from '@chakra-ui/react';
+import { LogoBobbyFull } from '@/shared/logo';
+import BobbyLogoIcon from '@/shared/icons/BobbyLogoIcon';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
@@ -39,7 +39,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false
   const toggleButtonHoverColor = useColorModeValue('brand.600', 'brand.400');
 
   const overlayBg = useColorModeValue('white', 'zinc.900');
-  const logoFilter = useColorModeValue('invert(1)', 'invert(0)');
   if (mobile && !open) return null;
 
   return (
@@ -66,15 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false
         color="text.primary"
       >
         <Flex align="center" pl={open ? '18px' : 0} justify={open ? 'flex-start' : 'center'} w={open ? 'auto' : 'full'}>
-          <Image
-            src={open ? logoImage : iconImage}
-            alt="Logo"
-            h={open ? '16px' : '20px'}
-            w="auto"
-            objectFit="contain"
-            mt="1px"
-            filter={logoFilter}
-          />
+          {open ? <LogoBobbyFull /> : <Box role="img" aria-label="Bobby Studio"><BobbyLogoIcon /></Box>}
         </Flex>
         <Box
           position="absolute"

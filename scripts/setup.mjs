@@ -42,7 +42,9 @@ function fail(message) {
 step('Toolchain');
 if (nodeMajor() < 20) fail(`Node.js >= 20 is required (found ${process.versions.node}).`);
 if (!commandExists('yarn')) fail('Yarn 1.x is required (corepack enable, or npm install -g yarn).');
-log(`node ${process.versions.node}, yarn ${run('yarn', ['--version']).stdout.trim()}`);
+const yarnVersion = run('yarn', ['--version']).stdout?.trim() ?? '';
+if (!yarnVersion.startsWith('1.')) fail('Yarn 1.x is required. Install locally with: npm install --prefix .data/toolchain yarn@1.22.22 --no-audit --no-fund');
+log(`node ${process.versions.node}, yarn ${yarnVersion}`);
 
 step('Dependencies (from lockfiles)');
 for (const app of APPS) {
@@ -186,6 +188,15 @@ function pgAdmin(sql) {
   candidates.push(['psql', ['-h', '127.0.0.1', '-p', String(PORTS.postgres), '-U', 'postgres', '-w', '-d', 'postgres']]);
   if (process.getuid?.() === 0 && commandExists('su')) candidates.push(['su', ['postgres', '-c', 'psql -d postgres']]);
   let last = { status: 1, stderr: 'no PostgreSQL admin access found' };
+  // The isolated Compose database contains psql even when the host does not.
+  const composeArgs = ['compose', '-f', path.join(ROOT, 'docker-compose.dev.yml')];
+  const composeEnv = { ...process.env, BOBBY_POSTGRES_PORT: String(PORTS.postgres) };
+  const published = run('docker', [...composeArgs, 'port', 'postgres', '5432'], { env: composeEnv });
+  if (!adminUrl && published.status === 0 && published.stdout.trim() === `127.0.0.1:${PORTS.postgres}`) {
+    const result = run('docker', [...composeArgs, 'exec', '-T', 'postgres', 'psql', '-U', 'postgres', '-d', 'postgres', '-v', 'ON_ERROR_STOP=1', '-tA'], { input: sql, env: composeEnv });
+    if (result.status === 0) return result;
+    last = result;
+  }
   for (const [command, base] of candidates) {
     const result =
       command === 'su'

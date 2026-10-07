@@ -37,6 +37,8 @@ yarn --cwd server-api test:integration                                          
 
 Without a Docker daemon (the cloud sandbox) `dev.mjs` uses native PostgreSQL (`pg_ctlcluster`) and `redis-server`; with Docker it uses `docker-compose.dev.yml` (unverified in the sandbox).
 
+Windows uses Docker Desktop and an isolated PostgreSQL port of 55432 by default (`BOBBY_POSTGRES_PORT` overrides it). Run `dev.mjs start --only=postgres,redis` before `setup.mjs`; setup uses the matching Compose container's `psql` when the host lacks PostgreSQL admin access. The scripts launch Firebase and Vite through their JavaScript entrypoints, avoiding Windows `.cmd` shim execution. A repository-local Yarn 1.22.22 can be installed with `npm install --prefix .data/toolchain yarn@1.22.22 --no-audit --no-fund`; it takes priority over system Yarn without changing lockfiles.
+
 ## 3. Firebase through supported mechanisms
 
 For local/CI, use the [official Authentication Emulator](https://firebase.google.com/docs/emulator-suite/connect_auth) and a demo project such as demo-bobby-studio. Frontend SDK, Admin SDK and CLI must agree on the project ID. Configure the Admin emulator host without a URL scheme and connect the web SDK explicitly. Production startup rejects emulator settings. Test SDK token acquisition and API verification, not a hardcoded bypass identity.

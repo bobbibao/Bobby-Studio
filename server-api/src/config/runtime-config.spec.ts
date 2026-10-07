@@ -1,4 +1,6 @@
 import { ConfigError, loadRuntimeConfig } from './runtime-config';
+import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
 
 const devEnv = {
   APP_ENV: 'development',
@@ -37,6 +39,12 @@ const problemsFor = (env: Record<string, string | undefined>): string[] => {
 };
 
 describe('loadRuntimeConfig', () => {
+  it('accepts an absolute storage path on the host platform and rejects a relative one', () => {
+    const root = resolve(tmpdir(), 'bobby-assets');
+    expect(loadRuntimeConfig({ ...devEnv, LOCAL_STORAGE_ROOT: root }).storage.localRoot).toBe(root);
+    expect(problemsFor({ ...devEnv, LOCAL_STORAGE_ROOT: '.data/assets' })).toContain('LOCAL_STORAGE_ROOT must be an absolute path');
+  });
+
   it('accepts the local development profile with the Auth Emulator', () => {
     const config = loadRuntimeConfig(devEnv);
     expect(config.firebase.credentialSource).toBe('emulator');

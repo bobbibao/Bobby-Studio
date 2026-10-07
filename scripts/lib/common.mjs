@@ -16,7 +16,8 @@ export const PORTS = {
   frontend: 4200,
   simulator: 4010,
   authEmulator: 9099,
-  postgres: 5432,
+  // Keep Windows' existing PostgreSQL installation separate from the Compose database.
+  postgres: Number(process.env.BOBBY_POSTGRES_PORT ?? (process.platform === 'win32' ? 55432 : 5432)),
   redis: 6379,
 };
 
@@ -31,7 +32,16 @@ export function log(message = '') {
 }
 
 export function run(command, args, options = {}) {
-  // Windows package-manager shims must be invoked through the command interpreter.
+  if (command === 'yarn') {
+    const localYarn = path.join(DATA_DIR, 'toolchain/node_modules/yarn/bin/yarn.js');
+    if (existsSync(localYarn)) return spawnSync(process.execPath, [localYarn, ...args], { encoding: 'utf8', ...options });
+    // Corepack's JavaScript entrypoint avoids spawning a Windows .cmd shim.
+    const corepack = path.join(path.dirname(process.execPath), 'node_modules/corepack/dist/yarn.js');
+    if (process.platform === 'win32' && existsSync(corepack)) {
+      return spawnSync(process.execPath, [corepack, ...args], { encoding: 'utf8', ...options });
+    }
+  }
+  // Fall back to installed Windows package-manager shims when no JavaScript entrypoint is available.
   if (process.platform === 'win32' && ['yarn', 'npm', 'pnpm'].includes(command)) {
     return spawnSync(`${command}.cmd`, args, { encoding: 'utf8', shell: true, windowsHide: true, ...options });
   }
@@ -39,6 +49,7 @@ export function run(command, args, options = {}) {
 }
 
 export function commandExists(command) {
+  if (command === 'yarn' && existsSync(path.join(DATA_DIR, 'toolchain/node_modules/yarn/bin/yarn.js'))) return true;
   if (process.platform === 'win32') return run('where.exe', [command]).status === 0;
   return run('sh', ['-c', `command -v ${command}`]).status === 0;
 }
