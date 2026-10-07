@@ -452,13 +452,15 @@ export function OverviewSection() {
               </Flex>
 
               {/* Button Section */}
-              <Flex gap={3} mt="auto">
+              <Flex direction={{ base: 'column', sm: 'row' }} gap={3} mt="auto" w="full">
                 <Button
                   flex={1}
                   background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
                   color="white"
                   borderRadius="full"
-                  h={11}
+                  h="46px"
+                  minH="46px"
+                  px={5}
                   _hover={{
                     opacity: 0.92,
                     transform: 'translateY(-1px)',
@@ -466,7 +468,7 @@ export function OverviewSection() {
                   }}
                   transition="all 0.2s"
                   fontWeight="700"
-                  fontSize="xs"
+                  fontSize="sm"
                   onClick={() => {
                     navigate('/profile#subscription');
                   }}
@@ -476,10 +478,12 @@ export function OverviewSection() {
 
                 {currentSubscription && (
                   <Button
-                    flex={1}
+                    flex={{ base: '1', sm: 'initial' }}
                     variant="outline"
                     borderRadius="full"
-                    h={11}
+                    h="46px"
+                    minH="46px"
+                    px={5}
                     borderColor={useColorModeValue('rgba(0, 0, 0, 0.12)', 'rgba(255, 255, 255, 0.15)')}
                     color="text.primary"
                     _hover={{
@@ -490,7 +494,7 @@ export function OverviewSection() {
                     }}
                     transition="all 0.2s"
                     fontWeight="600"
-                    fontSize="xs"
+                    fontSize="sm"
                     onClick={() => toggleModalCancelSubscription.on()}
                   >
                     {t('common:cancel_plan')}

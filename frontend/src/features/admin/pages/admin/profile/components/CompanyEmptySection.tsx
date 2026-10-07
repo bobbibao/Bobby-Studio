@@ -75,15 +75,17 @@ const CompanyEmptySection: React.FC<CompanyEmptySectionProps> = ({ onAction }) =
           onClick={() => onAction('CREATE_COMPANY_PROFILE')}
           background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
           color="white"
-          px={8}
-          h={11}
+          px={10}
+          h="50px"
+          minH="50px"
+          minW="240px"
           borderRadius="full"
-          fontSize="sm"
+          fontSize="md"
           fontWeight="700"
           _hover={{
-            opacity: 0.92,
+            opacity: 0.94,
             transform: 'translateY(-2px)',
-            boxShadow: '0 10px 24px -4px rgba(127, 86, 217, 0.4)',
+            boxShadow: '0 12px 28px -4px rgba(127, 86, 217, 0.45)',
           }}
           transition="all 0.25s ease"
         >

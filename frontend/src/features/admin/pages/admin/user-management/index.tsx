@@ -980,7 +980,16 @@ const UserManagement: React.FC = () => {
           </ModalBody>
 
           <ModalFooter gap={3}>
-            <Button variant="outline" onClick={onClose} isDisabled={isUpdating}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              isDisabled={isUpdating}
+              h="44px"
+              px={6}
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="600"
+            >
               {t('usermanagement:cancel')}
             </Button>
             <Button
@@ -988,6 +997,11 @@ const UserManagement: React.FC = () => {
               onClick={handleSubmit}
               isLoading={isUpdating}
               loadingText={t('usermanagement:updating')}
+              h="44px"
+              px={6}
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="700"
             >
               {t('usermanagement:save_changes')}
             </Button>

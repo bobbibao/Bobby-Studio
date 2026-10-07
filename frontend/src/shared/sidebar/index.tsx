@@ -100,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false
       initial={false}
       animate={open ? 'open' : 'closed'}
       variants={sidebarVariants}
-      overflow="hidden"
+      overflow={open ? 'hidden' : 'visible'}
       className="gpu-accelerated studio-transition"
     >
       {/* 1. Header Deck: Logo & Collapse Trigger */}
@@ -110,15 +110,17 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false
         justify={open ? 'space-between' : 'center'}
         h="16"
         minH="16"
-        px={open ? 4 : 2}
+        px={open ? 4 : 0}
         color="text.primary"
       >
         <Flex
           align="center"
+          justify="center"
+          w={open ? 'auto' : 'full'}
           gap={2}
           cursor="pointer"
-          onClick={() => navigate('/home')}
-          title="Bobby Studio Home"
+          onClick={() => (open ? navigate('/home') : onOpen?.())}
+          title={open ? "Bobby Studio Home" : (isVietnamese ? "Mở rộng thanh bên" : "Expand sidebar")}
         >
           {open ? (
             <Flex align="center" gap={2}>
@@ -133,8 +135,16 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false
               />
             </Flex>
           ) : (
-            <Box role="img" aria-label="Bobby Studio" transform="scale(0.95)">
-              <BobbyLogoIcon size={30} />
+            <Box
+              role="img"
+              aria-label="Bobby Studio"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              transition="transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+              _hover={{ transform: 'scale(1.08)' }}
+            >
+              <BobbyLogoIcon size={34} />
             </Box>
           )}
         </Flex>
@@ -142,19 +152,33 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose, onOpen, mobile = false
         {/* Floating Collapse / Expand Trigger */}
         <IconButton
           aria-label={open ? 'Collapse sidebar' : 'Expand sidebar'}
-          icon={open ? <ChevronLeft size={16} strokeWidth={2.5} /> : <ChevronRight size={16} strokeWidth={2.5} />}
+          icon={open ? <ChevronLeft size={16} strokeWidth={2.5} /> : <ChevronRight size={14} strokeWidth={2.5} />}
           variant="ghost"
           size="xs"
           rounded="full"
-          bg={useColorModeValue('rgba(0, 0, 0, 0.04)', 'rgba(255, 255, 255, 0.06)')}
+          position={open ? 'static' : 'absolute'}
+          right={open ? undefined : '-11px'}
+          top={open ? undefined : '20px'}
+          zIndex={60}
+          w={open ? undefined : '22px'}
+          h={open ? undefined : '22px'}
+          minW={open ? undefined : '22px'}
+          bg={useColorModeValue(
+            open ? 'rgba(0, 0, 0, 0.04)' : '#FFFFFF',
+            open ? 'rgba(255, 255, 255, 0.06)' : '#181A26'
+          )}
           border="1px solid"
           borderColor={borderColor}
-          boxShadow="xs"
+          boxShadow={open ? 'xs' : '0 2px 8px rgba(0,0,0,0.15)'}
           color={toggleButtonColor}
           _hover={{
-            transform: 'scale(1.1)',
+            transform: 'scale(1.15)',
             color: toggleButtonHoverColor,
-            bg: useColorModeValue('rgba(127, 86, 217, 0.1)', 'rgba(139, 92, 246, 0.15)'),
+            borderColor: 'brand.400',
+            bg: useColorModeValue(
+              open ? 'rgba(127, 86, 217, 0.1)' : '#FFFFFF',
+              open ? 'rgba(139, 92, 246, 0.15)' : '#222436'
+            ),
           }}
           transition="all 0.2s"
           onClick={() => (open ? onClose?.() : onOpen?.())}

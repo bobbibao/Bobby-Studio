@@ -288,17 +288,21 @@ export function TeamSection() {
             <MenuButton
               as={ChakraButton}
               leftIcon={<AddIconOutline />}
-              minW="120px"
-              borderRadius="lg"
+              h="44px"
+              px={5}
+              borderRadius="full"
               borderWidth="1px"
               borderColor={buttonBorderColor}
               color={buttonTextColor}
-              fontWeight="normal"
-              bg="transparent"
+              fontWeight="700"
+              fontSize="sm"
+              bg={useColorModeValue('whiteAlpha.800', 'whiteAlpha.100')}
               variant="outline"
               _hover={{
                 bg: buttonHoverBg,
                 color: buttonHoverColor,
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 14px rgba(127, 86, 217, 0.2)',
               }}
               transition="all 0.2s"
             >

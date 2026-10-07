@@ -136,14 +136,30 @@ const ModalCreateProject: React.FC<ModalCreateProjectProps> = ({ isOpen, editMod
           <ChakraButton
             variant="secondary"
             onClick={handleClose}
+            h="44px"
+            borderRadius="full"
+            fontSize="sm"
+            fontWeight="600"
             flex={1}
           >
             {t('common:cancel')}
           </ChakraButton>
           <ChakraButton
-            variant="solid"
             onClick={editMode ? handleEdit : handleCreate}
             isDisabled={!projectName.trim()}
+            background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+            color="white"
+            h="44px"
+            borderRadius="full"
+            fontSize="sm"
+            fontWeight="700"
+            boxShadow="0 4px 14px rgba(127, 86, 217, 0.35)"
+            _hover={{
+              opacity: 0.92,
+              transform: 'translateY(-1px)',
+              boxShadow: '0 6px 18px rgba(127, 86, 217, 0.45)',
+            }}
+            transition="all 0.2s"
             flex={1}
           >
             {t(`common:${editMode ? 'save' : 'create'}`)}

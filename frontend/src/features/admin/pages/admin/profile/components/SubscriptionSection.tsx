@@ -149,17 +149,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
             </>
           )}
 
-          <Flex gap={3}>
+          <Flex direction={{ base: 'column', sm: 'row' }} gap={3}>
             <Button
               bg={pickColor('black', 'white')}
               color={pickColor('white', 'black')}
               _hover={{
-                bg: pickColor('black', 'white'),
-                transform: 'scale(1.02)',
+                opacity: 0.9,
+                transform: 'translateY(-1px)',
               }}
               transition="all 0.2s"
-              fontWeight="medium"
-              size="md"
+              fontWeight="700"
+              fontSize="sm"
+              h="46px"
+              minH="46px"
+              borderRadius="full"
               flex="1"
             >
               {t('profile:manage_payment')}
@@ -171,14 +174,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
                 bg: 'red.600',
                 color: 'white',
                 borderColor: 'red.600',
-                transform: 'scale(1.05)',
+                transform: 'translateY(-1px)',
                 boxShadow: 'md',
               }}
               transition="all 0.2s"
               borderWidth="1px"
               borderColor={pickColor('zinc.300', 'whiteAlpha.300')}
-              fontWeight="medium"
-              size="md"
+              fontWeight="700"
+              fontSize="sm"
+              h="46px"
+              minH="46px"
+              borderRadius="full"
               onClick={onCancel}
               flex="1"
             >
@@ -191,20 +197,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
   );
 };
 
-// Credit Exchange Legend - matching screenshot
+// Credit Exchange Legend - English / Vietnamese
 const CreditExchangeLegend: React.FC = () => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const isViet = i18n.language?.toLowerCase().startsWith('vi');
   const mutedTextColor = useColorModeValue('zinc.500', 'zinc.400');
   const veryMutedTextColor = useColorModeValue('zinc.400', 'zinc.500');
 
   return (
     <Box textAlign="center" mt={8}>
-      <Text fontSize="sm" color={mutedTextColor}>
-        2K Bild = {CREDIT_EXCHANGE_RATES.image2k} Credits · 4K Bild = {CREDIT_EXCHANGE_RATES.image4k} Credits · Video ={' '}
-        {CREDIT_EXCHANGE_RATES.video} Credits
+      <Text fontSize="sm" color={mutedTextColor} fontWeight="500">
+        {isViet
+          ? `Ảnh 2K = ${CREDIT_EXCHANGE_RATES.image2k} Tín chỉ · Ảnh 4K = ${CREDIT_EXCHANGE_RATES.image4k} Tín chỉ`
+          : `2K Image = ${CREDIT_EXCHANGE_RATES.image2k} Credits · 4K Image = ${CREDIT_EXCHANGE_RATES.image4k} Credits`}
       </Text>
       <Text fontSize="xs" color={veryMutedTextColor} mt={2}>
-        * Gilt für alle Bilder ausser Bilder die rein mit Text Prompts generiert wurden.
+        {isViet
+          ? '* Áp dụng cho tất cả hình ảnh được tạo từ Bobby Studio AI Engine.'
+          : '* Applies to all generative images rendered via Bobby Studio AI Engine.'}
       </Text>
     </Box>
   );

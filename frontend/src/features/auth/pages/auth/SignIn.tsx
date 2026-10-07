@@ -43,8 +43,6 @@ export default function SignIn() {
   const translatorNotificationNS = (key: string) => t(`notification:${key}`);
   const navigate = useNavigate();
   const toast = useToast();
-  const formBorderWidth = 0;
-  const formBorderColor = 'transparent';
   const [modalNotActive, toggleModalNotActive] = useBoolean();
   const [modalServerError, toggleModalServerError] = useBoolean();
   const [email, setEmail] = useState('');
@@ -81,11 +79,13 @@ export default function SignIn() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       if(userCredential.user.emailVerified === false){
         await sendEmailVerification(i18n.language || 'en');
         toggleModalEmailVerify(true);
+        setLoading(false);
         return;
       }
       const token = await userCredential.user.getIdToken();      
@@ -96,6 +96,7 @@ export default function SignIn() {
 
       if(sessionResult === null){
         toggleModalServerError.on();
+        setLoading(false);
         return;
       }
       setAuthUser({
@@ -111,6 +112,7 @@ export default function SignIn() {
       if (!isActive) {
         sessionStorage.removeItem('authToken');
         toggleModalNotActive.on();
+        setLoading(false);
         return;
       }  
     
@@ -149,6 +151,8 @@ export default function SignIn() {
           });
       }
       console.error(JSON.stringify(err, null, 2));
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -175,154 +179,201 @@ export default function SignIn() {
     }
   };
 
+  const isVietnamese = i18n.language?.toLowerCase().startsWith('vi');
+  const [loading, setLoading] = useState(false);
+
   return (
     <motion.div
       key="page"
-      initial={{ x: '20%', opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '-20%', opacity: 0, transition: { duration: 0.2 } }}
-      transition={{ delay: 0, duration: 0.2 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
     >
-      <Flex
-        h="100vh"
-        maxH="calc(100vh - 150px)"
-        align="center"
-        justify="center"
-        px={{ base: 4, md: 0 }}
-        bg={useColorModeValue('white', 'zinc.900')}
-      >
-        <Box
-          w="full"
-          maxW="360px"
-          rounded="lg"
-          p={6}
-          borderWidth={formBorderWidth}
-          borderColor={formBorderColor}
-          bg={useColorModeValue('white', 'zinc.900')}
-        >
-          <Text as="h4" mb={2.5} fontSize="2xl" fontWeight="bold" color="text.primary">
-            {translatorProfileNS('log_in_to_your_account')}
-          </Text>
-          <Text mb={9} fontSize="base" color="text.muted">
-            {translatorProfileNS('welcome_back_please_enter_your_details')}
-          </Text>
-          <form onSubmit={handleSubmit}>
-            <FormControl isInvalid={!!emailError} mb={3}>
-              <FormLabel htmlFor="email" color="text.primary">
-                {translatorProfileNS('email')}{' '}
-                <Text as="span" color="brand.600">
-                  *
-                </Text>
-              </FormLabel>
-              <Input
-                id="email"
-                variant="outline"
-                type="email"
-                autoFocus={true}
-                placeholder={translatorProfileNS('enter_your_email')}
-                value={email}
-                onChange={handleInputChange(setEmail, validateEmail, setEmailError)}
-                bg={useColorModeValue('zinc.50', 'zinc.800')}
-                color="text.primary"
-                borderColor="border.default"
-                _placeholder={{ color: 'text.subtle' }}
-                _hover={{ borderColor: 'zinc.400' }}
-                _focus={{ borderColor: 'zinc.600', boxShadow: 'none' }}
-              />
-              <FormErrorMessage mt={0}>{emailError}</FormErrorMessage>
-            </FormControl>
-
-            <FormControl isInvalid={!!passwordError}>
-              <FormLabel htmlFor="password" color="text.primary">
-                {translatorProfileNS('password')}{' '}
-                <Text as="span" color="brand.600">
-                  *
-                </Text>
-              </FormLabel>
-              <InputGroup>
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={translatorProfileNS('enter_your_password')}
-                  value={password}
-                  onChange={handleInputChange(setPassword, validatePassword, setPasswordError)}
-                  mb={3}
-                  variant="outline"
-                  bg={useColorModeValue('zinc.50', 'zinc.800')}
-                  color="text.primary"
-                  borderColor="border.default"
-                  _placeholder={{ color: 'text.subtle' }}
-                  _hover={{ borderColor: 'zinc.400' }}
-                  _focus={{ borderColor: 'zinc.600', boxShadow: 'none' }}
-                />
-                <InputRightElement>
-                  <Button
-                    variant="unstyled"
-                    pl={4}
-                    onClick={() => setShowPassword(!showPassword)}
-                    color="text.muted"
-                    _hover={{ color: 'text.primary' }}
-                  >
-                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-              <FormErrorMessage mt={0}>{passwordError}</FormErrorMessage>
-            </FormControl>
-
-            <Button
-              width="full"
-              mt={4}
-              type="submit"
-              fontWeight="normal"
-              bg={useColorModeValue('zinc.900', 'zinc.100')}
-              color={useColorModeValue('white', 'zinc.900')}
-              transition="all 0.2s"
-              _hover={{
-                bg: useColorModeValue('zinc.800', 'zinc.200'),
-                transform: 'translateY(-1px)',
-                boxShadow: 'md',
-              }}
-              _active={{
-                bg: useColorModeValue('zinc.700', 'zinc.300'),
-                transform: 'translateY(0px)',
-              }}
-            >
-              {translatorProfileNS('sign_in')}
-            </Button>
-            <Button
-              onClick={signInWithGoogle}
-              variant="outline"
-              width="full"
-              h="44px"
-              mt={2}
-              fontWeight="normal"
-              borderColor="border.default"
-              bg="bg.surface"
-              color="text.primary"
-              _hover={{ bg: 'bg.subtle' }}
-            >
-              <img src={google_icon} className="w-5 h-5 mr-2" alt="Sign in with Google" />
-              {translatorProfileNS('sign_in_with_google')}
-            </Button>
-          </form>
-
-          <Box mt={4} textAlign="center">
-            <Text as="span" fontSize="sm" fontWeight="medium" mr={2} color="text.muted">
-              {translatorProfileNS('dont_have_an_account')}
-            </Text>
-            <Link
-              as={NavLink}
-              to="/auth/sign-up"
-              color="brand.600"
-              fontWeight="semibold"
-              _hover={{ color: 'brand.700', textDecoration: 'underline' }}
-            >
-              {translatorProfileNS('sign_up_now')}
-            </Link>
+      <Box w="full">
+        {/* Cyber Access Badge */}
+        <Flex align="center" gap={2} mb={3}>
+          <Box
+            px={2.5}
+            py={0.5}
+            rounded="full"
+            bg={useColorModeValue('rgba(127, 86, 217, 0.08)', 'rgba(139, 92, 246, 0.16)')}
+            border="1px solid"
+            borderColor={useColorModeValue('rgba(127, 86, 217, 0.25)', 'rgba(168, 85, 247, 0.35)')}
+            fontSize="2xs"
+            fontWeight="700"
+            color="brand.400"
+            letterSpacing="0.06em"
+            textTransform="uppercase"
+          >
+            ✦ Studio Access Gateway
           </Box>
+        </Flex>
+
+        {/* Heading */}
+        <Text as="h1" fontSize={{ base: '2xl', md: '3xl' }} fontWeight="800" letterSpacing="-0.02em" color="text.primary" mb={1.5}>
+          {translatorProfileNS('log_in_to_your_account')}
+        </Text>
+        <Text fontSize="sm" color="text.muted" mb={6} lineHeight="1.5">
+          {translatorProfileNS('welcome_back_please_enter_your_details')}
+        </Text>
+
+        {/* Fast Google Auth */}
+        <Button
+          onClick={signInWithGoogle}
+          variant="outline"
+          width="full"
+          h="46px"
+          borderRadius="14px"
+          fontWeight="600"
+          fontSize="sm"
+          borderColor={useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.12)')}
+          bg={useColorModeValue('rgba(255, 255, 255, 0.6)', 'rgba(255, 255, 255, 0.04)')}
+          backdropFilter="blur(10px)"
+          color="text.primary"
+          _hover={{
+            bg: useColorModeValue('rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.08)'),
+            borderColor: 'brand.400',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 14px rgba(127, 86, 217, 0.15)',
+          }}
+          transition="all 0.2s"
+          mb={5}
+        >
+          <img src={google_icon} className="w-5 h-5 mr-2.5" alt="Google icon" />
+          {translatorProfileNS('sign_in_with_google')}
+        </Button>
+
+        {/* Divider */}
+        <Flex align="center" gap={3} mb={5}>
+          <Box flex={1} h="1px" bg={useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(255, 255, 255, 0.08)')} />
+          <Text fontSize="2xs" fontWeight="600" textTransform="uppercase" letterSpacing="0.06em" color="text.muted">
+            {isVietnamese ? 'Hoặc tiếp tục với email' : 'Or continue with email'}
+          </Text>
+          <Box flex={1} h="1px" bg={useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(255, 255, 255, 0.08)')} />
+        </Flex>
+
+        <form onSubmit={handleSubmit}>
+          <FormControl isInvalid={!!emailError} mb={4}>
+            <FormLabel htmlFor="email" fontSize="xs" fontWeight="600" color="text.primary" mb={1.5}>
+              {translatorProfileNS('email')}{' '}
+              <Text as="span" color="brand.500">
+                *
+              </Text>
+            </FormLabel>
+            <Input
+              id="email"
+              variant="outline"
+              type="email"
+              autoFocus={true}
+              placeholder={translatorProfileNS('enter_your_email')}
+              value={email}
+              onChange={handleInputChange(setEmail, validateEmail, setEmailError)}
+              h="46px"
+              borderRadius="14px"
+              bg={useColorModeValue('rgba(0, 0, 0, 0.02)', 'rgba(255, 255, 255, 0.04)')}
+              color="text.primary"
+              borderColor={useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')}
+              _placeholder={{ color: 'text.muted', fontSize: 'sm' }}
+              _hover={{ borderColor: 'brand.400' }}
+              _focus={{
+                borderColor: 'brand.400',
+                boxShadow: '0 0 0 3px rgba(127, 86, 217, 0.2)',
+                bg: useColorModeValue('#FFFFFF', 'rgba(255, 255, 255, 0.06)'),
+              }}
+              transition="all 0.2s"
+            />
+            <FormErrorMessage fontSize="xs" mt={1}>{emailError}</FormErrorMessage>
+          </FormControl>
+
+          <FormControl isInvalid={!!passwordError} mb={2}>
+            <FormLabel htmlFor="password" fontSize="xs" fontWeight="600" color="text.primary" mb={1.5}>
+              {translatorProfileNS('password')}{' '}
+              <Text as="span" color="brand.500">
+                *
+              </Text>
+            </FormLabel>
+            <InputGroup>
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder={translatorProfileNS('enter_your_password')}
+                value={password}
+                onChange={handleInputChange(setPassword, validatePassword, setPasswordError)}
+                h="46px"
+                borderRadius="14px"
+                variant="outline"
+                bg={useColorModeValue('rgba(0, 0, 0, 0.02)', 'rgba(255, 255, 255, 0.04)')}
+                color="text.primary"
+                borderColor={useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')}
+                _placeholder={{ color: 'text.muted', fontSize: 'sm' }}
+                _hover={{ borderColor: 'brand.400' }}
+                _focus={{
+                  borderColor: 'brand.400',
+                  boxShadow: '0 0 0 3px rgba(127, 86, 217, 0.2)',
+                  bg: useColorModeValue('#FFFFFF', 'rgba(255, 255, 255, 0.06)'),
+                }}
+                transition="all 0.2s"
+              />
+              <InputRightElement h="46px" pr={1}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  borderRadius="full"
+                  onClick={() => setShowPassword(!showPassword)}
+                  color="text.muted"
+                  _hover={{ color: 'text.primary', bg: 'transparent' }}
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+            <FormErrorMessage fontSize="xs" mt={1}>{passwordError}</FormErrorMessage>
+          </FormControl>
+
+          {/* Submit Button */}
+          <Button
+            width="full"
+            mt={5}
+            h="46px"
+            borderRadius="14px"
+            type="submit"
+            isLoading={loading}
+            fontWeight="700"
+            fontSize="sm"
+            background="linear-gradient(135deg, #7F56D9 0%, #6366F1 50%, #EC4899 100%)"
+            color="white"
+            boxShadow="0 4px 18px rgba(127, 86, 217, 0.35)"
+            _hover={{
+              filter: 'brightness(1.08)',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 6px 22px rgba(127, 86, 217, 0.5)',
+            }}
+            _active={{
+              transform: 'translateY(0)',
+            }}
+            transition="all 0.2s"
+          >
+            {translatorProfileNS('sign_in')}
+          </Button>
+        </form>
+
+        <Box mt={6} textAlign="center">
+          <Text as="span" fontSize="xs" fontWeight="500" mr={2} color="text.muted">
+            {translatorProfileNS('dont_have_an_account')}
+          </Text>
+          <Link
+            as={NavLink}
+            to="/auth/sign-up"
+            color="brand.400"
+            fontSize="xs"
+            fontWeight="700"
+            _hover={{ textDecoration: 'underline', color: 'brand.300' }}
+          >
+            {translatorProfileNS('sign_up_now')}
+          </Link>
         </Box>
-      </Flex>
+      </Box>
       <ModalUserNotActive
         open={modalNotActive}
         onClose ={ ()=>toggleModalNotActive.off()}

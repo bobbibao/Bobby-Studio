@@ -56,10 +56,10 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       className={classNames(
-        'flex items-center justify-center rounded-lg text-sm bg-primary dark:bg-white',
-        'px-3 py-2 text-white dark:text-primary shadow-lg h-10 transition duration-200 ease-in-out',
-        'hover:bg-gray-800 dark:hover:bg-gray-100 hover:shadow-xl',
-        'disabled:bg-gray-400 dark:disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:hover:shadow-lg',
+        'flex items-center justify-center rounded-xl text-sm font-semibold bg-primary dark:bg-white',
+        'px-5 py-2.5 text-white dark:text-primary shadow-md min-h-[44px] h-11 transition duration-200 ease-in-out',
+        'hover:opacity-95 hover:shadow-lg active:scale-[0.98]',
+        'disabled:bg-gray-400 dark:disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-none disabled:active:scale-100',
         extraClass,
         className
       )}

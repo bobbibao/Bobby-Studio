@@ -841,21 +841,32 @@ export const CompanyUpdate: React.FC<CompanyUpdateProps> = ({ company, refreshDa
         transition="all 0.2s"
         zIndex={40}
       >
-        <Flex w="full" maxW="3xl" justify="flex-end" pr="60px">
+        <Flex w="full" maxW="3xl" justify="flex-end" pr={{ base: 4, md: 8 }}>
           <Button
             type="button"
             onClick={handleSubmit(onSubmit)}
             isDisabled={!isDirty}
-            variant="solid"
-            h={10}
-            px={3}
-            py={2}
-            fontSize="sm"
-            fontWeight="semibold"
-            borderRadius="lg"
-            _disabled={{ cursor: 'not-allowed', opacity: 0.5 }}
+            background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+            color="white"
+            h="48px"
+            minH="48px"
+            px={8}
+            minW="200px"
+            fontSize="md"
+            fontWeight="700"
+            borderRadius="full"
+            boxShadow="0 4px 16px rgba(127, 86, 217, 0.35)"
+            _hover={{
+              opacity: 0.92,
+              transform: 'translateY(-1px)',
+              boxShadow: '0 8px 20px -4px rgba(127, 86, 217, 0.45)',
+            }}
+            transition="all 0.2s"
+            _disabled={{ cursor: 'not-allowed', opacity: 0.5, boxShadow: 'none' }}
           >
-            {t('common:save_changes', { defaultValue: 'Save Changes' })}
+            {!company
+              ? t('profile:create_company_account', { defaultValue: 'Create Company Account' })
+              : t('common:save_changes', { defaultValue: 'Save Changes' })}
           </Button>
         </Flex>
       </Box>

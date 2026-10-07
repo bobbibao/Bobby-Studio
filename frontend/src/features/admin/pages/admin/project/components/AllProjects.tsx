@@ -271,21 +271,32 @@ const AllProjects: React.FC<AllProjectsProps> = ({
               _hover={{
                 filter: 'brightness(1.1)',
                 transform: 'translateY(-1px)',
-                boxShadow: '0 4px 14px rgba(127, 86, 217, 0.4)',
+                boxShadow: '0 6px 18px rgba(127, 86, 217, 0.45)',
               }}
               _active={{ transform: 'translateY(0)' }}
               leftIcon={<AddIconThin />}
               onClick={() => setOpenModal(true)}
-              size="sm"
-              borderRadius="xl"
-              boxShadow="0 2px 10px rgba(127, 86, 217, 0.3)"
+              h="42px"
+              px={5}
+              borderRadius="full"
+              fontSize="sm"
+              fontWeight="700"
+              boxShadow="0 4px 14px rgba(127, 86, 217, 0.3)"
               isDisabled={!canCreateProject}
             >
               {translatorCommonNS('create_project')}
             </ChakraButton>
           </Tooltip>
           {!canCreateProject && onUpgradeClick && (
-            <ChakraButton variant="primary" size="sm" borderRadius="xl" onClick={onUpgradeClick}>
+            <ChakraButton
+              variant="primary"
+              h="42px"
+              px={5}
+              fontSize="sm"
+              fontWeight="700"
+              borderRadius="full"
+              onClick={onUpgradeClick}
+            >
               {translatorCommonNS('upgrade')}
             </ChakraButton>
           )}

@@ -858,18 +858,21 @@ export const MyAccountSection: React.FC = () => {
         transition="all 0.2s"
         zIndex={40}
       >
-        <Flex w="full" maxW="3xl" justify="flex-end" pr="60px">
+        <Flex w="full" maxW="3xl" justify="flex-end" pr={{ base: 4, md: 8 }}>
           <Button
             type="button"
             onClick={handleSubmit(onSubmit)}
             isDisabled={!isDirty}
             background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
             color="white"
-            h={11}
-            px={6}
-            fontSize="sm"
+            h="48px"
+            minH="48px"
+            px={8}
+            minW="180px"
+            fontSize="md"
             fontWeight="700"
             borderRadius="full"
+            boxShadow="0 4px 16px rgba(127, 86, 217, 0.35)"
             _hover={{
               opacity: 0.92,
               transform: 'translateY(-1px)',

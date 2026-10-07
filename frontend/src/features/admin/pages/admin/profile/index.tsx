@@ -249,11 +249,11 @@ const Profile: React.FC = () => {
             variant="outline"
             size="sm"
             borderRadius="full"
-            h={9}
-            px={4}
-            fontWeight="600"
-            fontSize="xs"
-            leftIcon={<LogOut size={14} />}
+            h="42px"
+            px={5}
+            fontWeight="700"
+            fontSize="sm"
+            leftIcon={<LogOut size={15} />}
             borderColor={useColorModeValue('red.200', 'rgba(239, 68, 68, 0.3)')}
             color={useColorModeValue('red.600', 'red.400')}
             bg={useColorModeValue('red.50', 'rgba(239, 68, 68, 0.08)')}
@@ -261,7 +261,7 @@ const Profile: React.FC = () => {
               bg: useColorModeValue('red.100', 'rgba(239, 68, 68, 0.18)'),
               borderColor: 'red.400',
               transform: 'translateY(-1px)',
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
+              boxShadow: '0 4px 14px rgba(239, 68, 68, 0.25)',
             }}
             transition="all 0.2s ease"
             onClick={handleLogout}
@@ -290,15 +290,15 @@ const Profile: React.FC = () => {
                 key={tab.label}
                 as="button"
                 onClick={() => handleTabChange(index)}
-                px={4}
-                py={2}
+                px={5}
+                py={2.5}
                 borderRadius="full"
                 borderWidth="1px"
                 borderColor={isSelected ? pillActiveBorder : cardBorder}
                 bg={isSelected ? pillActiveBg : pillInactiveBg}
                 color={isSelected ? (useColorModeValue('purple.700', 'white')) : 'text.muted'}
-                fontWeight={isSelected ? '700' : '500'}
-                fontSize="xs"
+                fontWeight={isSelected ? '700' : '600'}
+                fontSize="sm"
                 display="flex"
                 alignItems="center"
                 gap={2}

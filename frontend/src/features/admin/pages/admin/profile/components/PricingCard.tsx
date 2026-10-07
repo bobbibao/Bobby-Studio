@@ -307,8 +307,9 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
             <Button
               w="full"
               h="44px"
-              borderRadius="lg"
-              fontWeight="normal"
+              borderRadius="full"
+              fontWeight="600"
+              fontSize="sm"
               bg={currentPlanBg}
               color={currentPlanColor}
               borderWidth="1px"
@@ -326,15 +327,19 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
           ) : isPro ? (
             <Button
               w="full"
-              h="44px"
-              borderRadius="lg"
-              fontWeight="medium"
+              h="48px"
+              borderRadius="full"
+              fontWeight="700"
+              fontSize="sm"
               bg={proButtonBg}
               color={proButtonColor}
               border="none"
               _hover={{
                 bg: proButtonHoverBg,
+                transform: 'translateY(-1px)',
+                boxShadow: '0 6px 20px -4px rgba(127, 86, 217, 0.4)',
               }}
+              transition="all 0.2s"
               onClick={onPurchase}
             >
               {getButtonLabel()}
@@ -342,15 +347,18 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
           ) : (
             <Button
               w="full"
-              h="44px"
-              borderRadius="lg"
-              fontWeight="medium"
+              h="48px"
+              borderRadius="full"
+              fontWeight="700"
+              fontSize="sm"
               bg={defaultButtonBg}
               color={defaultButtonColor}
               border="none"
               _hover={{
                 bg: defaultButtonHoverBg,
+                transform: 'translateY(-1px)',
               }}
+              transition="all 0.2s"
               onClick={onPurchase}
             >
               {getButtonLabel()}
