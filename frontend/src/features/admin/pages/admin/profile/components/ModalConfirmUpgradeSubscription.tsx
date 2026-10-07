@@ -2,11 +2,12 @@ import { FC, useState } from 'react';
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/react';
 import { ModalCommon } from '@/shared/modal';
 import { QuestionIconBgPurple } from '@/shared/icons/QuestionIconPurple';
+import { WarningIcon } from '@/shared/icons/WarningIcon';
 import { useNavigate } from 'react-router-dom';
 import { updateSubscriptionPlan } from '@/features/user';
 import success_ic from '@/assets/svg/icons/success.svg';
-import { WarningIcon } from '@chakra-ui/icons';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency';
 import { fetchCurrentUser } from '@/slices/currentUserSlice';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 
@@ -27,7 +28,7 @@ export const ModalConfirmUpgradeSubscription: FC<ModalCancelSubscriptionProps> =
   plan = '',
   onSuccess,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
@@ -108,7 +109,7 @@ export const ModalConfirmUpgradeSubscription: FC<ModalCancelSubscriptionProps> =
             'are_you_sure_you_want_to_upgrade_your_subscription_your_current_subscription_will_be_canceled'
           )}
 
-          <span className="font-bold"> CHF{priceAmount ? (priceAmount / 100).toFixed(0) : '0'}</span>
+          <span className="font-bold"> {formatCurrency(priceAmount ? priceAmount / 100 : 0, i18n.language)}</span>
         </p>
         {error && <p className="mt-2 text-center text-red-500">{error}</p>}
       </ModalCommon>
@@ -121,7 +122,7 @@ export const ModalConfirmUpgradeSubscription: FC<ModalCancelSubscriptionProps> =
             {resultModal.success ? (
               <img src={success_ic} alt={'status-icon'} className="w-18 h-18 mx-auto text-green-500" />
             ) : (
-              <WarningIcon w={10} h={10} color="red.500" />
+              <WarningIcon className="w-10 h-10 mx-auto" />
             )}
           </ModalHeader>
           <ModalBody p={0} mt={5}>

@@ -16,26 +16,26 @@ import Textarea from './components/textarea';
 const theme = extendTheme({
   colors,
   fonts: {
-    heading: `'Inter', sans-serif`,
-    body: `'Inter', sans-serif`,
+    heading: `'Space Grotesk Variable', 'Space Grotesk', 'Inter Variable', 'Inter', -apple-system, sans-serif`,
+    body: `'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`,
   },
   semanticTokens: {
     colors: {
       // Backgrounds
       'bg.canvas': {
-        default: 'white',
+        default: 'zinc.50',
         _dark: 'zinc.950',
       },
       'bg.surface': {
         default: 'white',
-        _dark: 'zinc.900',
+        _dark: 'zinc.800',
       },
       'bg.subtle': {
-        default: 'zinc.150',
+        default: 'zinc.100',
         _dark: 'zinc.900',
       },
       'bg.muted': {
-        default: 'zinc.200',
+        default: 'zinc.150',
         _dark: 'zinc.700',
       },
       
@@ -44,7 +44,7 @@ const theme = extendTheme({
         default: 'zinc.900',
         _dark: 'white',
       },
-      'text.secondary': { // Keeping legacy support if needed, but preferring muted
+      'text.secondary': {
         default: 'zinc.600',
         _dark: 'zinc.400',
       },
@@ -64,15 +64,19 @@ const theme = extendTheme({
       // Borders
       'border.default': {
         default: 'zinc.200',
-        _dark: 'zinc.800',
+        _dark: 'zinc.700',
       },
       'border.subtle': {
         default: 'zinc.100',
-        _dark: 'zinc.800', // Or even subtler if needed
+        _dark: 'zinc.800',
       },
       'border.muted': {
         default: 'zinc.200',
         _dark: 'zinc.700',
+      },
+      'border.glow': {
+        default: 'brand.300',
+        _dark: 'brand.500',
       },
       
       // Brand Aliases
@@ -98,10 +102,17 @@ const theme = extendTheme({
           bg: 'bg.surface',
           border: '1px solid',
           borderColor: 'border.default',
+          borderRadius: '14px',
+          boxShadow: '0 10px 30px -10px rgba(0,0,0,0.2)',
+          backdropFilter: 'blur(12px)',
+          py: 2,
         },
         item: {
-          bg: 'bg.surface',
+          bg: 'transparent',
           color: 'text.primary',
+          borderRadius: '8px',
+          mx: 1,
+          w: 'calc(100% - 8px)',
           _hover: {
             bg: 'bg.subtle',
           },
@@ -117,10 +128,10 @@ const theme = extendTheme({
       body: {
         bg: 'bg.canvas',
         color: 'text.primary',
+        fontFeatureSettings: '"cv02", "cv03", "cv04", "cv11"',
       },
     }),
   },
 });
 
 export default theme;
-

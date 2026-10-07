@@ -588,7 +588,7 @@
   "videos": "Videos",
   "video": "Video",
   "image": "Image",
-  "save_amount": "Save CHF {{amount}}/year",
+  "save_amount": "Save ${{amount}}/year",
   "excl_vat": "excl. VAT",
   "credit_packs": "Credit Packs",
   "buy_additional_credits": "Buy Additional Credits",

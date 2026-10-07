@@ -71,8 +71,9 @@ export enum ActionTypeEnum {
 }
 
 export enum CreationTypeEnum {
-  EXTERIOR = 'exterior',
-  INTERIOR = 'interior',
+  PHOTOREALISM = 'photorealism',
+  CINEMATIC = 'cinematic',
+  CONCEPT = 'concept',
 }
 
 export enum InputTypeEnum {
@@ -106,8 +107,9 @@ export enum StyleEnum {
 }
 
 export const CreationTypeToTextMap: ReadonlyMap<CreationTypeEnum, string> = new Map([
-  [CreationTypeEnum.EXTERIOR, 'exterior'],
-  [CreationTypeEnum.INTERIOR, 'interior'],
+  [CreationTypeEnum.PHOTOREALISM, 'photorealism'],
+  [CreationTypeEnum.CINEMATIC, 'cinematic'],
+  [CreationTypeEnum.CONCEPT, 'concept'],
 ]);
 
 export const InputTypeToTextMap: ReadonlyMap<InputTypeEnum, string> = new Map([

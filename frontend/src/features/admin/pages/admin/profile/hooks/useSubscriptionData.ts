@@ -17,7 +17,7 @@ const TEAM_PLAN_FALLBACK: {
 } = {
   monthly: {
     id: 'team_monthly',
-    currency: 'chf',
+    currency: 'usd',
     unit_amount: 82500, // 825 CHF total for 3 users (275 per user)
     product: 'Team Plan',
     productDescription: 'Team subscription for collaboration',
@@ -27,7 +27,7 @@ const TEAM_PLAN_FALLBACK: {
   },
   yearly: {
     id: 'team_yearly',
-    currency: 'chf',
+    currency: 'usd',
     unit_amount: 792000, // 660 CHF/month * 12 = 7920 CHF total for 3 users yearly
     product: 'Team Plan',
     productDescription: 'Team subscription for collaboration',

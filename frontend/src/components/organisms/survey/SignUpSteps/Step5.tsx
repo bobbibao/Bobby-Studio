@@ -34,7 +34,7 @@ const Step5: React.FC = () => {
         { value: 'Public/Institutional', label: 'public_institutional' },
         { value: 'Mixed-use', label: 'mixed_use' },
         { value: 'Urban planning', label: 'urban_planning' },
-        { value: 'Interior design', label: 'interior_design' },
+        { value: 'Digital Art & Concept', label: 'digital_art_concept' },
       ],
     },
   ];

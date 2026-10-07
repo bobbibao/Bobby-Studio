@@ -12,18 +12,34 @@ interface StatusChipProps extends Omit<FlexProps, 'children'> {
 /** A status is always icon + text; color only reinforces it. */
 export function StatusChip({ tone = 'neutral', icon, children, ...rest }: StatusChipProps) {
   const palette = {
-    neutral: useColorModeValue({ bg: 'zinc.100', fg: 'zinc.800', border: 'zinc.300' }, { bg: 'zinc.800', fg: 'zinc.100', border: 'zinc.600' }),
-    info: useColorModeValue({ bg: 'blue.50', fg: 'blue.900', border: 'blue.200' }, { bg: 'blue.900', fg: 'blue.100', border: 'blue.700' }),
-    success: useColorModeValue({ bg: 'green.50', fg: 'green.900', border: 'green.200' }, { bg: 'green.900', fg: 'green.100', border: 'green.700' }),
-    warning: useColorModeValue({ bg: 'orange.50', fg: 'orange.900', border: 'orange.200' }, { bg: 'orange.900', fg: 'orange.100', border: 'orange.700' }),
-    danger: useColorModeValue({ bg: 'red.50', fg: 'red.900', border: 'red.200' }, { bg: 'red.900', fg: 'red.100', border: 'red.700' }),
+    neutral: useColorModeValue(
+      { bg: 'rgba(0,0,0,0.04)', fg: 'zinc.800', border: 'rgba(0,0,0,0.08)' },
+      { bg: 'rgba(255,255,255,0.06)', fg: 'zinc.100', border: 'rgba(255,255,255,0.1)' }
+    ),
+    info: useColorModeValue(
+      { bg: 'rgba(6, 182, 212, 0.08)', fg: 'cyan.700', border: 'rgba(6, 182, 212, 0.25)' },
+      { bg: 'rgba(6, 182, 212, 0.15)', fg: 'cyan.200', border: 'rgba(6, 182, 212, 0.35)' }
+    ),
+    success: useColorModeValue(
+      { bg: 'rgba(16, 185, 129, 0.08)', fg: 'emerald.700', border: 'rgba(16, 185, 129, 0.25)' },
+      { bg: 'rgba(16, 185, 129, 0.15)', fg: 'emerald.200', border: 'rgba(16, 185, 129, 0.35)' }
+    ),
+    warning: useColorModeValue(
+      { bg: 'rgba(245, 158, 11, 0.08)', fg: 'orange.700', border: 'rgba(245, 158, 11, 0.25)' },
+      { bg: 'rgba(245, 158, 11, 0.15)', fg: 'orange.200', border: 'rgba(245, 158, 11, 0.35)' }
+    ),
+    danger: useColorModeValue(
+      { bg: 'rgba(239, 68, 68, 0.08)', fg: 'red.700', border: 'rgba(239, 68, 68, 0.25)' },
+      { bg: 'rgba(239, 68, 68, 0.15)', fg: 'red.200', border: 'rgba(239, 68, 68, 0.35)' }
+    ),
   }[tone];
+
   return (
     <Flex
       display="inline-flex"
       align="center"
       gap={1.5}
-      px={2.5}
+      px={3}
       py={1}
       borderRadius="full"
       borderWidth="1px"
@@ -31,9 +47,10 @@ export function StatusChip({ tone = 'neutral', icon, children, ...rest }: Status
       color={palette.fg}
       borderColor={palette.border}
       fontSize="xs"
-      fontWeight="medium"
+      fontWeight="500"
       lineHeight="short"
       maxW="100%"
+      backdropFilter="blur(8px)"
       {...rest}
     >
       {icon}

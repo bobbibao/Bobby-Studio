@@ -21,7 +21,7 @@ export function PromptField({ value, maxChars, onChange, onCompositionStart, onC
   const over = length > maxChars;
   return (
     <FormControl isInvalid={Boolean(error) || over}>
-      <FormLabel htmlFor="studio-prompt" fontSize="sm" fontWeight="semibold" mb={1.5}>
+      <FormLabel htmlFor="studio-prompt" fontSize="sm" fontWeight="600" mb={2}>
         {t('prompt.label')}
       </FormLabel>
       <Textarea
@@ -40,6 +40,15 @@ export function PromptField({ value, maxChars, onChange, onCompositionStart, onC
         _focusVisible={focusRing}
         fontSize="md"
         minH="120px"
+        borderRadius="14px"
+        borderColor="border.default"
+        bg="bg.surface"
+        transition="all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+        _hover={{ borderColor: 'brand.400' }}
+        _focus={{
+          borderColor: 'brand.400',
+          boxShadow: '0 0 0 1px var(--chakra-colors-brand-400), 0 0 20px -3px rgba(127, 86, 217, 0.3)',
+        }}
         wordBreak="break-word"
       />
       <Box id={counterId} display="flex" justifyContent="space-between" gap={2} mt={1.5}>

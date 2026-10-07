@@ -23,6 +23,7 @@ import { selectCurrentUser } from '@/selectors/user';
 import { useSelector } from 'react-redux';
 import * as usageAPI from '@/features/user';
 import { useCallback, useEffect, useState } from 'react';
+import { formatCurrency } from '@/utils/currency';
 import { UsageStatisticsDto } from '@/features/admin/pages/admin/profile/types/usageStatistics.dto';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
@@ -39,7 +40,7 @@ import { capitalize } from '@/utils';
 
 export function OverviewSection() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const translatorProfileNS = (key: string) => t(`profile:${key}`);
   const dispatch = useAppDispatch();
 
@@ -214,26 +215,40 @@ export function OverviewSection() {
     <Box
       display="flex"
       flexDirection="column"
-      rounded="md"
+      borderRadius="20px"
       borderWidth="1px"
       borderColor={borderColor}
-      borderRadius="lg"
       overflow="hidden"
-      p="5"
+      p="6"
       gap="2"
       height="100%"
-      bg={cardBg}
-      bgGradient={bgGradient}
-      transition="all 0.3s"
-      _hover={hoverStyles}
+      bg={useColorModeValue('rgba(255, 255, 255, 0.85)', 'rgba(15, 17, 26, 0.85)')}
+      backdropFilter="blur(16px)"
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+      _hover={{
+        borderColor: useColorModeValue('rgba(127, 86, 217, 0.45)', 'rgba(139, 92, 246, 0.5)'),
+        transform: 'translateY(-2px)',
+        boxShadow: '0 16px 32px -10px rgba(127, 86, 217, 0.18)',
+      }}
       justifyContent="space-between"
     >
-      <Text fontSize="md" fontWeight="medium" color="zinc.500" _dark={{ color: 'zinc.400' }}>
-        {title}
-      </Text>
+      <Flex align="center" justify="space-between">
+        <Text fontSize="xs" fontWeight="700" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
+          {title}
+        </Text>
+        <Box
+          w={2}
+          h={2}
+          borderRadius="full"
+          bg="brand.400"
+          boxShadow="0 0 8px rgba(127, 86, 217, 0.8)"
+        />
+      </Flex>
       <Flex direction="row" justify="space-between" align="flex-end" flex={1} w="full">
         <Stat gap="1">
-          <StatNumber fontSize="32px">{value}</StatNumber>
+          <StatNumber fontSize="34px" fontWeight="800" letterSpacing="-0.03em" color="text.primary">
+            {value}
+          </StatNumber>
           {subtext && <StatHelpText mb={0}>{subtext}</StatHelpText>}
         </Stat>
         {chart}
@@ -245,22 +260,34 @@ export function OverviewSection() {
     <Box
       display="flex"
       flexDirection="column"
-      rounded="md"
+      borderRadius="20px"
       borderWidth="1px"
       borderColor={borderColor}
-      borderRadius="lg"
       overflow="hidden"
-      p="5"
+      p="6"
       gap="3"
       height="100%"
-      bg={cardBg}
-      bgGradient={bgGradient}
-      transition="all 0.3s"
-      _hover={hoverStyles}
+      bg={useColorModeValue('rgba(255, 255, 255, 0.85)', 'rgba(15, 17, 26, 0.85)')}
+      backdropFilter="blur(16px)"
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+      _hover={{
+        borderColor: useColorModeValue('rgba(127, 86, 217, 0.45)', 'rgba(139, 92, 246, 0.5)'),
+        transform: 'translateY(-2px)',
+        boxShadow: '0 16px 32px -10px rgba(127, 86, 217, 0.18)',
+      }}
     >
-      <Text fontSize="md" fontWeight="medium" color="zinc.500" _dark={{ color: 'zinc.400' }}>
-        {title}
-      </Text>
+      <Flex align="center" justify="space-between">
+        <Text fontSize="xs" fontWeight="700" color="text.muted" textTransform="uppercase" letterSpacing="0.05em">
+          {title}
+        </Text>
+        <Box
+          w={2}
+          h={2}
+          borderRadius="full"
+          bg="brand.400"
+          boxShadow="0 0 8px rgba(127, 86, 217, 0.8)"
+        />
+      </Flex>
       <SimpleGrid columns={3} gap={4} h="full">
         {images.length > 0 ? (
           images.map((img, idx) => (
@@ -308,109 +335,115 @@ export function OverviewSection() {
   return (
     <Box pb={8}>
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(4, 1fr)' }} gap={4}>
-        {/* Subscription Box - 2x2 - Designed to match PricingCard.tsx style */}
+        {/* Subscription Box - 2x2 - Futuristic Cybernetic Card */}
         <GridItem colSpan={{ base: 1, lg: 2 }} rowSpan={{ base: 1, lg: 2 }}>
           <Box
             display="flex"
             flexDirection="column"
-            rounded="lg"
+            borderRadius="24px"
             borderWidth="1px"
             borderColor={borderColor}
             overflow="hidden"
-            p="5"
-            gap="4"
+            p="6"
+            gap="5"
             height="100%"
-            bg={cardBg}
-            bgGradient={bgGradient}
-            transition="all 0.3s"
-            _hover={hoverStyles}
+            bg={useColorModeValue('rgba(255, 255, 255, 0.85)', 'rgba(15, 17, 26, 0.85)')}
+            backdropFilter="blur(20px)"
+            transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+            _hover={{
+              borderColor: useColorModeValue('rgba(127, 86, 217, 0.45)', 'rgba(139, 92, 246, 0.5)'),
+              boxShadow: '0 20px 40px -10px rgba(127, 86, 217, 0.2)',
+            }}
             justifyContent="space-between"
           >
             <Box flex={1} display="flex" flexDirection="column">
               {/* Plan Icon/Badge Area */}
-              <Box mb={2} display="flex" justifyContent="space-between" alignItems="flex-start">
-                <Box>
-                  <Text fontSize="2xl" fontWeight="bold" mb={1} minH="24px" display="flex" alignItems="center">
+              <Box mb={3} display="flex" justifyContent="space-between" alignItems="center">
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Box
+                    px={2.5}
+                    py={0.5}
+                    rounded="full"
+                    bg={useColorModeValue('rgba(127, 86, 217, 0.1)', 'rgba(139, 92, 246, 0.18)')}
+                    border="1px solid"
+                    borderColor={useColorModeValue('rgba(127, 86, 217, 0.25)', 'rgba(168, 85, 247, 0.35)')}
+                    fontSize="2xs"
+                    fontWeight="700"
+                    color="brand.400"
+                    letterSpacing="0.06em"
+                    textTransform="uppercase"
+                  >
+                    ✦ Active Tier
+                  </Box>
+                  <Text fontSize="2xl" fontWeight="800" letterSpacing="-0.02em" color="text.primary">
                     {capitalize(planType === 'PRO' ? 'Pro' : planType)}
                   </Text>
                 </Box>
-                <Box minH="20px" mt={1} display="flex" alignItems="center">
-                  {renderDate()}
-                </Box>
+                <Box>{renderDate()}</Box>
               </Box>
 
               {/* Price Section */}
-              <Box mb={4} minH="60px" display="flex" flexDirection="column" justifyContent="flex-start">
+              <Box mb={5} display="flex" flexDirection="column" justifyContent="flex-start">
                 <Flex align="baseline">
-                  <Text fontSize="4xl" fontWeight="bold" letterSpacing="-0.02em">
-                    CHF{price}
+                  <Text fontSize="4xl" fontWeight="800" letterSpacing="-0.03em" color="text.primary">
+                    {formatCurrency(Number(price), i18n.language)}
                   </Text>
-                  <Text fontSize="md" color="zinc.500" _dark={{ color: 'zinc.400' }} ml={1} fontWeight="medium">
-                    /{translatorProfileNS('month').toLowerCase()}
+                  <Text fontSize="sm" color="text.muted" ml={1.5} fontWeight="600">
+                    /{i18n.language.startsWith('vi') ? 'tháng' : 'month'}
                   </Text>
                 </Flex>
               </Box>
 
               {/* Credit Usage Section */}
-              <Flex direction="column" gap={hasExtraCredits ? 3 : 2} mb={4}>
+              <Flex direction="column" gap={hasExtraCredits ? 3 : 2} mb={5}>
                 {/* Subscription Credits */}
                 <Flex direction="column" gap={2}>
                   <Flex justify="space-between" align="center">
-                    <Text fontSize="sm" fontWeight="medium" color="zinc.700" _dark={{ color: 'zinc.300' }}>
+                    <Text fontSize="xs" fontWeight="600" color="text.muted">
                       {hasExtraCredits ? translatorProfileNS('subscription_credits') : translatorProfileNS('credits')}
                     </Text>
-                    <Text color="zinc.600" fontSize="sm" _dark={{ color: 'zinc.400' }}>
+                    <Text color="text.primary" fontSize="xs" fontWeight="700">
                       {(currentUser?.role ?? '') === FREE_USER_ROLE
-                        ? `${usedCredit ?? 0}/${credit ?? 0}`
-                        : `${usedCredit ?? 0}/${credit ?? 0} ${translatorProfileNS('credits')}`}
+                        ? `${usedCredit ?? 0} / ${credit ?? 0}`
+                        : `${usedCredit ?? 0} / ${credit ?? 0} ${translatorProfileNS('credits')}`}
                     </Text>
                   </Flex>
                   <Progress
                     value={creditUsagePercent}
                     size="sm"
-                    colorScheme="purple"
-                    h={2}
+                    h={2.5}
                     borderRadius="full"
-                    bg={progressBg}
+                    bg={useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.08)')}
                     sx={{
                       '& > div[role="progressbar"]': {
-                        backgroundColor: 'purple.600',
-                      },
-                    }}
-                    _dark={{
-                      '& > div[role="progressbar"]': {
-                        backgroundColor: 'white',
+                        background: 'linear-gradient(90deg, #7F56D9 0%, #6366F1 100%)',
+                        borderRadius: 'full',
                       },
                     }}
                   />
                 </Flex>
 
-                {/* Extra Purchased Credits - only shown if user has purchased extra credits */}
+                {/* Extra Purchased Credits */}
                 {hasExtraCredits && (
                   <Flex direction="column" gap={2}>
                     <Flex justify="space-between" align="center">
-                      <Text fontSize="sm" fontWeight="medium" color="zinc.700" _dark={{ color: 'zinc.300' }}>
+                      <Text fontSize="xs" fontWeight="600" color="text.muted">
                         {translatorProfileNS('purchased_credits')}
                       </Text>
-                      <Text color="zinc.600" fontSize="sm" _dark={{ color: 'zinc.400' }}>
-                        {usedExtraCredit}/{extraCredit} {translatorProfileNS('credits')}
+                      <Text color="text.primary" fontSize="xs" fontWeight="700">
+                        {usedExtraCredit} / {extraCredit} {translatorProfileNS('credits')}
                       </Text>
                     </Flex>
                     <Progress
                       value={extraCreditUsagePercent}
                       size="sm"
-                      colorScheme="green"
-                      h={2}
+                      h={2.5}
                       borderRadius="full"
-                      bg={progressBg}
+                      bg={useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.08)')}
                       sx={{
                         '& > div[role="progressbar"]': {
-                          backgroundColor: 'green.500',
-                        },
-                      }}
-                      _dark={{
-                        '& > div[role="progressbar"]': {
-                          backgroundColor: 'green.400',
+                          background: 'linear-gradient(90deg, #10B981 0%, #059669 100%)',
+                          borderRadius: 'full',
                         },
                       }}
                     />
@@ -422,16 +455,18 @@ export function OverviewSection() {
               <Flex gap={3} mt="auto">
                 <Button
                   flex={1}
-                  bg={managePaymentBg}
-                  color={managePaymentColor}
+                  background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+                  color="white"
+                  borderRadius="full"
+                  h={11}
                   _hover={{
-                    bg: managePaymentHoverBg,
-                    transform: 'scale(1.05)',
-                    boxShadow: 'md',
+                    opacity: 0.92,
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 8px 20px -4px rgba(127, 86, 217, 0.45)',
                   }}
                   transition="all 0.2s"
-                  fontWeight="bold"
-                  size="md"
+                  fontWeight="700"
+                  fontSize="xs"
                   onClick={() => {
                     navigate('/profile#subscription');
                   }}
@@ -442,21 +477,20 @@ export function OverviewSection() {
                 {currentSubscription && (
                   <Button
                     flex={1}
-                    variant="solid"
-                    bg={cancelPlanBg}
-                    color={cancelPlanColor}
+                    variant="outline"
+                    borderRadius="full"
+                    h={11}
+                    borderColor={useColorModeValue('rgba(0, 0, 0, 0.12)', 'rgba(255, 255, 255, 0.15)')}
+                    color="text.primary"
                     _hover={{
-                      bg: 'red.600',
-                      color: 'white',
-                      borderColor: 'red.600',
-                      transform: 'scale(1.05)',
-                      boxShadow: 'md',
+                      bg: useColorModeValue('red.50', 'rgba(239, 68, 68, 0.1)'),
+                      borderColor: 'red.400',
+                      color: 'red.400',
+                      transform: 'translateY(-1px)',
                     }}
                     transition="all 0.2s"
-                    borderWidth="1px"
-                    borderColor={cancelPlanBorderColor}
-                    fontWeight="medium"
-                    size="md"
+                    fontWeight="600"
+                    fontSize="xs"
                     onClick={() => toggleModalCancelSubscription.on()}
                   >
                     {t('common:cancel_plan')}

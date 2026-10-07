@@ -25,6 +25,24 @@ import UserManagement from './features/admin/pages/admin/user-management';
 import UserHistory from './features/admin/pages/admin/user-management/history';
 import UserHistoryDetail from './features/admin/pages/admin/user-management/historyDetail';
 import UserManagementIcon from './shared/icons/UserManagementIcon';
+import React from 'react';
+import ModelsPage from './features/admin/pages/admin/models';
+import PromptsPage from './features/admin/pages/admin/prompts';
+import LabPage from './features/admin/pages/admin/lab';
+import MorphIcon from './components/common/MorphIcon';
+
+const ModelsIcon = ({ active }: { active?: boolean }) =>
+  React.createElement(MorphIcon, { type: 'model', size: 20, color: active ? '#7F56D9' : 'currentColor' });
+
+const PromptsIcon = ({ active }: { active?: boolean }) =>
+  React.createElement(MorphIcon, { type: 'prompt', size: 20, color: active ? '#7F56D9' : 'currentColor' });
+
+const LabIcon = ({ active }: { active?: boolean }) =>
+  React.createElement(MorphIcon, { type: 'lab', size: 20, color: active ? '#7F56D9' : 'currentColor' });
+
+const WorkspaceIcon = ({ active }: { active?: boolean }) =>
+  React.createElement(MorphIcon, { type: 'sparkle', size: 20, color: active ? '#7F56D9' : 'currentColor' });
+
 const routes = [
   {
     name: 'Home',
@@ -151,10 +169,40 @@ const routes = [
     navbarHeading: 'Workspace',
     layout: '/workspace',
     path: 'workspace',
-    icon: GenerateIcon,
+    icon: WorkspaceIcon,
     component: WorkspaceRedirect,
     position: 'top',
     group: 'workspace',
+  },
+  {
+    name: 'AI Models',
+    navbarHeading: 'AI Models',
+    layout: '/home',
+    path: 'models',
+    icon: ModelsIcon,
+    component: ModelsPage,
+    position: 'top',
+    group: 'studio',
+  },
+  {
+    name: 'Prompt Matrix',
+    navbarHeading: 'Prompt Matrix',
+    layout: '/home',
+    path: 'prompts',
+    icon: PromptsIcon,
+    component: PromptsPage,
+    position: 'top',
+    group: 'studio',
+  },
+  {
+    name: 'Creative Lab',
+    navbarHeading: 'Creative Lab',
+    layout: '/home',
+    path: 'lab',
+    icon: LabIcon,
+    component: LabPage,
+    position: 'top',
+    group: 'studio',
   },
   {
     name: 'Favorite',

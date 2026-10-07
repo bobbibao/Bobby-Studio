@@ -19,8 +19,8 @@ const FilterModal: React.FC<FilterModalProps> = ({
   onResetFilters,
   onCancel,
   initialFilters = {},
-  filterFields = ['models', 'type', 'time'],
-  typeOptions = ['exterior', 'interior'],
+  filterFields = ['models', 'time'],
+  typeOptions = [],
 }) => {
   const { t } = useTranslation();
   const translatorCommonNS = (key: string) => t(`common:${key}`);
@@ -113,13 +113,14 @@ const FilterModal: React.FC<FilterModalProps> = ({
   return (
     <Box 
       ref={modalRef}
-      bg="zinc.950" 
-      _light={{ bg: "bg.surface" }}
-      rounded="lg" 
-      shadow="xl" 
+      bg="bg.surface" 
+      rounded="20px" 
+      shadow="2xl" 
       w="450px" 
       borderWidth="1px" 
       borderColor="border.default"
+      backdropFilter="blur(20px)"
+      boxShadow="0 25px 50px -12px rgba(0,0,0,0.35)"
     >
       <Box p={4}>
         <Flex justify="space-between" align="center" mb={2}>

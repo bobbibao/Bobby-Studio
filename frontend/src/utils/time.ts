@@ -23,7 +23,7 @@ export const DATE_TIME_FROM_NOW_FORMAT = 'DD/MM/YYYY HH:mm';
 
 export const relativeTimeFormat = (timeUtc: number | string, addition = 0, locale: string) => {
   const language = locale.split('-')[0];
-  const time = moment.utc(timeUtc).add(addition, 'seconds').local().locale(['en', 'de', 'vi'].includes(language) ? language : 'en');
+  const time = moment.utc(timeUtc).add(addition, 'seconds').local().locale(['en', 'vi'].includes(language) ? language : 'en');
   return time.fromNow();
 };
 

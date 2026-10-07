@@ -23,10 +23,9 @@ export function PrivacySection() {
   const translatorProfileNS = (key: string) => t(`profile:${key}`);
   const translatorNotificationNS = (key: string) => t(`notification:${key}`);
 
-  // Get language prefix for links (de, en, vn)
+  // Get language prefix for links (en, vn)
   const getLanguagePrefix = () => {
     const lang = i18n.language?.toLowerCase() || 'en';
-    if (lang.startsWith('de')) return 'de';
     if (lang.startsWith('vi')) return 'vn';
     return 'en';
   };
@@ -215,21 +214,27 @@ export function PrivacySection() {
         zIndex={40}
       >
         <Flex w="full" maxW="3xl" justify="flex-end" pr="60px">
-            <Button
-              type="button"
-              onClick={handleSubmit(onSubmit)}
-              isDisabled={!isDirty}
-              variant="solid"
-              h={10}
-              px={3}
-              py={2}
-              fontSize="sm"
-              fontWeight="semibold"
-              borderRadius="lg"
-              _disabled={{ cursor: 'not-allowed', opacity: 0.5 }}
-            >
-              {t('common:save_changes', { defaultValue: 'Save Changes' })}
-            </Button>
+          <Button
+            type="button"
+            onClick={handleSubmit(onSubmit)}
+            isDisabled={!isDirty}
+            background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+            color="white"
+            h={11}
+            px={6}
+            fontSize="sm"
+            fontWeight="700"
+            borderRadius="full"
+            _hover={{
+              opacity: 0.92,
+              transform: 'translateY(-1px)',
+              boxShadow: '0 8px 20px -4px rgba(127, 86, 217, 0.45)',
+            }}
+            transition="all 0.2s"
+            _disabled={{ cursor: 'not-allowed', opacity: 0.5, boxShadow: 'none' }}
+          >
+            {t('common:save_changes', { defaultValue: 'Save Changes' })}
+          </Button>
         </Flex>
       </Box>
     </Box>

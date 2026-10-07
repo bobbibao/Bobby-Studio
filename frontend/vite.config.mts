@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
     host: "localhost",
   },
   plugins: [react()],
+  assetsInclude: ['**/*.lottie'],
   build: {
     outDir: "dist",
     emptyOutDir: true,

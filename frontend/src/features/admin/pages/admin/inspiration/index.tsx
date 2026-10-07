@@ -1,4 +1,4 @@
-import { Box, Flex, Tab, TabList, Tabs, VStack } from '@chakra-ui/react';
+import { Box, Flex, Tab, TabList, Tabs, VStack, Heading, Text, useColorModeValue } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -13,7 +13,7 @@ import LoadingPage from '@/components/LoadingPage';
 import Empty from '@/components/Empty';
 import { useTranslation } from 'react-i18next';
 import FilterModal from '@/features/admin/pages/admin/inspiration/components/FilterDialog/FilterDialog';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Sparkles } from 'lucide-react';
 import { InputTypeEnum } from '@/constants/attribute-enum';
 import { FilterState } from '@/features/admin/pages/admin/inspiration/types/filterDropdown';
 import { PaginationType } from '@/types/pagination';
@@ -24,13 +24,19 @@ import { GridSwitcher } from '@/components/GridSwitcher';
 import { countActiveFilters, FilterField } from '@/utils/filterUtils';
 
 const TABS_LIST = ['all', InputTypeEnum.LINE_DRAWING, InputTypeEnum.TEXT_PROMPT, InputTypeEnum.REFERENCE, InputTypeEnum.MODEL_3D];
-const TYPE_FILTER_OPTIONS = ['exterior', 'interior'] as const;
-type TypeFilterOption = (typeof TYPE_FILTER_OPTIONS)[number];
-type TypeFilterSelection = TypeFilterOption | '';
+const CREATIVE_CATEGORIES = [
+  { id: '', labelEn: 'All Creations', labelVi: 'Tất Cả Tác Phẩm' },
+  { id: 'photorealism', labelEn: 'Photorealism', labelVi: 'Siêu Thực' },
+  { id: 'cinematic', labelEn: 'Cinematic 8K', labelVi: 'Điện Ảnh 8K' },
+  { id: 'concept', labelEn: 'Concept Art', labelVi: 'Concept Art' },
+  { id: 'scifi', labelEn: 'Sci-Fi & Cyber', labelVi: 'Viễn Tưởng' },
+] as const;
+type TypeFilterSelection = string;
 const FILTER_MODAL_FIELDS: FilterField[] = ['models', 'time'];
 
 const Inspiration: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isViet = i18n.language?.toLowerCase().startsWith('vi');
   const location = useLocation();
   const dispatch = useDispatch();
   const { columns, setColumns } = useLayoutStore();
@@ -277,56 +283,85 @@ const Inspiration: React.FC = () => {
   return (
     <>
       <CustomDragPreview />
-      <VStack spacing={0} h="full" w="full" bg="bg.canvas">
-        <Tabs index={selectedTabIndex} onChange={handleTabChange} variant="unstyled" px={4} pt={4} pb={0} w="full">
-          <Flex direction="row" align="center" justify="space-between" w="full" gap={2}>
-            <Flex direction="row" align="center" gap={2}>
-              <FilterButton
-                label={translatorCommonNS('all')}
-                onClick={() => handleTypeFilterChange('')}
-                isActive={!savedFilters.type}
-              />
-              {TYPE_FILTER_OPTIONS.map((type) => {
-                const isActive = savedFilters.type === type;
-                return (
-                  <FilterButton
-                    key={type}
-                    label={translatorCommonNS(type)}
-                    onClick={() => handleTypeFilterChange(type)}
-                    isActive={isActive}
-                  />
-                );
-              })}
-              <Box position="relative" ref={filterRef}>
-                <FilterButton
-                  label={filterButtonLabel}
-                  onClick={handleFilterOpen}
-                  isActive={isFilterButtonActive}
-                  justifyContent="space-between"
-                  rightIcon={
-                    <Box as="span" display="inline-flex">
-                      <ChevronDownIcon size={16} />
-                    </Box>
-                  }
-                />
-                {isFilterOpen && (
-                  <Box position="absolute" top="100%" left={0} zIndex={50} mt={2}>
-                    <FilterModal
-                      onApplyFilter={handleApplyFilter}
-                      onResetFilters={handleResetFilters}
-                      onCancel={handleFilterClose}
-                      initialFilters={savedFilters}
-                      filterFields={FILTER_MODAL_FIELDS}
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Flex>
-            <Flex direction="row" align="center" gap={2}>
-              <GridSwitcher columns={columns} onChange={handleColChange} />
-            </Flex>
+      <VStack spacing={0} h="full" w="full" minH={0} flex={1} bg="bg.canvas">
+        {/* Futuristic Inspiration Hero Banner */}
+        <Box px={6} pt={5} pb={3} w="full">
+          <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align={{ base: 'start', md: 'center' }} gap={4}>
+            <Box>
+              <Flex align="center" gap={2} mb={1}>
+                <Box
+                  px={2}
+                  py={0.5}
+                  rounded="full"
+                  bg={useColorModeValue('rgba(127, 86, 217, 0.08)', 'rgba(139, 92, 246, 0.15)')}
+                  border="1px solid"
+                  borderColor={useColorModeValue('rgba(127, 86, 217, 0.25)', 'rgba(168, 85, 247, 0.3)')}
+                  fontSize="2xs"
+                  fontWeight="700"
+                  color="brand.400"
+                  letterSpacing="0.06em"
+                  textTransform="uppercase"
+                >
+                  ✦ Neural Community Gallery
+                </Box>
+              </Flex>
+              <Heading fontSize={{ base: 'xl', md: '2xl' }} fontWeight="700" letterSpacing="-0.02em" color="text.primary">
+                {isViet ? 'Khám Phá Cảm Hứng Sáng Tạo' : 'Inspiration & Community Showcase'}
+              </Heading>
+              <Text fontSize="xs" color="text.muted" mt={0.5}>
+                {isViet 
+                  ? 'Tuyển tập các tác phẩm thế hệ mới từ hệ thống AI Studio Bobby, sẵn sàng sao chép prompt và remix.' 
+                  : 'Curated neural generations, hyper-realistic renders, and prompt recipes ready to remix.'}
+              </Text>
+            </Box>
           </Flex>
-        </Tabs>
+        </Box>
+
+        {/* Creative Filter Bar */}
+        <Flex direction="row" align="center" justify="space-between" w="full" px={6} py={2} gap={3} flexWrap="wrap">
+          <Flex direction="row" align="center" gap={2} flexWrap="wrap">
+            {CREATIVE_CATEGORIES.map((cat) => {
+              const isActive = (savedFilters.type || '') === cat.id;
+              return (
+                <FilterButton
+                  key={cat.id}
+                  label={isViet ? cat.labelVi : cat.labelEn}
+                  onClick={() => handleTypeFilterChange(cat.id)}
+                  isActive={isActive}
+                />
+              );
+            })}
+
+            <Box position="relative" ref={filterRef}>
+              <FilterButton
+                label={filterButtonLabel}
+                onClick={handleFilterOpen}
+                isActive={isFilterButtonActive}
+                justifyContent="space-between"
+                rightIcon={
+                  <Box as="span" display="inline-flex">
+                    <ChevronDownIcon size={16} />
+                  </Box>
+                }
+              />
+              {isFilterOpen && (
+                <Box position="absolute" top="100%" left={0} zIndex={50} mt={2}>
+                  <FilterModal
+                    onApplyFilter={handleApplyFilter}
+                    onResetFilters={handleResetFilters}
+                    onCancel={handleFilterClose}
+                    initialFilters={savedFilters}
+                    filterFields={FILTER_MODAL_FIELDS}
+                  />
+                </Box>
+              )}
+            </Box>
+          </Flex>
+
+          <Flex direction="row" align="center" gap={2}>
+            <GridSwitcher columns={columns} onChange={handleColChange} />
+          </Flex>
+        </Flex>
 
         <Box height="full" width="full" pt={4} px={4} display="flex" flexDirection="column" minHeight={0} bg="bg.canvas">
           <Box
@@ -334,12 +369,6 @@ const Inspiration: React.FC = () => {
             flex="1"
             overflowY="auto"
             minHeight={0}
-            sx={{
-              '&::-webkit-scrollbar': {
-                display: 'none',
-              },
-              scrollbarWidth: 'none',
-            }}
             onScroll={(e) => {
               const target = e.target as HTMLElement;
               const scrollTop = target.scrollTop;

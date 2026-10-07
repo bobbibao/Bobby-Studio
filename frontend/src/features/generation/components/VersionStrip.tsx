@@ -44,17 +44,20 @@ export function VersionStrip({ versions, selectedJobId, onSelect }: VersionStrip
                   aria-label={t('versions.item_label', { label, state: saved ? t('result.saved') : t('result.unsaved') })}
                   onClick={() => onSelect(version.job.jobId)}
                   position="relative"
-                  w="84px"
+                  w="88px"
                   textAlign="start"
-                  borderRadius="10px"
+                  borderRadius="14px"
                   borderWidth="2px"
-                  borderColor={selected ? 'brand.600' : 'border.default'}
-                  p={1}
+                  borderColor={selected ? 'brand.500' : 'border.default'}
+                  boxShadow={selected ? '0 0 15px rgba(127, 86, 217, 0.4)' : 'none'}
+                  transform={selected ? 'translateY(-1px)' : 'none'}
+                  p={1.5}
                   bg="bg.surface"
+                  transition="all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
                   _focusVisible={focusRing}
-                  _hover={{ borderColor: selected ? 'brand.600' : 'zinc.400' }}
+                  _hover={{ borderColor: selected ? 'brand.500' : 'brand.300', transform: 'translateY(-1px)' }}
                 >
-                  <Box w="100%" h="60px" borderRadius="6px" overflow="hidden" bg="bg.muted" display="flex" alignItems="center" justifyContent="center">
+                  <Box w="100%" h="64px" borderRadius="10px" overflow="hidden" bg="bg.muted" display="flex" alignItems="center" justifyContent="center">
                     {unavailable ? (
                       <ImageOff size={18} aria-hidden="true" />
                     ) : (

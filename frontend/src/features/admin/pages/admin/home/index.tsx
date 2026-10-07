@@ -1,13 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { FilterButton } from '@/components/FilterButton';
 import { GridSwitcher } from '@/components/GridSwitcher';
-import { Box, Flex, Heading, Button, SimpleGrid, useBreakpointValue, Tab, TabList, Tabs, Skeleton, useBoolean } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Button, SimpleGrid, useBreakpointValue, Tab, TabList, Tabs, Skeleton, useBoolean } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import QuickActionCard from '../ai-design/components/QuickActionCard';
 import PhotoIcon from '@/shared/icons/PhotoIcon';
 import ImageCard from '@/shared/card/ImageCard';
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, Sparkles } from 'lucide-react';
+import MorphIcon from '@/components/common/MorphIcon';
+import FolderIcon from '@/shared/icons/FolderIcon';
 import { HistoryAPI } from '@/actions/history';
 import { useImageNavigation } from '@/hooks/useImageNavigation';
 import FilterModal from '../inspiration/components/FilterDialog/FilterDialog';
@@ -24,8 +26,13 @@ import { countActiveFilters, FilterField } from '@/utils/filterUtils';
 import { useAuth } from '@/common/context/useAuthContext';
 import { ModalTutorialVideo } from './components/ModalTutorialVideo';
 
-const TYPE_FILTER_OPTIONS = ['exterior', 'interior'] as const;
-type TypeFilterSelection = (typeof TYPE_FILTER_OPTIONS)[number] | '';
+const CREATIVE_HOME_STYLES = [
+  { id: '', labelEn: 'All Creations', labelVi: 'Tất Cả' },
+  { id: 'photorealism', labelEn: 'Photorealism', labelVi: 'Siêu Thực' },
+  { id: 'cinematic', labelEn: 'Cinematic', labelVi: 'Điện Ảnh' },
+  { id: 'concept', labelEn: 'Concept Art', labelVi: 'Concept Art' },
+] as const;
+type TypeFilterSelection = string;
 
 const FILTER_MODAL_FIELDS: FilterField[] = ['models', 'time'];
 
@@ -66,7 +73,8 @@ const HomeGridSkeleton: React.FC<{ columns: number }> = ({ columns }) => {
 };
 
 const Home: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isViet = i18n.language?.toLowerCase().startsWith('vi');
   const { user } = useAuthentication();
   const { columns, setColumns } = useLayoutStore();
   
@@ -80,16 +88,39 @@ const Home: React.FC = () => {
   }> = [
     {
       title: 'bobby_ai_studio',
-      icon: <PhotoIcon />,
+      icon: <MorphIcon type="sparkle" size={22} />,
       linkTo: '/generate',
+      badgeLabel: 'Core',
     },
-    // Disabled — re-enable when canvas is ready
-    // {
-    //   title: 'canvas',
-    //   icon: <CanvasIcon />,
-    //   linkTo: '/generate?tab=canvas&mode=generate',
-    //   isNew: true,
-    // },
+    {
+      title: 'ai_models',
+      icon: <MorphIcon type="model" size={22} />,
+      linkTo: '/models',
+      isNew: true,
+      badgeLabel: 'New',
+    },
+    {
+      title: 'prompt_matrix',
+      icon: <MorphIcon type="prompt" size={22} />,
+      linkTo: '/prompts',
+      badgeLabel: 'Magic',
+    },
+    {
+      title: 'creative_lab',
+      icon: <MorphIcon type="lab" size={22} />,
+      linkTo: '/lab',
+      badgeLabel: 'Beta',
+    },
+    {
+      title: 'inspiration',
+      icon: <PhotoIcon active={false} />,
+      linkTo: '/inspiration',
+    },
+    {
+      title: 'projects',
+      icon: <FolderIcon active={false} />,
+      linkTo: '/projects',
+    },
   ];
 
   const itemsPerRowTop = useBreakpointValue({ base: 1, md: 2, lg: 3, xl: 6 }) || 6;
@@ -283,28 +314,163 @@ const Home: React.FC = () => {
   };
 
   return (
-    <Flex direction="column" h="100%" flex={1} overflow="hidden" pt={0} bg="bg.canvas">
+    <Flex direction="column" h="100%" flex={1} minH={0} overflow="hidden" pt={0} bg="bg.canvas">
       <Box
         overflowY="auto"
         flex={1}
+        minH={0}
         pb={6}
-        sx={{
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
-          scrollbarWidth: 'none',
-        }}
       >
-        <Flex justify="space-between" align="center" mb={4} mt={6} px={4}>
-          <Heading as="h1" fontSize="2xl" fontWeight="semibold" textAlign="left" color="text.primary">
-            {t('common:hello_user', { name: user?.firstName || user?.username || '' })}
-          </Heading>
-          {/* Disabled — ai-design page is turned off
-          <FilterButton as={RouterLink} to="/ai-design" label={t('common:more')} isActive={false} minW="auto" px={4} />
-          */}
-        </Flex>
+        {/* Futuristic Hero Banner */}
+        <Box px={4} pt={4} pb={2}>
+          <Box
+            position="relative"
+            overflow="hidden"
+            borderRadius="24px"
+            p={{ base: 6, md: 8 }}
+            bg="linear-gradient(135deg, rgba(127, 86, 217, 0.16) 0%, rgba(6, 182, 212, 0.10) 50%, rgba(15, 23, 42, 0.05) 100%)"
+            border="1px solid"
+            borderColor="border.subtle"
+            boxShadow="0 20px 40px -15px rgba(127, 86, 217, 0.15)"
+            _dark={{
+              bg: 'linear-gradient(135deg, rgba(127, 86, 217, 0.22) 0%, rgba(6, 182, 212, 0.14) 45%, rgba(11, 13, 20, 0.8) 100%)',
+              borderColor: 'rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            {/* Ambient decorative glow */}
+            <Box
+              position="absolute"
+              top="-40px"
+              right="-40px"
+              w="260px"
+              h="260px"
+              borderRadius="full"
+              bg="brand.500"
+              filter="blur(80px)"
+              opacity={0.25}
+              pointerEvents="none"
+            />
+            <Box
+              position="absolute"
+              bottom="-30px"
+              left="30%"
+              w="200px"
+              h="200px"
+              borderRadius="full"
+              bg="cyan.400"
+              filter="blur(70px)"
+              opacity={0.15}
+              pointerEvents="none"
+            />
 
-        <Box px={4} mb={8}>
+            <Flex
+              direction={{ base: 'column', md: 'row' }}
+              justify="space-between"
+              align={{ base: 'flex-start', md: 'center' }}
+              gap={6}
+              position="relative"
+              zIndex={1}
+            >
+              <Box maxW="640px">
+                <Flex align="center" gap={2} mb={3}>
+                  <Box
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    bg="rgba(127, 86, 217, 0.2)"
+                    color="brand.300"
+                    border="1px solid"
+                    borderColor="rgba(127, 86, 217, 0.3)"
+                    display="inline-flex"
+                    alignItems="center"
+                    gap={1.5}
+                  >
+                    <Sparkles size={13} />
+                    <span>Bobby Studio Next-Gen</span>
+                  </Box>
+                  <Box
+                    px={2.5}
+                    py={1}
+                    borderRadius="full"
+                    fontSize="2xs"
+                    fontWeight="bold"
+                    letterSpacing="wider"
+                    textTransform="uppercase"
+                    bg="cyan.500"
+                    color="white"
+                  >
+                    AI 2.0
+                  </Box>
+                </Flex>
+
+                <Heading
+                  as="h1"
+                  fontSize={{ base: '2xl', md: '3xl' }}
+                  fontWeight="bold"
+                  letterSpacing="-0.02em"
+                  color="text.primary"
+                  lineHeight="1.2"
+                  mb={2}
+                >
+                  {t('common:hello_user', { name: user?.firstName || user?.username || '' })}
+                </Heading>
+
+                <Text color="text.secondary" fontSize={{ base: 'sm', md: 'md' }} lineHeight="1.6">
+                  {t('dashboard:hero_subtitle', {
+                    defaultValue: 'Create ultra-photorealistic renders, transform architectural spaces, and ideate at the speed of thought with state-of-the-art AI models.',
+                  })}
+                </Text>
+              </Box>
+
+              <Flex gap={3} flexWrap="wrap" align="center">
+                <Button
+                  as={RouterLink}
+                  to="/generate"
+                  variant="gradient"
+                  size="lg"
+                  h="48px"
+                  px={6}
+                  borderRadius="14px"
+                  leftIcon={<Sparkles size={18} />}
+                  boxShadow="0 10px 25px -5px rgba(127, 86, 217, 0.45)"
+                  _hover={{
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 14px 28px -4px rgba(127, 86, 217, 0.55)',
+                  }}
+                  _active={{ transform: 'translateY(0)' }}
+                >
+                  {t('common:start_creating', { defaultValue: 'Launch Studio' })}
+                </Button>
+                <Button
+                  as={RouterLink}
+                  to="/inspiration"
+                  variant="outline"
+                  size="lg"
+                  h="48px"
+                  px={5}
+                  borderRadius="14px"
+                  color="text.primary"
+                  borderColor="border.subtle"
+                  bg="rgba(255, 255, 255, 0.05)"
+                  backdropFilter="blur(10px)"
+                  _hover={{
+                    bg: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: 'border.focus',
+                    transform: 'translateY(-2px)',
+                  }}
+                  _active={{ transform: 'translateY(0)' }}
+                >
+                  {t('navigation:inspiration', { defaultValue: 'Explore Inspiration' })}
+                </Button>
+              </Flex>
+            </Flex>
+          </Box>
+        </Box>
+
+        <Box px={4} mb={6} mt={4}>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 6 }} spacing={4}>
             {displayedQuickActions.map((action, index) => (
               <QuickActionCard key={index} title={action.title} icon={action.icon} linkTo={action.linkTo} isNew={action.isNew} badgeLabel={action.badgeLabel} />
@@ -335,13 +501,13 @@ const Home: React.FC = () => {
                 onClick={() => handleTypeFilterChange('')}
                 isActive={!savedFilters.type}
               />
-              {TYPE_FILTER_OPTIONS.map((type) => {
-                const isActive = savedFilters.type === type;
+              {CREATIVE_HOME_STYLES.map((style) => {
+                const isActive = (savedFilters.type || '') === style.id;
                 return (
                   <FilterButton
-                    key={type}
-                    label={translatorCommonNS(type)}
-                    onClick={() => handleTypeFilterChange(type)}
+                    key={style.id}
+                    label={isViet ? style.labelVi : style.labelEn}
+                    onClick={() => handleTypeFilterChange(style.id)}
                     isActive={isActive}
                   />
                 );

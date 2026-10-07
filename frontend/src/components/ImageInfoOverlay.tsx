@@ -48,13 +48,12 @@ const ImageInfoOverlay: React.FC<ImageInfoOverlayProps> = ({
       year: 'numeric',
     });
 
-    // Format time based on language (24-hour for German and Vietnamese, 12-hour for others)
-    const isGerman = currentLanguage.toLowerCase().startsWith('de');
+    // Format time based on language (24-hour for Vietnamese, 12-hour for others)
     const isViet = currentLanguage.toLowerCase().startsWith('vi');
-    const formattedTime = date.toLocaleTimeString(isGerman || isViet ? 'de-DE' : 'en-US', {
+    const formattedTime = date.toLocaleTimeString(isViet ? 'vi-VN' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: !(isGerman || isViet),
+      hour12: !isViet,
     });
 
     // Check if it's today

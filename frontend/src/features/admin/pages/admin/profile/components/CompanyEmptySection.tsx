@@ -8,44 +8,88 @@ interface CompanyEmptySectionProps {
 }
 
 const CompanyEmptySection: React.FC<CompanyEmptySectionProps> = ({ onAction }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const translatorProfileNS = (key: string) => t(`profile:${key}`);
-  const navigate = useNavigate();
-  const iconBg = useColorModeValue('zinc.100', 'zinc.800');
-  const iconColor = useColorModeValue('zinc.600', 'zinc.400');
-  const buttonBg = useColorModeValue('black', 'white');
-  const buttonColor = useColorModeValue('white', 'black');
-  const buttonHoverBg = useColorModeValue('zinc.800', 'zinc.100');
+  const isViet = i18n.language?.toLowerCase().startsWith('vi');
+
+  const cardBg = useColorModeValue('rgba(255, 255, 255, 0.8)', 'rgba(15, 17, 26, 0.7)');
+  const cardBorder = useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(255, 255, 255, 0.08)');
   
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" h="calc(100vh - 210px)">
-      <VStack spacing={4} textAlign="center">
-        {/* Icon */}
-        <Box p={4} bg={iconBg} borderRadius="xl">
-          <Box as={FaBuilding} color={iconColor} fontSize="4xl" />
+    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minH="500px" py={12} px={4}>
+      <Box
+        maxW="540px"
+        w="full"
+        p={8}
+        borderRadius="24px"
+        bg={cardBg}
+        backdropFilter="blur(20px)"
+        border="1px solid"
+        borderColor={cardBorder}
+        boxShadow="0 24px 48px -12px rgba(0, 0, 0, 0.15)"
+        textAlign="center"
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+      >
+        {/* Futuristic Icon Container */}
+        <Box
+          p={5}
+          borderRadius="2xl"
+          bg={useColorModeValue('rgba(127, 86, 217, 0.08)', 'rgba(139, 92, 246, 0.15)')}
+          border="1px solid"
+          borderColor={useColorModeValue('rgba(127, 86, 217, 0.25)', 'rgba(168, 85, 247, 0.35)')}
+          boxShadow="0 0 24px rgba(127, 86, 217, 0.25)"
+          mb={5}
+        >
+          <Box as={FaBuilding} color="brand.400" fontSize="3xl" />
+        </Box>
+
+        <Box
+          px={3}
+          py={1}
+          rounded="full"
+          bg={useColorModeValue('rgba(127, 86, 217, 0.08)', 'rgba(139, 92, 246, 0.15)')}
+          border="1px solid"
+          borderColor={useColorModeValue('rgba(127, 86, 217, 0.25)', 'rgba(168, 85, 247, 0.3)')}
+          fontSize="2xs"
+          fontWeight="700"
+          color="brand.400"
+          letterSpacing="0.06em"
+          textTransform="uppercase"
+          mb={3}
+        >
+          ✦ Enterprise Organization
         </Box>
 
         {/* Text */}
-        <Text fontSize="xl" fontWeight="semibold" color={useColorModeValue('zinc.900', 'white')}>
+        <Text fontSize="xl" fontWeight="700" color="text.primary" letterSpacing="-0.01em" mb={2}>
           {translatorProfileNS('you_are_using_a_personal_account')}
         </Text>
-        <Text color={useColorModeValue('zinc.600', 'zinc.400')}>
+        <Text fontSize="sm" color="text.muted" maxW="400px" mb={6} lineHeight="1.6">
           {translatorProfileNS('create_a_company_account_to_unlock_business_tools')}
         </Text>
 
-        {/* Button */}
+        {/* Action Button */}
         <Button
           onClick={() => onAction('CREATE_COMPANY_PROFILE')}
-          bg={buttonBg}
-          color={buttonColor}
-          px={6}
-          py={2}
-          borderRadius="md"
-          _hover={{ bg: buttonHoverBg }}
+          background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+          color="white"
+          px={8}
+          h={11}
+          borderRadius="full"
+          fontSize="sm"
+          fontWeight="700"
+          _hover={{
+            opacity: 0.92,
+            transform: 'translateY(-2px)',
+            boxShadow: '0 10px 24px -4px rgba(127, 86, 217, 0.4)',
+          }}
+          transition="all 0.25s ease"
         >
           {translatorProfileNS('create_company_account')}
         </Button>
-      </VStack>
+      </Box>
     </Box>
   );
 }

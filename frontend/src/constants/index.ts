@@ -103,7 +103,7 @@ export const OPTIONS_ORDERS = (t: (key: string) => string) => [
 
 export const languageOptions = [
   { value: 'en', label: 'English', shortLabel: 'ENG' },
-  { value: 'de', label: 'Deutsch (German)', shortLabel: 'DE' },
   { value: 'vi', label: 'Tiếng Việt (Vietnamese)', shortLabel: 'VI' },
 ];
+
 

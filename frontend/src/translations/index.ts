@@ -36,7 +36,7 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    supportedLngs: ['en', 'vi', 'de'],
+    supportedLngs: ['en', 'vi'],
     load: 'languageOnly',
     ns: namespaces,
     defaultNS: 'common',

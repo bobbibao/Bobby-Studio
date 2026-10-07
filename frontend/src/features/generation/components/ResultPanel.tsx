@@ -13,6 +13,7 @@ import { StatusChip } from './StatusChip';
 import { focusRing, panelStyle, touchSize } from './styles';
 import { useExpired } from './useExpiry';
 import { ZoomableImage } from './ZoomableImage';
+import LottieAnimation from '@/components/common/LottieAnimation';
 
 export interface ResultPanelProps {
   displayed: VersionView | null;
@@ -211,8 +212,10 @@ export function ResultPanel({ displayed, activeJob, latestFailure, freshness, up
         ) : displayed && !snapshot ? (
           <Skeleton minH={{ base: '240px', md: '300px' }} h="100%" borderRadius="12px" />
         ) : jobRunning ? (
-          <Flex direction="column" gap={3} minH={{ base: '240px', md: '300px' }} justify="center" align="center" bg="bg.muted" borderRadius="12px" p={4}>
-            <Skeleton w="60%" h="120px" borderRadius="10px" />
+          <Flex direction="column" gap={3} minH={{ base: '240px', md: '300px' }} justify="center" align="center" bg="bg.muted" borderRadius="16px" p={4}>
+            <Box w="80px" h="80px">
+              <LottieAnimation name="ai-loading" width="80px" height="80px" />
+            </Box>
             <Flex align="center" gap={2}>
               <SpinIcon />
               <Text fontSize="sm" fontWeight="medium">
@@ -221,8 +224,10 @@ export function ResultPanel({ displayed, activeJob, latestFailure, freshness, up
             </Flex>
           </Flex>
         ) : (
-          <Flex direction="column" align="center" justify="center" textAlign="center" gap={2} minH={{ base: '240px', md: '300px' }} bg="bg.muted" borderRadius="12px" p={4} color="text.muted">
-            <ImageIcon size={32} aria-hidden="true" />
+          <Flex direction="column" align="center" justify="center" textAlign="center" gap={2} minH={{ base: '240px', md: '300px' }} bg="bg.muted" borderRadius="16px" p={6} color="text.muted">
+            <Box w="70px" h="70px" mb={1}>
+              <LottieAnimation name="ai-twinkle" width="70px" height="70px" />
+            </Box>
             <Text fontWeight="semibold" color="text.primary">
               {t('result.empty_title')}
             </Text>

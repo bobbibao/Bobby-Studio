@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Flex, Box, HStack } from '@chakra-ui/react';
+import { Flex, Box, HStack, Heading, Text, useColorModeValue } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingPage from '@/components/LoadingPage';
 import ImageCard from '@/shared/card/ImageCard';
@@ -19,10 +19,11 @@ import { GridSwitcher } from '@/components/GridSwitcher';
 import { countActiveFilters, FilterField } from '@/utils/filterUtils';
 
 const FAVORITE_TABS = ['My Favorites', 'Liked Images'];
-const FILTER_MODAL_FIELDS: FilterField[] = ['models', 'type', 'time'];
+const FILTER_MODAL_FIELDS: FilterField[] = ['models', 'time'];
 
 const Favorite: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isViet = i18n.language?.toLowerCase().startsWith('vi');
 
   const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
   const { columns, setColumns } = useLayoutStore();
@@ -225,11 +226,44 @@ const Favorite: React.FC = () => {
         mb={0}
         bg="bg.canvas"
       >
+        {/* Futuristic Favorites Hero Banner */}
+        <Box px={2} pt={2} pb={1} w="full">
+          <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align={{ base: 'start', md: 'center' }} gap={4}>
+            <Box>
+              <Flex align="center" gap={2} mb={1}>
+                <Box
+                  px={2}
+                  py={0.5}
+                  rounded="full"
+                  bg={useColorModeValue('rgba(236, 72, 153, 0.08)', 'rgba(236, 72, 153, 0.15)')}
+                  border="1px solid"
+                  borderColor={useColorModeValue('rgba(236, 72, 153, 0.25)', 'rgba(236, 72, 153, 0.3)')}
+                  fontSize="2xs"
+                  fontWeight="700"
+                  color="pink.400"
+                  letterSpacing="0.06em"
+                  textTransform="uppercase"
+                >
+                  ❤️ Curated Masterpieces
+                </Box>
+              </Flex>
+              <Heading fontSize={{ base: 'xl', md: '2xl' }} fontWeight="700" letterSpacing="-0.02em" color="text.primary">
+                {isViet ? 'Bộ Sưu Tập Tác Phẩm Yêu Thích' : 'Saved Creations & Favorites'}
+              </Heading>
+              <Text fontSize="xs" color="text.muted" mt={0.5}>
+                {isViet 
+                  ? 'Kho lưu trữ các hình ảnh bạn đã gắn sao và đánh dấu lưu lại từ Studio hoặc cộng đồng sáng tạo.' 
+                  : 'Your personal vault of starred generation outputs and bookmarked community masterpieces.'}
+              </Text>
+            </Box>
+          </Flex>
+        </Box>
+
         <Flex direction="row" align="center" justify="space-between" w="full" gap={2}>
           <HStack spacing={2}>
-                  {FAVORITE_TABS.map((item, index) => (
+            {FAVORITE_TABS.map((item, index) => (
               <FilterButton
-                      key={index}
+                key={index}
                 label={t(`favorite:${item.toLocaleLowerCase().replace(/ /g, '_')}`)}
                 onClick={() => handleTabChange(index)}
                 isActive={selectedTabIndex === index}

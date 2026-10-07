@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Divider, Text, Flex, useColorModeValue, useColorMode, Badge, Button } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { capitalize } from '@/utils';
+import { formatCurrency } from '@/utils/currency';
 import { getPlanChangeType } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
 import { SubscriptionResponseDtoV2 } from '@/features/admin/pages/admin/profile/types/subscriptionResponse.dto';
 
@@ -41,7 +42,8 @@ interface PricingCardProps {
 
 export const PricingCard: React.FC<PricingCardProps> = React.memo(
   ({ plan, isBestValue, intervalLabel, currentSubscription, onPurchase, onCancelPlan }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isViet = i18n.language?.toLowerCase().startsWith('vi');
     const translatorProfileNS = (key: string, options?: Record<string, any>) =>
       t(`profile:${key}`, options);
     const { colorMode } = useColorMode();
@@ -250,24 +252,30 @@ export const PricingCard: React.FC<PricingCardProps> = React.memo(
               letterSpacing="-0.02em"
               color={textColor}
             >
-              CHF {isFree ? '0' : Math.round(planData.price)}
+              {isFree ? (isViet ? '0 đ' : '$0') : formatCurrency(Math.round(planData.price), i18n.language)}
             </Text>
             <Text fontSize="sm" color={mutedTextColor} ml={1}>
-              {isTeamPlan ? '/ User / Mt.' : '/ Mt.'}
+              {isTeamPlan
+                ? isViet ? '/ người / tháng' : '/ user / mo'
+                : isViet ? '/ tháng' : '/ mo'}
             </Text>
           </Flex>
 
           {/* Total for Team plan */}
           {isTeamPlan && planData.totalPrice && (
             <Text fontSize="sm" color={mutedTextColor} mt={0.5}>
-              Total: CHF {Math.round(planData.totalPrice)} / Mt.
+              {isViet ? 'Tổng cộng: ' : 'Total: '}
+              {formatCurrency(Math.round(planData.totalPrice), i18n.language)}
+              {isViet ? ' / tháng' : ' / mo'}
             </Text>
           )}
 
           {/* Savings text (only for yearly) */}
           {!isFree && intervalLabel === 'yearly' && planData.savings > 0 && (
             <Text fontSize="sm" color={savingsColor} fontWeight="medium" mt={0.5}>
-              Sparen Sie CHF {planData.savings}/Jahr
+              {isViet ? 'Tiết kiệm ' : 'Save '}
+              {formatCurrency(planData.savings, i18n.language)}
+              {isViet ? ' / năm' : ' / year'}
             </Text>
           )}
         </Box>

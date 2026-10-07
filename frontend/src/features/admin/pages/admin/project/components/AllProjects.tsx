@@ -1,4 +1,4 @@
-import { Box, Flex, HStack, Button as ChakraButton, Tooltip } from '@chakra-ui/react';
+import { Box, Flex, HStack, Button as ChakraButton, Tooltip, Heading, Text, useColorModeValue } from '@chakra-ui/react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Empty from '@/components/Empty';
 import { CreateProjectParams } from '@/types';
@@ -55,7 +55,8 @@ const AllProjects: React.FC<AllProjectsProps> = ({
   projectLimitMessage = '',
   onUpgradeClick,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isViet = i18n.language?.toLowerCase().startsWith('vi');
   const translatorCommonNS = (key: string) => t(`common:${key}`);
 
   const assignedProjectImage = useSelector(projectImagesSelector);
@@ -206,6 +207,39 @@ const AllProjects: React.FC<AllProjectsProps> = ({
 
   return (
     <Box w="full">
+      {/* Futuristic Project Vault Hero Banner */}
+      <Box pt={1} pb={4} w="full">
+        <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align={{ base: 'start', md: 'center' }} gap={4}>
+          <Box>
+            <Flex align="center" gap={2} mb={1}>
+              <Box
+                px={2}
+                py={0.5}
+                rounded="full"
+                bg={useColorModeValue('rgba(127, 86, 217, 0.08)', 'rgba(139, 92, 246, 0.15)')}
+                border="1px solid"
+                borderColor={useColorModeValue('rgba(127, 86, 217, 0.25)', 'rgba(168, 85, 247, 0.3)')}
+                fontSize="2xs"
+                fontWeight="700"
+                color="brand.400"
+                letterSpacing="0.06em"
+                textTransform="uppercase"
+              >
+                ✦ Neural Asset Vault
+              </Box>
+            </Flex>
+            <Heading fontSize={{ base: 'xl', md: '2xl' }} fontWeight="700" letterSpacing="-0.02em" color="text.primary">
+              {isViet ? 'Quản Lý Dự Án & Không Gian Sáng Tạo' : 'Projects & Asset Workspace'}
+            </Heading>
+            <Text fontSize="xs" color="text.muted" mt={0.5}>
+              {isViet
+                ? 'Lưu trữ các phiên tạo hình AI, thư mục moodboard và bộ sưu tập tác phẩm chất lượng cao.'
+                : 'Organize generation sessions, asset iterations, and multi-prompt collections.'}
+            </Text>
+          </Box>
+        </Flex>
+      </Box>
+
       <Flex align="center" justify="space-between" w="full" mb={4}>
         <ViewSwitcher view={selectedViewOption} onChange={handleViewChange} />
 
@@ -232,17 +266,26 @@ const AllProjects: React.FC<AllProjectsProps> = ({
 
           <Tooltip isDisabled={canCreateProject} label={projectLimitMessage} hasArrow placement="top">
             <ChakraButton
-              variant="secondary"
+              bg="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+              color="white"
+              _hover={{
+                filter: 'brightness(1.1)',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 14px rgba(127, 86, 217, 0.4)',
+              }}
+              _active={{ transform: 'translateY(0)' }}
               leftIcon={<AddIconThin />}
               onClick={() => setOpenModal(true)}
               size="sm"
+              borderRadius="xl"
+              boxShadow="0 2px 10px rgba(127, 86, 217, 0.3)"
               isDisabled={!canCreateProject}
             >
               {translatorCommonNS('create_project')}
             </ChakraButton>
           </Tooltip>
           {!canCreateProject && onUpgradeClick && (
-            <ChakraButton variant="primary" size="sm" onClick={onUpgradeClick}>
+            <ChakraButton variant="primary" size="sm" borderRadius="xl" onClick={onUpgradeClick}>
               {translatorCommonNS('upgrade')}
             </ChakraButton>
           )}

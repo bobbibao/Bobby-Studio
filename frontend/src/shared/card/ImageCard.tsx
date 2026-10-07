@@ -364,11 +364,16 @@ const ImageCard: React.FC<{
       w="full"
       overflow="hidden"
       position="relative"
-      borderRadius="lg"
+      borderRadius="16px"
       className="group cursor-pointer"
       data-id={id}
       ref={drag}
       opacity={isDragging ? 0.5 : 1}
+      transition="all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+      _hover={{
+        transform: 'translateY(-2px)',
+        boxShadow: '0 14px 32px -8px rgba(0, 0, 0, 0.35)',
+      }}
       onClick={() => {
         if (handleOnClick) {
           handleOnClick();

@@ -26,7 +26,7 @@ const Step1: React.FC = () => {
       label: 'what_best_describes_your_role',
       options: [
         { value: 'Architect', label: 'architect' },
-        { value: 'Interior Designer', label: 'interior_designer' },
+        { value: 'Creative Visualizer', label: 'creative_visualizer' },
         { value: 'Project Manager', label: 'project_manager' },
         { value: 'Design Student', label: 'design_student' },
         { value: 'Others', label: 'others' },

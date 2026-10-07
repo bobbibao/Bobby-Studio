@@ -27,6 +27,7 @@ import StripeIcon from '@/shared/icons/StripeIcon';
 import { StripePrice } from '@/features/admin/pages/admin/profile/types/stripePricingResponse.dto';
 import { useQueryParamsURL } from '@/hooks/useQueryParamsURL';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency';
 
 type PaymentMethod = 'visa' | 'mastercard' | 'stripe';
 const DefaultPaymentMethod = 'stripe';
@@ -101,7 +102,7 @@ const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export default function PaymentDetail() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const translatorProfileNS = (key: string) => t(`profile:${key}`);
   const translatorNotificationNS = (key: string) => t(`notification:${key}`);
 
@@ -288,41 +289,16 @@ export default function PaymentDetail() {
                     :
                   </Text>
                   <Text id="price-1" color={colors.price} {...FONTS.price} _dark={{ color: COLORS.LIGHT_TEXT }}>
-                    CHF{price ? ((price.unit_amount ?? 0) / 100).toFixed(2) : t('common:loading')}
+                    {price ? formatCurrency((price.unit_amount ?? 0) / 100, i18n.language) : t('common:loading')}
                   </Text>
                 </HStack>
-                {/*<HStack w="full" justify="space-between">
-                  <Text
-                    id="subtitle-cost2"
-                    color={colors.subtitle}
-                    {...FONTS.subtitle}
-                  >
-                    Add discount:
-                  </Text>
-                  <Text color={colors.price} {...FONTS.price}></Text>
-                </HStack>
-                <HStack w="full" justify="space-between">
-                  <Text
-                    id="subtitle-cost2"
-                    color={colors.subtitle}
-                    {...FONTS.subtitle}
-                  >
-                    VAT (10%):
-                  </Text>
-                  <Text id="price-2" color={colors.price} {...FONTS.price}>
-                    $
-                    {price
-                      ? ((price.unit_amount * 0.1) / 100).toFixed(2)
-                      : t('common:loading')}
-                  </Text>
-                </HStack> */}
                 <Divider />
                 <HStack w="full" justify="space-between">
                   <Text id="subtitle-cost3" color={colors.subtitle} {...FONTS.subtitle} _dark={{ color: '#A0A0A0' }}>
                     {translatorProfileNS('total')}:
                   </Text>
                   <Text id="price-3" color={colors.price} {...FONTS.price} _dark={{ color: COLORS.LIGHT_TEXT }}>
-                    CHF{price ? ((price.unit_amount ?? 0) / 100).toFixed(2) : t('common:loading')}
+                    {price ? formatCurrency((price.unit_amount ?? 0) / 100, i18n.language) : t('common:loading')}
                   </Text>
                 </HStack>
               </VStack>

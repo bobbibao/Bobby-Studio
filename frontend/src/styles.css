@@ -1,3 +1,180 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/space-grotesk';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --aurora-gradient: linear-gradient(135deg, #7F56D9 0%, #6366F1 40%, #06B6D4 100%);
+  --glow-shadow: 0 0 25px -5px rgba(127, 86, 217, 0.4);
+}
+
+/* Futuristic ambient background - lightweight static radial gradient (zero GPU animation cost) */
+.aurora-bg {
+  position: relative;
+  background-image: radial-gradient(circle at 85% 15%, rgba(127, 86, 217, 0.08) 0%, transparent 45%),
+                    radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.05) 0%, transparent 45%);
+}
+
+.chakra-ui-dark .aurora-bg {
+  background-image: radial-gradient(circle at 85% 15%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.07) 0%, transparent 50%);
+}
+
+/* Glassmorphism surface - crisp, lightweight 8px blur */
+.glass-surface {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.chakra-ui-dark .glass-surface {
+  background: rgba(14, 15, 22, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Cyber card with hover glowing border */
+.cyber-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  position: relative;
+}
+
+.cyber-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -8px rgba(127, 86, 217, 0.18);
+}
+
+.chakra-ui-dark .cyber-card:hover {
+  box-shadow: 0 10px 28px -8px rgba(127, 86, 217, 0.25);
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+/* Subtle glowing pulse */
+.pulse-glow {
+  box-shadow: 0 0 16px rgba(127, 86, 217, 0.4);
+}
+
+/* Smooth futuristic scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(150, 150, 160, 0.3) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 160, 0.3);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(127, 86, 217, 0.6);
+}
+
+.chakra-ui-dark *::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.chakra-ui-dark *::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.6);
+}
+
+/* CMDK Command palette styles */
+[cmdk-root] {
+  width: 100%;
+  max-width: 640px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+
+.chakra-ui-dark [cmdk-root] {
+  background: #11121a;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.12), 0 0 40px -10px rgba(127, 86, 217, 0.3);
+}
+
+[cmdk-input] {
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: inherit;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.chakra-ui-dark [cmdk-input] {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[cmdk-list] {
+  max-height: 340px;
+  overflow: auto;
+  padding: 8px;
+}
+
+[cmdk-item] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+[cmdk-item][data-selected='true'] {
+  background: #f3f4f8;
+  color: #7f56d9;
+}
+
+.chakra-ui-dark [cmdk-item][data-selected='true'] {
+  background: #1e202f;
+  color: #c4b5fd;
+}
+
+[cmdk-group-heading] {
+  padding: 8px 14px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888899;
+}
+
+[cmdk-empty] {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #888899;
+}
+
+/* High-performance hardware acceleration */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.studio-transition {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

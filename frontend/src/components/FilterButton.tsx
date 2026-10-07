@@ -9,33 +9,38 @@ interface FilterButtonProps extends ButtonProps {
 }
 
 export const FilterButton: React.FC<FilterButtonProps> = ({ isActive = false, label, ...props }) => {
-  const activeBorderColor = useColorModeValue('zinc.900', 'white');
-  const inactiveBorderColor = useColorModeValue('zinc.200', 'zinc.700');
-  const activeColor = useColorModeValue('zinc.900', 'white');
+  const activeBg = useColorModeValue('zinc.900', 'white');
+  const activeColor = useColorModeValue('white', 'zinc.950');
+  const inactiveBg = useColorModeValue('rgba(0, 0, 0, 0.03)', 'rgba(255, 255, 255, 0.04)');
+  const inactiveBorder = useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(255, 255, 255, 0.08)');
   const inactiveColor = useColorModeValue('zinc.600', 'zinc.400');
 
   return (
     <Button
       variant="outline"
       size="sm"
-      minW="120px"
-      fontWeight={isActive ? 'semibold' : 'normal'}
-      borderColor={isActive ? activeBorderColor : inactiveBorderColor}
+      minW="100px"
+      h="34px"
+      borderRadius="12px"
+      fontWeight={isActive ? '600' : '500'}
+      fontSize="xs"
       borderWidth="1px"
+      borderColor={isActive ? 'transparent' : inactiveBorder}
       color={isActive ? activeColor : inactiveColor}
-      bg="transparent"
+      bg={isActive ? activeBg : inactiveBg}
+      boxShadow={isActive ? '0 2px 10px rgba(0, 0, 0, 0.15)' : 'none'}
       _hover={{
-        bg: 'transparent',
-        borderColor: isActive ? activeBorderColor : 'zinc.400',
+        bg: isActive ? activeBg : useColorModeValue('rgba(0,0,0,0.06)', 'rgba(255,255,255,0.08)'),
+        borderColor: isActive ? 'transparent' : 'brand.400',
+        transform: 'translateY(-1px)',
       }}
       _active={{
-        bg: 'bg.subtle',
+        transform: 'translateY(0)',
       }}
-      transition="all 0.2s"
+      transition="all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
       {...props}
     >
       {label}
     </Button>
   );
 };
-

@@ -25,10 +25,11 @@ import {
 } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Menu as MenuIcon } from 'lucide-react';
+import { Menu as MenuIcon, Command, Cpu } from 'lucide-react';
 import { INSPIRATION_TABS } from '@/constants';
 import { useTranslation } from 'react-i18next';
 import HistoryMenu from './HistoryJobMenu';
+import ShortcutsModal from '@/components/common/ShortcutsModal';
 
 interface NavbarProps {
   onOpenSidenav: () => void;
@@ -57,6 +58,17 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
     isWorkspaceTab || isLinkedGenerateTab || isEditMode || isEditTab || isVideoGenerateSubmode;
 
   const [scrolled, setScrolled] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        setIsShortcutsOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const translatorCommonNS = (key: string) => t(`common:${key}`);
   const translatorNotificationNS = (key: string) => t(`notification:${key}`);
@@ -190,6 +202,68 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
       </Flex>
 
       <HStack spacing={2} mr={isMobile ? 0 : 2} position="relative" align="center" h="16">
+        {/* Command Menu quick search bar in Navbar */}
+        <Box
+          as="button"
+          type="button"
+          display={{ base: 'none', md: 'flex' }}
+          alignItems="center"
+          gap={2}
+          h="9"
+          px={3}
+          rounded="full"
+          bg={useColorModeValue('rgba(0,0,0,0.03)', 'rgba(255,255,255,0.05)')}
+          border="1px solid"
+          borderColor={useColorModeValue('rgba(0,0,0,0.07)', 'rgba(255,255,255,0.08)')}
+          color="text.muted"
+          fontSize="xs"
+          onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }))}
+          _hover={{
+            bg: useColorModeValue('rgba(127,86,217,0.08)', 'rgba(139,92,246,0.12)'),
+            borderColor: 'brand.400',
+            color: 'text.primary',
+          }}
+          transition="all 0.2s"
+        >
+          <Text as="span">Search actions...</Text>
+          <Box as="span" px={1.5} py={0.5} rounded="md" bg={useColorModeValue('white', 'zinc.800')} border="1px solid" borderColor="inherit" fontSize="10px" fontWeight="600">
+            ⌘K
+          </Box>
+        </Box>
+
+        {/* Live Engine Status indicator */}
+        <Box
+          display={{ base: 'none', lg: 'flex' }}
+          alignItems="center"
+          gap={1.5}
+          px={2.5}
+          py={1}
+          rounded="full"
+          bg={useColorModeValue('rgba(16, 185, 129, 0.08)', 'rgba(16, 185, 129, 0.12)')}
+          border="1px solid"
+          borderColor={useColorModeValue('rgba(16, 185, 129, 0.25)', 'rgba(16, 185, 129, 0.3)')}
+          fontSize="2xs"
+          fontWeight="semibold"
+          color="emerald.400"
+        >
+          <Box w="6px" h="6px" rounded="full" bg="emerald.400" />
+          <span>Core v2.0 • Online</span>
+        </Box>
+
+        {/* Keyboard Shortcuts Trigger */}
+        <IconButton
+          aria-label="Studio Shortcuts"
+          icon={<Command size={15} />}
+          size="sm"
+          variant="ghost"
+          rounded="full"
+          display={{ base: 'none', sm: 'inline-flex' }}
+          onClick={() => setIsShortcutsOpen(true)}
+          color="text.muted"
+          _hover={{ color: 'text.primary', bg: 'bg.subtle' }}
+          title="Studio Pro Shortcuts (?)"
+        />
+
         {isMobile ? (
           <IconButton
             aria-label={translatorCommonNS('workspace')}
@@ -197,11 +271,11 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
             h="10"
             w="10"
             minW="10"
-            rounded="lg"
-            bg="black"
+            rounded="xl"
+            bg="brand.600"
             color="white"
-            _dark={{ bg: 'white', color: 'black' }}
-            _hover={{ bg: 'black' }}
+            boxShadow="0 4px 14px rgba(127, 86, 217, 0.4)"
+            _hover={{ bg: 'brand.700', transform: 'scale(1.05)' }}
             onClick={handleGenerateClick}
           />
         ) : shouldUseWorkspaceGhostButton ? (
@@ -212,32 +286,52 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
             display="flex"
             alignItems="center"
             gap={2}
-            rounded="lg"
+            rounded="xl"
             border="1px solid"
-            borderColor={workspaceGhostBorder}
-            bg="transparent"
-            px={3}
+            borderColor="brand.400"
+            bg={useColorModeValue('rgba(127,86,217,0.08)', 'rgba(139,92,246,0.12)')}
+            px={3.5}
             py={2}
             fontSize="sm"
-            fontWeight="semibold"
-            color={workspaceGhostText}
+            fontWeight="600"
+            color="brand.500"
             h="10"
             transition="all 0.2s"
-            _hover={{ transform: 'translateY(-1px)' }}
+            _hover={{ transform: 'translateY(-1px)', boxShadow: '0 4px 12px rgba(127, 86, 217, 0.2)' }}
           >
-            <Box color={workspaceGhostIcon}>
+            <Box color="brand.500">
               <GenerateIcon />
             </Box>
             {translatorCommonNS('workspace')}
           </Box>
         ) : (
-          <Button
-            label={translatorCommonNS('workspace')}
-            iconPosition="before"
-            extraClass="!bg-black !text-white dark:!bg-white dark:!text-black !h-10 !px-3 !py-2 !text-sm !font-semibold transform transition-all duration-200 ease-out hover:-translate-y-[1px] hover:shadow-md dark:hover:shadow-white/10 hover:!bg-black dark:hover:!bg-white hover:!text-white dark:hover:!text-black"
+          <Box
+            as="button"
+            type="button"
             onClick={handleGenerateClick}
-            icon={<GenerateIcon />}
-          />
+            display="flex"
+            alignItems="center"
+            gap={2}
+            rounded="xl"
+            bg="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+            color="white"
+            px={4}
+            py={2}
+            fontSize="sm"
+            fontWeight="600"
+            h="10"
+            boxShadow="0 4px 14px rgba(127, 86, 217, 0.35)"
+            transition="all 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+            _hover={{
+              transform: 'translateY(-1px)',
+              boxShadow: '0 6px 20px rgba(127, 86, 217, 0.5)',
+              filter: 'brightness(1.08)',
+            }}
+            _active={{ transform: 'translateY(0)' }}
+          >
+            <GenerateIcon />
+            {translatorCommonNS('workspace')}
+          </Box>
         )}
         {/* <Box
           as="button"
@@ -329,6 +423,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenSidenav }) => {
           />
         )} */}
       </HStack>
+      <ShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
     </Box>
   );
 };

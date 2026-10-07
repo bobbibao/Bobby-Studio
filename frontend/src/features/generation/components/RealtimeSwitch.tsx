@@ -18,7 +18,7 @@ export function RealtimeSwitch({ checked, onChange, creditsPerPreview, paused, d
   const labelId = useId();
   const hintId = useId();
   return (
-    <Flex align="center" gap={2} minH={{ base: '44px', md: '36px' }}>
+    <Flex align="center" gap={2.5} minH={{ base: '44px', md: '36px' }}>
       <chakra.button
         type="button"
         role="switch"
@@ -44,9 +44,10 @@ export function RealtimeSwitch({ checked, onChange, creditsPerPreview, paused, d
           h="26px"
           borderRadius="full"
           borderWidth="1px"
-          borderColor={checked ? 'brand.600' : 'zinc.500'}
-          bg={checked ? 'brand.600' : 'bg.muted'}
-          transition="background-color 150ms"
+          borderColor={checked ? 'brand.400' : 'border.default'}
+          bg={checked ? 'linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)' : 'bg.muted'}
+          boxShadow={checked ? '0 0 14px rgba(127, 86, 217, 0.45)' : 'none'}
+          transition="all 200ms cubic-bezier(0.16, 1, 0.3, 1)"
           sx={reducedMotion}
         >
           <Box
@@ -57,14 +58,14 @@ export function RealtimeSwitch({ checked, onChange, creditsPerPreview, paused, d
             h="20px"
             borderRadius="full"
             bg="white"
-            boxShadow="sm"
-            transition="inset-inline-start 150ms"
+            boxShadow="0 2px 5px rgba(0,0,0,0.2)"
+            transition="inset-inline-start 200ms cubic-bezier(0.16, 1, 0.3, 1)"
             sx={reducedMotion}
           />
         </Box>
       </chakra.button>
       <Box minW={0}>
-        <Text id={labelId} fontSize="sm" fontWeight="semibold" lineHeight="short">
+        <Text id={labelId} fontSize="sm" fontWeight="600" lineHeight="short">
           {t('realtime.label')}
         </Text>
         <Text id={hintId} fontSize="xs" color="text.muted" lineHeight="short">

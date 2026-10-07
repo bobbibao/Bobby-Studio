@@ -42,12 +42,12 @@ const HistoryJobMenu: React.FC = () => {
   });
   const items = recent.data?.items ?? [];
 
-  const menuBg = useColorModeValue('white', 'zinc.950');
-  const menuBorderColor = useColorModeValue('zinc.200', 'zinc.700');
+  const menuBg = useColorModeValue('rgba(255, 255, 255, 0.96)', 'rgba(15, 16, 24, 0.96)');
+  const menuBorderColor = useColorModeValue('rgba(0, 0, 0, 0.08)', 'rgba(255, 255, 255, 0.08)');
   const buttonBg = useColorModeValue('zinc.100', 'zinc.800');
   const buttonHoverBg = useColorModeValue('zinc.200', 'zinc.700');
-  const itemHoverBg = useColorModeValue('zinc.50', 'zinc.900');
-  const listBorderColor = useColorModeValue('zinc.200', 'zinc.700');
+  const itemHoverBg = useColorModeValue('zinc.100', 'zinc.850');
+  const listBorderColor = useColorModeValue('rgba(0,0,0,0.06)', 'rgba(255,255,255,0.06)');
 
   const openStudio = () => navigate('/generate');
 
@@ -76,12 +76,23 @@ const HistoryJobMenu: React.FC = () => {
       </MenuButton>
 
       <Portal>
-        <MenuList maxW="300px" minW="300px" borderRadius="lg" bg={menuBg} borderColor={menuBorderColor} borderWidth="1px" boxShadow="xl" zIndex={99999} p={0}>
+        <MenuList
+          maxW="320px"
+          minW="320px"
+          borderRadius="18px"
+          bg={menuBg}
+          backdropFilter="blur(16px)"
+          borderColor={menuBorderColor}
+          borderWidth="1px"
+          boxShadow="0 20px 40px -10px rgba(0,0,0,0.35)"
+          zIndex={99999}
+          p={0}
+        >
           <Flex justify="space-between" align="center" px={4} py={3}>
-            <Text fontSize="lg" fontWeight="semibold" color="text.primary">
+            <Text fontSize="md" fontWeight="600" color="text.primary">
               {t('studio:history.title')}
             </Text>
-            <Button onClick={openStudio} variant="ghost" size="sm" fontWeight="medium" color="text.muted" bg={buttonBg} px={2} py={1} borderRadius="md" _hover={{ bg: buttonHoverBg, color: 'text.primary' }}>
+            <Button onClick={openStudio} variant="ghost" size="xs" fontWeight="500" color="brand.500" bg={buttonBg} px={2.5} py={1} borderRadius="lg" _hover={{ bg: buttonHoverBg, color: 'brand.600' }}>
               {t('studio:history.open_studio')}
             </Button>
           </Flex>
@@ -99,37 +110,38 @@ const HistoryJobMenu: React.FC = () => {
                   justifyContent="space-between"
                   alignItems="center"
                   px={4}
-                  py={3}
+                  py={2.5}
                   gap={3}
                   cursor="pointer"
                   onClick={openStudio}
                   _hover={{ bg: itemHoverBg }}
+                  transition="background-color 0.15s"
                 >
                   <Flex gap={3} align="center" minW={0}>
-                    <Box w="28px" h="28px" display="flex" alignItems="center" justifyContent="center" borderRadius="md" bg="brand.600" flexShrink={0}>
-                      <ImagePlaceholderIcon width="12px" height="12px" color="white" />
+                    <Box w="30px" h="30px" display="flex" alignItems="center" justifyContent="center" borderRadius="lg" bg="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)" flexShrink={0} boxShadow="0 2px 8px rgba(127, 86, 217, 0.3)">
+                      <ImagePlaceholderIcon width="13px" height="13px" color="white" />
                     </Box>
                     <Flex direction="column" minW={0}>
-                      <Text color="text.primary" fontSize="sm" noOfLines={1}>
+                      <Text color="text.primary" fontSize="xs" fontWeight="500" noOfLines={1}>
                         {t(`studio:history.mode_${job.mode}`)}
                         {job.intent === 'preview' ? ` · ${t('studio:history.preview')}` : ''}
                       </Text>
-                      <Text color="text.muted" fontSize="xs">
+                      <Text color="text.muted" fontSize="11px">
                         {formatDateTime(job.completedAt ?? job.createdAt, i18n.language)}
                       </Text>
                     </Flex>
                   </Flex>
-                  <Badge colorScheme={STATUS_COLOR[job.status]} flexShrink={0}>
+                  <Badge colorScheme={STATUS_COLOR[job.status]} borderRadius="md" fontSize="10px" px={1.5} py={0.5} flexShrink={0}>
                     {t(`studio:history.status_${job.status}`)}
                   </Badge>
                 </ListItem>
               ))
             ) : (
-              <Flex direction="column" justify="center" align="center" p={6} gap={3}>
-                <Button w="68px" h="68px" borderRadius="full" bg={buttonBg} _hover={{ bg: buttonHoverBg }} onClick={openStudio} aria-label={t('studio:history.open_studio')}>
-                  <AddIcon width="36px" height="36px" />
+              <Flex direction="column" justify="center" align="center" p={6} gap={2}>
+                <Button w="56px" h="56px" borderRadius="full" bg={buttonBg} _hover={{ bg: buttonHoverBg, transform: 'scale(1.05)' }} transition="all 0.2s" onClick={openStudio} aria-label={t('studio:history.open_studio')}>
+                  <AddIcon width="28px" height="28px" />
                 </Button>
-                <Text color="text.muted" fontSize="sm" fontWeight="medium" textAlign="center">
+                <Text color="text.muted" fontSize="xs" fontWeight="500" textAlign="center" mt={1}>
                   {t('studio:history.empty')}
                 </Text>
               </Flex>

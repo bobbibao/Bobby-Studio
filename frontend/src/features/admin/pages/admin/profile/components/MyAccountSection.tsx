@@ -863,14 +863,20 @@ export const MyAccountSection: React.FC = () => {
             type="button"
             onClick={handleSubmit(onSubmit)}
             isDisabled={!isDirty}
-            variant="solid"
-            h={10}
-            px={3}
-            py={2}
+            background="linear-gradient(135deg, #7F56D9 0%, #6366F1 100%)"
+            color="white"
+            h={11}
+            px={6}
             fontSize="sm"
-            fontWeight="semibold"
-            borderRadius="lg"
-            _disabled={{ cursor: 'not-allowed', opacity: 0.5 }}
+            fontWeight="700"
+            borderRadius="full"
+            _hover={{
+              opacity: 0.92,
+              transform: 'translateY(-1px)',
+              boxShadow: '0 8px 20px -4px rgba(127, 86, 217, 0.45)',
+            }}
+            transition="all 0.2s"
+            _disabled={{ cursor: 'not-allowed', opacity: 0.5, boxShadow: 'none' }}
           >
             {t('common:save_changes', { defaultValue: 'Save Changes' })}
           </Button>

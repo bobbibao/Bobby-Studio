@@ -50,6 +50,12 @@ export function installDomStubs(options: { width?: number; viewport?: Viewport }
     disconnect() {}
   }
   Object.defineProperty(window, 'ResizeObserver', { configurable: true, writable: true, value: FakeResizeObserver });
+  class FakeIntersectionObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  Object.defineProperty(window, 'IntersectionObserver', { configurable: true, writable: true, value: FakeIntersectionObserver });
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(() => ({
     x: 0,
     y: 0,

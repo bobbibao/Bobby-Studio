@@ -21,6 +21,7 @@ import { PricingCard } from './PricingCard';
 import { ComparisonTable } from './ComparisonTable';
 import { ModalCancelSubscription } from './ModalCancelSubscription';
 import { ModalConfirmUpgradeSubscription } from './ModalConfirmUpgradeSubscription';
+import { formatCurrency } from '@/utils/currency';
 import { useSubscriptionData } from '../hooks/useSubscriptionData';
 import { SUBSCRIPTION_PLANS, CREDIT_EXCHANGE_RATES } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
 import PricingSubscriptionSkeleton from './PricingSubscriptionSkeleton';
@@ -39,7 +40,7 @@ interface HeroSectionProps {
 const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => {
   const { colorMode } = useColorMode();
   const pickColor = <T,>(light: T, dark: T): T => (colorMode === 'dark' ? dark : light);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const bgGradient = useColorModeValue('linear(to-br, white, zinc.50)', 'linear(to-br, whiteAlpha.200, whiteAlpha.50)');
   const borderColor = useColorModeValue('zinc.200', 'whiteAlpha.300');
 
@@ -106,7 +107,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ subscription, onCancel }) => 
             {planName}
           </Text>
           <Text fontSize="lg" opacity={0.9} mb={1}>
-            CHF{subscription.amount ? (subscription.amount / 100).toFixed(0) : 0} -{' '}
+            {formatCurrency(subscription.amount ? subscription.amount / 100 : 0, i18n.language)} -{' '}
             {subscription.billingInterval === 'year' ? t('profile:billed_annually') : t('profile:billed_monthly')}
           </Text>
         </Box>

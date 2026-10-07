@@ -14,6 +14,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '@/utils/currency';
 import { CREDIT_PACKS } from '@/features/admin/pages/admin/profile/constants/subscriptionPlans';
 
 // Coin icon
@@ -25,7 +26,7 @@ const CoinIcon = () => (
 );
 
 export const CreditPacksSection: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Color mode values
   const textColor = useColorModeValue('zinc.900', 'white');
@@ -180,7 +181,7 @@ export const CreditPacksSection: React.FC = () => {
                     py={4}
                   >
                     <Text color={mutedTextColor} fontSize="sm">
-                      CHF {pack.prices.basic}
+                      {formatCurrency(pack.prices.basic, i18n.language)}
                     </Text>
                   </Td>
                   <Td
@@ -194,7 +195,7 @@ export const CreditPacksSection: React.FC = () => {
                     py={4}
                   >
                     <Text fontWeight="semibold" color={textColor} fontSize="sm">
-                      CHF {pack.prices.pro}
+                      {formatCurrency(pack.prices.pro, i18n.language)}
                     </Text>
                   </Td>
                   <Td 
@@ -204,7 +205,7 @@ export const CreditPacksSection: React.FC = () => {
                     py={4}
                   >
                     <Text color={mutedTextColor} fontSize="sm">
-                      CHF {pack.prices.team}
+                      {formatCurrency(pack.prices.team, i18n.language)}
                     </Text>
                   </Td>
                 </Tr>

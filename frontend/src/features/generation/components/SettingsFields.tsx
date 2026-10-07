@@ -19,7 +19,16 @@ interface SettingsFieldsProps {
   idPrefix?: string;
 }
 
-const selectProps = { _focusVisible: focusRing, h: touchSize, borderRadius: '10px' } as const;
+const selectProps = {
+  _focusVisible: focusRing,
+  h: touchSize,
+  borderRadius: '12px',
+  borderColor: 'border.default',
+  bg: 'bg.surface',
+  fontSize: 'sm',
+  transition: 'all 0.2s',
+  _hover: { borderColor: 'brand.400' },
+} as const;
 
 /** Model, aspect ratio and quality from the catalog's capabilities. Provider details are never shown. */
 export function SettingsFields({ models, model, size, quality, onModel, onSize, onQuality, fieldErrors = [], idPrefix = 'studio' }: SettingsFieldsProps) {
